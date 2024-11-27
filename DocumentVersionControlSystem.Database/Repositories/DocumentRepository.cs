@@ -39,6 +39,11 @@ public class DocumentRepository
         return _context.Documents.Where(d => d.Name == name).ToList();
     }
 
+    public DocumentVersionControlSystem.Database.Models.Document GetDocumentByPath(string path)
+    {
+        return _context.Documents.FirstOrDefault(d => d.FilePath == path);
+    }
+
     public void SaveChanges()
     {
         _context.SaveChanges();
