@@ -2,18 +2,18 @@
 
 public class DiffManager
 {
-    public string GetDiff(string oldFileReference, string newFileReference)
+    public string GetDiff(string firstFilePath, string secondFilePath)
     {
-        var oldText = System.IO.File.ReadAllText(oldFileReference);
-        var newText = System.IO.File.ReadAllText(newFileReference);
+        var oldText = System.IO.File.ReadAllText(firstFilePath);
+        var newText = System.IO.File.ReadAllText(secondFilePath);
         return GetDiffText(oldText, newText);
     }
 
-    public string GetDiffText(string oldText, string newText)
+    public string GetDiffText(string textA, string textB)
     {
         var differ = new DiffPlex.Differ();
         var diffBuilder = new DiffPlex.DiffBuilder.SideBySideDiffBuilder(differ);
-        var diffModel = diffBuilder.BuildDiffModel(oldText, newText);
+        var diffModel = diffBuilder.BuildDiffModel(textA, textB);
         diffBuilder.Equals(diffModel);
 
         var result = new System.Text.StringBuilder();
@@ -24,15 +24,15 @@ public class DiffManager
         return result.ToString();
     }
 
-    public bool IsFileChanged(string oldFileReference, string newFileReference)
+    public bool IsFileChanged(string firstFilePath, string secondFilePath)
     {
-        var oldText = System.IO.File.ReadAllText(oldFileReference);
-        var newText = System.IO.File.ReadAllText(newFileReference);
+        var oldText = System.IO.File.ReadAllText(firstFilePath);
+        var newText = System.IO.File.ReadAllText(secondFilePath);
         return IsTextChanged(oldText, newText);
     }
 
-    public bool IsTextChanged(string oldText, string newText)
+    public bool IsTextChanged(string textA, string textB)
     {
-        return !string.Equals(oldText, newText, StringComparison.Ordinal);
+        return !string.Equals(textA, textB, StringComparison.Ordinal);
     }
 }
