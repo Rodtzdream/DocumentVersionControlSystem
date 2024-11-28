@@ -2,16 +2,18 @@
 
 public class DocumentManager
 {
-    private readonly DocumentVersionControlSystem.Database.Repositories.DocumentRepository _documentRepository;
-    private readonly DocumentVersionControlSystem.Database.Repositories.VersionRepository _versionRepository;
-    private readonly DocumentVersionControlSystem.DiffManager.DiffManager _diffManager;
+    private readonly Database.Repositories.DocumentRepository _documentRepository;
+    private readonly Database.Repositories.VersionRepository _versionRepository;
+    private readonly DiffManager.DiffManager _diffManager;
+    private readonly Logging.Logger _logger;
     private readonly List<FileChangeWatcher> _fileWatchers = new();
 
-    public DocumentManager(DocumentVersionControlSystem.Database.Repositories.DocumentRepository documentRepository, DocumentVersionControlSystem.Database.Repositories.VersionRepository versionRepository, DocumentVersionControlSystem.DiffManager.DiffManager diffManager)
+    public DocumentManager(Database.Repositories.DocumentRepository documentRepository, Database.Repositories.VersionRepository versionRepository, DiffManager.DiffManager diffManager, Logging.Logger logger)
     {
         _documentRepository = documentRepository;
         _versionRepository = versionRepository;
         _diffManager = diffManager;
+        _logger = logger;
     }
 
     public void InitializeFileWatchers()
@@ -59,35 +61,38 @@ public class DocumentManager
         _fileWatchers.Clear();
     }
 
-    public void AddDocument(DocumentVersionControlSystem.Database.Models.Document document)
+    public void AddDocument(Database.Models.Document document)
     {
         _documentRepository.AddDocument(document);
         _documentRepository.SaveChanges();
+        _logger.LogInformation($"Document {document.Id} added");
     }
 
-    public void UpdateDocument(DocumentVersionControlSystem.Database.Models.Document document)
+    public void UpdateDocument(Database.Models.Document document)
     {
         _documentRepository.UpdateDocument(document);
         _documentRepository.SaveChanges();
+        _logger.LogInformation($"Document {document.Id} updated");
     }
 
-    public void DeleteDocument(DocumentVersionControlSystem.Database.Models.Document document)
+    public void DeleteDocument(Database.Models.Document document)
     {
         _documentRepository.DeleteDocument(document);
         _documentRepository.SaveChanges();
+        _logger.LogInformation($"Document {document.Id} deleted");
     }
 
-    public DocumentVersionControlSystem.Database.Models.Document GetDocumentById(int id)
+    public Database.Models.Document GetDocumentById(int id)
     {
         return _documentRepository.GetDocumentById(id);
     }
 
-    public List<DocumentVersionControlSystem.Database.Models.Document> GetAllDocuments()
+    public List<Database.Models.Document> GetAllDocuments()
     {
         return _documentRepository.GetAllDocuments();
     }
 
-    public List<DocumentVersionControlSystem.Database.Models.Document> GetDocumentsByName(string name)
+    public List<Database.Models.Document> GetDocumentsByName(string name)
     {
         return _documentRepository.GetDocumentsByName(name);
     }
@@ -95,7 +100,7 @@ public class DocumentManager
     public void AddVersionToDocument(int documentId, string versionDescription, string FilePath)
     {
         var document = _documentRepository.GetDocumentById(documentId);
-        var version = new DocumentVersionControlSystem.Database.Models.Version
+        var version = new Database.Models.Version
         {
             DocumentId = documentId,
             Document = document,
@@ -105,11 +110,12 @@ public class DocumentManager
         };
         _versionRepository.AddVersion(version);
         _versionRepository.SaveChanges();
+        _logger.LogInformation($"Version {version.Id} added to document {document.Id}");
     }
 
     public void AddDocument(string name, string FilePath)
     {
-        var document = new DocumentVersionControlSystem.Database.Models.Document
+        var document = new Database.Models.Document
         {
             Name = name,
             CreationDate = DateTime.Now,
@@ -118,6 +124,7 @@ public class DocumentManager
         };
         _documentRepository.AddDocument(document);
         _documentRepository.SaveChanges();
+        _logger.LogInformation($"Document {document.Id} added");
     }
 
     public void UpdateDocument(int documentId, string name)
@@ -127,6 +134,7 @@ public class DocumentManager
         document.LastModifiedDate = DateTime.Now;
         _documentRepository.UpdateDocument(document);
         _documentRepository.SaveChanges();
+        _logger.LogInformation($"Document {document.Id} updated");
     }
 
     public void DeleteDocument(int documentId)
@@ -134,5 +142,6 @@ public class DocumentManager
         var document = _documentRepository.GetDocumentById(documentId);
         _documentRepository.DeleteDocument(document);
         _documentRepository.SaveChanges();
+        _logger.LogInformation($"Document {document.Id} deleted");
     }
 }
