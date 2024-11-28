@@ -5,12 +5,58 @@ public class DocumentManager
     private readonly DocumentVersionControlSystem.Database.Repositories.DocumentRepository _documentRepository;
     private readonly DocumentVersionControlSystem.Database.Repositories.VersionRepository _versionRepository;
     private readonly DocumentVersionControlSystem.DiffManager.DiffManager _diffManager;
+    private readonly List<FileChangeWatcher> _fileWatchers = new();
 
     public DocumentManager(DocumentVersionControlSystem.Database.Repositories.DocumentRepository documentRepository, DocumentVersionControlSystem.Database.Repositories.VersionRepository versionRepository, DocumentVersionControlSystem.DiffManager.DiffManager diffManager)
     {
         _documentRepository = documentRepository;
         _versionRepository = versionRepository;
         _diffManager = diffManager;
+    }
+
+    public void InitializeFileWatchers()
+    {
+        var documents = _documentRepository.GetAllDocuments();
+        foreach (var document in documents)
+        {
+            var watcher = new FileChangeWatcher(
+                document.FilePath,
+                (oldPath, newPath) => HandleFileRenamedOrMoved(oldPath, newPath),
+                (path) => HandleFileDeleted(path)
+            );
+
+            _fileWatchers.Add(watcher);
+        }
+    }
+
+    private void HandleFileRenamedOrMoved(string oldPath, string newPath)
+    {
+        var document = _documentRepository.GetDocumentByPath(oldPath);
+        if (document != null)
+        {
+            document.FilePath = newPath;
+            document.Name = Path.GetFileName(newPath);
+
+            _documentRepository.UpdateDocument(document);
+            _documentRepository.SaveChanges();
+        }
+    }
+
+    private void HandleFileDeleted(string path)
+    {
+        var document = _documentRepository.GetDocumentByPath(path);
+        if (document != null)
+        {
+            _documentRepository.DeleteDocument(document);
+            _documentRepository.SaveChanges();
+        }
+    }
+
+    public void StopAllWatchers()
+    {
+        foreach (var watcher in _fileWatchers)
+            watcher.Stop();
+        _fileWatchers.Clear();
     }
 
     public void AddDocument(DocumentVersionControlSystem.Database.Models.Document document)
