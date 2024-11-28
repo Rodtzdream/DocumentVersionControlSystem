@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DocumentVersionControlSystem.Database\DocumentVersionControlSystem.Database.csproj" />
-    <ProjectReference Include="..\DocumentVersionControlSystem.DocumentManagement\DocumentVersionControlSystem.DocumentManagement.csproj" />
-    <ProjectReference Include="..\DocumentVersionControlSystem.Logging\DocumentVersionControlSystem.Logging.csproj" />
+    <ProjectReference Include="..\DocumentVersionControlSystem.DiffManager\DocumentVersionControlSystem.DiffManager.csproj" />
+    <ProjectReference Include="..\DocumentVersionControlSystem.FileStorage\DocumentVersionControlSystem.FileStorage.csproj" />
   </ItemGroup>
 
 </Project>
