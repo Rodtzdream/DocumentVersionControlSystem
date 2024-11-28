@@ -32,6 +32,7 @@ public class DocumentRepository
     public void DeleteDocument(DocumentVersionControlSystem.Database.Models.Document document)
     {
         _context.Documents.Remove(document);
+        _context.Versions.RemoveRange(_context.Versions.Where(v => v.DocumentId == document.Id));
     }
 
     public List<DocumentVersionControlSystem.Database.Models.Document> GetDocumentsByName(string name)
