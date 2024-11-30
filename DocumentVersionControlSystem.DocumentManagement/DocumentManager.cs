@@ -108,7 +108,7 @@ public class DocumentManager
             FilePath = FilePath,
             CreationDate = DateTime.Now
         };
-        _versionRepository.AddVersion(version);
+        _versionRepository.AddVersion(document, version);
         _versionRepository.SaveChanges();
         _logger.LogInformation($"Version {version.Id} added to document {document.Id}");
     }

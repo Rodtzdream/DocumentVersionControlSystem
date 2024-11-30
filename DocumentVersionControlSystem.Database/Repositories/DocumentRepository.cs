@@ -1,4 +1,5 @@
-﻿namespace DocumentVersionControlSystem.Database.Repositories;
+﻿using DocumentVersionControlSystem.Database.Contexts;
+namespace DocumentVersionControlSystem.Database.Repositories;
 
 public class DocumentRepository
 {
@@ -9,38 +10,38 @@ public class DocumentRepository
         _context = context;
     }
 
-    public void AddDocument(DocumentVersionControlSystem.Database.Models.Document document)
+    public void AddDocument(Models.Document document)
     {
         _context.Documents.Add(document);
     }
 
-    public DocumentVersionControlSystem.Database.Models.Document GetDocumentById(int id)
+    public Models.Document GetDocumentById(int id)
     {
         return _context.Documents.Find(id);
     }
 
-    public List<DocumentVersionControlSystem.Database.Models.Document> GetAllDocuments()
+    public List<Models.Document> GetAllDocuments()
     {
         return _context.Documents.ToList();
     }
 
-    public void UpdateDocument(DocumentVersionControlSystem.Database.Models.Document document)
+    public void UpdateDocument(Models.Document document)
     {
         _context.Documents.Update(document);
     }
 
-    public void DeleteDocument(DocumentVersionControlSystem.Database.Models.Document document)
+    public void DeleteDocument(Models.Document document)
     {
         _context.Documents.Remove(document);
         _context.Versions.RemoveRange(_context.Versions.Where(v => v.DocumentId == document.Id));
     }
 
-    public List<DocumentVersionControlSystem.Database.Models.Document> GetDocumentsByName(string name)
+    public List<Models.Document> GetDocumentsByName(string name)
     {
         return _context.Documents.Where(d => d.Name == name).ToList();
     }
 
-    public DocumentVersionControlSystem.Database.Models.Document GetDocumentByPath(string path)
+    public Models.Document GetDocumentByPath(string path)
     {
         return _context.Documents.FirstOrDefault(d => d.FilePath == path);
     }

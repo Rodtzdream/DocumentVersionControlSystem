@@ -1,4 +1,5 @@
 ﻿namespace DocumentVersionControlSystem.Database.Repositories;
+using DocumentVersionControlSystem.Database.Contexts;
 
 public class VersionRepository
 {
@@ -9,27 +10,32 @@ public class VersionRepository
         _context = context;
     }
 
-    public void AddVersion(DocumentVersionControlSystem.Database.Models.Version version)
+    public void AddVersion(Models.Document document, Models.Version version)
     {
+        if (document.Versions == null)
+        {
+           document.Versions = new List<Models.Version>();
+        }
         _context.Versions.Add(version);
+        document.Versions.Add(version);
     }
 
-    public DocumentVersionControlSystem.Database.Models.Version GetVersionById(int id)
+    public Models.Version GetVersionById(int id)
     {
         return _context.Versions.Find(id);
     }
 
-    public List<DocumentVersionControlSystem.Database.Models.Version> GetAllVersions()
+    public List<Models.Version> GetAllVersions()
     {
         return _context.Versions.ToList();
     }
 
-    public void DeleteVersion(DocumentVersionControlSystem.Database.Models.Version version)
+    public void DeleteVersion(Models.Version version)
     {
         _context.Versions.Remove(version);
     }
 
-    public List<DocumentVersionControlSystem.Database.Models.Version> GetVersionsByDocumentId(int documentId)
+    public List<Models.Version> GetVersionsByDocumentId(int documentId)
     {
         return _context.Versions.Where(v => v.DocumentId == documentId).ToList();
     }

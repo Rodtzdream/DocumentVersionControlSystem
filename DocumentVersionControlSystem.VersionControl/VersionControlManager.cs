@@ -1,13 +1,14 @@
 ﻿namespace DocumentVersionControlSystem.VersionControl;
+using DocumentVersionControlSystem.Database.Models;
 
 public class VersionControlManager
 {
-    private readonly DocumentVersionControlSystem.Database.Repositories.VersionRepository _versionRepository;
+    private readonly Database.Repositories.VersionRepository _versionRepository;
     private readonly FileStorage.FileStorageManager _fileStorageManager;
     private readonly DiffManager.DiffManager _diffManager;
     private readonly Logging.Logger _logger;
 
-    public VersionControlManager(DocumentVersionControlSystem.Database.Repositories.VersionRepository versionRepository, FileStorage.FileStorageManager fileStorageManager, DiffManager.DiffManager diffManager, Logging.Logger logger)
+    public VersionControlManager(Database.Repositories.VersionRepository versionRepository, FileStorage.FileStorageManager fileStorageManager, DiffManager.DiffManager diffManager, Logging.Logger logger)
     {
         _versionRepository = versionRepository;
         _fileStorageManager = fileStorageManager;
@@ -15,36 +16,36 @@ public class VersionControlManager
         _logger = logger;
     }
 
-    public void AddVersion(DocumentVersionControlSystem.Database.Models.Version version)
+    public void AddVersion(Document document, Version version)
     {
-        _versionRepository.AddVersion(version);
+        _versionRepository.AddVersion(document, version);
         _versionRepository.SaveChanges();
         _logger.LogInformation($"Version {version.Id} added");
     }
 
-    public void DeleteVersion(DocumentVersionControlSystem.Database.Models.Version version)
+    public void DeleteVersion(Version version)
     {
         _versionRepository.DeleteVersion(version);
         _versionRepository.SaveChanges();
         _logger.LogInformation($"Version {version.Id} deleted");
     }
 
-    public DocumentVersionControlSystem.Database.Models.Version GetVersionById(int id)
+    public Version GetVersionById(int id)
     {
         return _versionRepository.GetVersionById(id);
     }
 
-    public List<DocumentVersionControlSystem.Database.Models.Version> GetAllVersions()
+    public List<Version> GetAllVersions()
     {
         return _versionRepository.GetAllVersions();
     }
 
-    public List<DocumentVersionControlSystem.Database.Models.Version> GetVersionsByDocumentId(int documentId)
+    public List<Version> GetVersionsByDocumentId(int documentId)
     {
         return _versionRepository.GetVersionsByDocumentId(documentId);
     }
 
-    public void CreateNewVersion(Database.Models.Document document, string newFilePath, string versionDescription)
+    public void CreateNewVersion(Document document, string newFilePath, string versionDescription)
     {
         var oldFilePath = document.FilePath;
         var oldText = _fileStorageManager.ReadFile(oldFilePath);
@@ -71,7 +72,7 @@ public class VersionControlManager
         return _diffManager.GetDiff(oldVersion.FilePath, newVersion.FilePath);
     }
 
-    public void SwitchToVersionAndDeleteNewer(Database.Models.Document document, Database.Models.Version version)
+    public void SwitchToVersionAndDeleteNewer(Document document, Version version)
     {
         var oldFilePath = document.FilePath;
         var newFilePath = version.FilePath;
@@ -81,7 +82,7 @@ public class VersionControlManager
         _logger.LogInformation($"Switched to version {version.Id} for document {document.Id}");
     }
 
-    public void SwitchToVersionAndSaveAsLatest(Database.Models.Document document, Database.Models.Version version)
+    public void SwitchToVersionAndSaveAsLatest(Document document, Version version)
     {
         var oldFilePath = document.FilePath;
         var newFilePath = version.FilePath;
@@ -99,14 +100,14 @@ public class VersionControlManager
         _logger.LogInformation($"Switched to version {version.Id} and saved as latest for document {document.Id}");
     }
 
-    public void ChangeVersionDescription(Database.Models.Version version, string newDescription)
+    public void ChangeVersionDescription(Version version, string newDescription)
     {
         version.VersionDescription = newDescription;
         _versionRepository.SaveChanges();
         _logger.LogInformation($"Version {version.Id} description changed to {newDescription}");
     }
 
-    public void DeleteVersion(Database.Models.Document document, Database.Models.Version version)
+    public void DeleteVersion(Document document, Version version)
     {
         document.Versions.Remove(version);
         _fileStorageManager.DeleteFile(version.FilePath);

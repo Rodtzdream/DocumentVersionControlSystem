@@ -1,15 +1,22 @@
-﻿using DocumentVersionControlSystem.Database.Models;
+﻿namespace DocumentVersionControlSystem.Database.Contexts;
+using DocumentVersionControlSystem.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
 public class DatabaseContext : DbContext
 {
     public DbSet<Document> Documents { get; set; }
-    public DbSet<DocumentVersionControlSystem.Database.Models.Version> Versions { get; set; }
+    public DbSet<Version> Versions { get; set; }
+
+    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
+    {
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DocVerControlDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
-        base.OnConfiguring(optionsBuilder);
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DocVerControlDB;Integrated Security=True");
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,14 +32,14 @@ public class DatabaseContext : DbContext
             .Property(d => d.LastModifiedDate)
             .HasDefaultValueSql("GETDATE()");
 
-        modelBuilder.Entity<DocumentVersionControlSystem.Database.Models.Version>()
+        modelBuilder.Entity<Version>()
             .HasKey(v => v.Id);
 
-        modelBuilder.Entity<DocumentVersionControlSystem.Database.Models.Version>()
+        modelBuilder.Entity<Version>()
             .Property(v => v.CreationDate)
             .HasDefaultValueSql("GETDATE()");
 
-        modelBuilder.Entity<DocumentVersionControlSystem.Database.Models.Version>()
+        modelBuilder.Entity<Version>()
             .HasOne(v => v.Document)
             .WithMany(d => d.Versions)
             .HasForeignKey(v => v.DocumentId);
