@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
@@ -18,7 +19,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DocumentVersionControlSystem.Database\DocumentVersionControlSystem.Database.csproj" />
+    <ProjectReference Include="..\DocumentVersionControlSystem.DiffManager\DocumentVersionControlSystem.DiffManager.csproj" />
     <ProjectReference Include="..\DocumentVersionControlSystem.DocumentManagement\DocumentVersionControlSystem.DocumentManagement.csproj" />
+    <ProjectReference Include="..\DocumentVersionControlSystem.FileStorage\DocumentVersionControlSystem.FileStorage.csproj" />
     <ProjectReference Include="..\DocumentVersionControlSystem.Logging\DocumentVersionControlSystem.Logging.csproj" />
     <ProjectReference Include="..\DocumentVersionControlSystem.VersionControl\DocumentVersionControlSystem.VersionControl.csproj" />
   </ItemGroup>
