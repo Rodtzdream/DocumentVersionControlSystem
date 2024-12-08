@@ -4,30 +4,14 @@ using DocumentVersionControlSystem.Database.Models;
 public class VersionControlManager
 {
     private readonly Database.Repositories.VersionRepository _versionRepository;
-    private readonly FileStorage.FileStorageManager _fileStorageManager;
     private readonly DiffManager.DiffManager _diffManager;
     private readonly Logging.Logger _logger;
 
-    public VersionControlManager(Database.Repositories.VersionRepository versionRepository, FileStorage.FileStorageManager fileStorageManager, DiffManager.DiffManager diffManager, Logging.Logger logger)
+    public VersionControlManager(Database.Repositories.VersionRepository versionRepository, DiffManager.DiffManager diffManager, Logging.Logger logger)
     {
         _versionRepository = versionRepository;
-        _fileStorageManager = fileStorageManager;
         _diffManager = diffManager;
         _logger = logger;
-    }
-
-    public void AddVersion(Document document, Version version)
-    {
-        _versionRepository.AddVersion(document, version);
-        _versionRepository.SaveChanges();
-        _logger.LogInformation($"Version {version.Id} added");
-    }
-
-    public void DeleteVersion(Version version)
-    {
-        _versionRepository.DeleteVersion(version);
-        _versionRepository.SaveChanges();
-        _logger.LogInformation($"Version {version.Id} deleted");
     }
 
     public Version GetVersionById(int id)
@@ -48,8 +32,8 @@ public class VersionControlManager
     public void CreateNewVersion(Document document, string newFilePath, string versionDescription)
     {
         var oldFilePath = document.FilePath;
-        var oldText = _fileStorageManager.ReadFile(oldFilePath);
-        var newText = _fileStorageManager.ReadFile(newFilePath);
+        var oldText = FileStorage.FileStorageManager.ReadFile(oldFilePath);
+        var newText = FileStorage.FileStorageManager.ReadFile(newFilePath);
         var diff = _diffManager.GetDiffText(oldText, newText);
         var version = new Database.Models.Version
         {
@@ -61,7 +45,7 @@ public class VersionControlManager
         };
         document.Versions.Add(version);
         document.LastModifiedDate = DateTime.Now;
-        _fileStorageManager.CopyFile(newFilePath, oldFilePath);
+        FileStorage.FileStorageManager.CopyFile(newFilePath, oldFilePath);
         _logger.LogInformation($"New version {version.Id} created for document {document.Id}");
     }
 
@@ -76,7 +60,7 @@ public class VersionControlManager
     {
         var oldFilePath = document.FilePath;
         var newFilePath = version.FilePath;
-        _fileStorageManager.CopyFile(newFilePath, oldFilePath);
+        FileStorage.FileStorageManager.CopyFile(newFilePath, oldFilePath);
         document.Versions.RemoveAll(v => v.CreationDate > version.CreationDate);
         document.LastModifiedDate = DateTime.Now;
         _logger.LogInformation($"Switched to version {version.Id} for document {document.Id}");
@@ -86,7 +70,7 @@ public class VersionControlManager
     {
         var oldFilePath = document.FilePath;
         var newFilePath = version.FilePath;
-        _fileStorageManager.CopyFile(newFilePath, oldFilePath);
+        FileStorage.FileStorageManager.CopyFile(newFilePath, oldFilePath);
         document.LastModifiedDate = DateTime.Now;
         var newVersion = new Database.Models.Version
         {
@@ -107,10 +91,18 @@ public class VersionControlManager
         _logger.LogInformation($"Version {version.Id} description changed to {newDescription}");
     }
 
+    public void DeleteVersion(Version version)
+    {
+        _versionRepository.DeleteVersion(version);
+        _versionRepository.SaveChanges();
+        FileStorage.FileStorageManager.DeleteFile(version.FilePath);
+        _logger.LogInformation($"Version {version.Id} deleted");
+    }
+
     public void DeleteVersion(Document document, Version version)
     {
         document.Versions.Remove(version);
-        _fileStorageManager.DeleteFile(version.FilePath);
+        FileStorage.FileStorageManager.DeleteFile(version.FilePath);
         _versionRepository.DeleteVersion(version);
         _versionRepository.SaveChanges();
         _logger.LogInformation($"Version {version.Id} deleted from document {document.Id}");
@@ -119,6 +111,7 @@ public class VersionControlManager
     public void DeleteVersion(int versionId)
     {
         var version = _versionRepository.GetVersionById(versionId);
+        FileStorage.FileStorageManager.DeleteFile(version.FilePath);
         _versionRepository.DeleteVersion(version);
         _versionRepository.SaveChanges();
         _logger.LogInformation($"Version {versionId} deleted");
