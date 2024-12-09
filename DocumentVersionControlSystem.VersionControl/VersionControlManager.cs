@@ -72,10 +72,10 @@ public class VersionControlManager
         return;
     }
 
-    public string GetVersionDifference(int oldVersionId, int newVersionId)
+    public string GetVersionDifference(int documentId, int lastVersionId)
     {
-        var oldVersion = _versionRepository.GetVersionById(oldVersionId);
-        var newVersion = _versionRepository.GetVersionById(newVersionId);
+        var oldVersion = _versionRepository.GetVersionById(documentId);
+        var newVersion = _versionRepository.GetVersionById(lastVersionId);
         return _diffManager.GetDiff(oldVersion.FilePath, newVersion.FilePath);
     }
 
@@ -86,9 +86,9 @@ public class VersionControlManager
 
     public void SwitchToVersionAndDeleteNewer(Document document, Version version)
     {
-        var oldFilePath = document.FilePath;
-        var newFilePath = version.FilePath;
-        FileStorage.FileStorageManager.CopyFile(newFilePath, oldFilePath);
+        var documentFilePath = document.FilePath;
+        var versionFilePath = version.FilePath;
+        FileStorage.FileStorageManager.CopyFile(versionFilePath, documentFilePath);
         document.Versions.RemoveAll(v => v.CreationDate > version.CreationDate);
         document.LastModifiedDate = DateTime.Now;
         _logger.LogInformation($"Switched to version {version.Id} for document {document.Id}");
@@ -96,16 +96,16 @@ public class VersionControlManager
 
     public void SwitchToVersionAndSaveAsLatest(Document document, Version version)
     {
-        var oldFilePath = document.FilePath;
-        var newFilePath = version.FilePath;
-        FileStorage.FileStorageManager.CopyFile(newFilePath, oldFilePath);
+        var documentFilePath = document.FilePath;
+        var versionFilePath = version.FilePath;
+        FileStorage.FileStorageManager.CopyFile(versionFilePath, documentFilePath);
         document.LastModifiedDate = DateTime.Now;
         var newVersion = new Version
         {
             DocumentId = document.Id,
             Document = document,
             VersionDescription = version.VersionDescription,
-            FilePath = oldFilePath,
+            FilePath = documentFilePath,
             CreationDate = DateTime.Now
         };
         document.Versions.Add(newVersion);
