@@ -146,6 +146,15 @@ public class DocumentManager
         _logger.LogInformation($"Document {document.Id} updated");
     }
 
+    public void UpdateDocument(int documentId)
+    {
+        var document = _documentRepository.GetDocumentById(documentId);
+        document.LastModifiedDate = DateTime.Now;
+        _documentRepository.UpdateDocument(document);
+        _documentRepository.SaveChanges();
+        _logger.LogInformation($"Document {document.Id} updated");
+    }
+
     public void DeleteDocument(int documentId)
     {
         var document = _documentRepository.GetDocumentById(documentId);
