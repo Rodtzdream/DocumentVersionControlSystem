@@ -61,8 +61,17 @@ public class DocumentManager
         _fileWatchers.Clear();
     }
 
-    public void AddDocument(Database.Models.Document document)
+    public void AddDocument(string filePath)
     {
+        var fileInfo = new FileInfo(filePath);
+
+        var document = new Database.Models.Document
+        {
+            Name = fileInfo.Name,
+            FilePath = filePath,
+            CreationDate = fileInfo.CreationTime,
+            LastModifiedDate = fileInfo.LastWriteTime
+        };
         _documentRepository.AddDocument(document);
         _documentRepository.SaveChanges();
         _logger.LogInformation($"Document {document.Id} added");
