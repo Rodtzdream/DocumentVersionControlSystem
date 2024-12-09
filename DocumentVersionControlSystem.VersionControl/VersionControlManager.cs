@@ -29,24 +29,47 @@ public class VersionControlManager
         return _versionRepository.GetVersionsByDocumentId(documentId);
     }
 
-    public void CreateNewVersion(Document document, string newFilePath, string versionDescription)
+    public void CreateNewVersion(Document document, string versionDescription)
     {
-        var oldFilePath = document.FilePath;
-        var oldText = FileStorage.FileStorageManager.ReadFile(oldFilePath);
-        var newText = FileStorage.FileStorageManager.ReadFile(newFilePath);
-        var diff = _diffManager.GetDiffText(oldText, newText);
-        var version = new Database.Models.Version
+        Version version;
+        string oldFilePath, newFilePath;
+
+        if (document.Versions == null)
         {
-            DocumentId = document.Id,
-            Document = document,
-            VersionDescription = versionDescription,
-            FilePath = newFilePath,
-            CreationDate = DateTime.Now
-        };
+            document.Versions = new List<Version>();
+        }
+
+        if (document.Versions.Count == 0)
+        {
+            oldFilePath = document.FilePath;
+            newFilePath = document.FilePath + ".v1";
+            version = new Version
+            {
+                DocumentId = document.Id,
+                Document = document,
+                VersionDescription = versionDescription,
+                FilePath = newFilePath,
+                CreationDate = DateTime.Now
+            };
+        }
+        else
+        {
+            oldFilePath = document.Versions.Last().FilePath;
+            newFilePath = oldFilePath + ".v" + (document.Versions.Count + 1);
+            GetVersionDifference(oldFilePath, newFilePath);
+            version = new Version
+            {
+                DocumentId = document.Id,
+                Document = document,
+                VersionDescription = versionDescription,
+                FilePath = newFilePath,
+                CreationDate = DateTime.Now
+            };
+        }
         document.Versions.Add(version);
-        document.LastModifiedDate = DateTime.Now;
         FileStorage.FileStorageManager.CopyFile(newFilePath, oldFilePath);
         _logger.LogInformation($"New version {version.Id} created for document {document.Id}");
+        return;
     }
 
     public string GetVersionDifference(int oldVersionId, int newVersionId)
@@ -54,6 +77,11 @@ public class VersionControlManager
         var oldVersion = _versionRepository.GetVersionById(oldVersionId);
         var newVersion = _versionRepository.GetVersionById(newVersionId);
         return _diffManager.GetDiff(oldVersion.FilePath, newVersion.FilePath);
+    }
+
+    public string GetVersionDifference(string oldFilePath, string newFilePath)
+    {
+        return _diffManager.GetDiff(oldFilePath, newFilePath);
     }
 
     public void SwitchToVersionAndDeleteNewer(Document document, Version version)
@@ -72,7 +100,7 @@ public class VersionControlManager
         var newFilePath = version.FilePath;
         FileStorage.FileStorageManager.CopyFile(newFilePath, oldFilePath);
         document.LastModifiedDate = DateTime.Now;
-        var newVersion = new Database.Models.Version
+        var newVersion = new Version
         {
             DocumentId = document.Id,
             Document = document,
@@ -88,7 +116,7 @@ public class VersionControlManager
     {
         version.VersionDescription = newDescription;
         _versionRepository.SaveChanges();
-        _logger.LogInformation($"Version {version.Id} description changed to {newDescription}");
+        _logger.LogInformation($"Version {version.Id} description changed to '{newDescription}'");
     }
 
     public void DeleteVersion(Version version)
