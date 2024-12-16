@@ -311,7 +311,6 @@ public class DocumentRepositoryTests
 
             var version1 = new Database.Models.Version
             {
-                Document = document,
                 VersionDescription = "Initial version",
                 FilePath = "test1.txt",
                 CreationDate = DateTime.Now
@@ -319,7 +318,6 @@ public class DocumentRepositoryTests
 
             var version2 = new Database.Models.Version
             {
-                Document = document,
                 VersionDescription = "Updated version",
                 FilePath = "test2.txt",
                 CreationDate = DateTime.Now
@@ -361,7 +359,6 @@ public class DocumentRepositoryTests
 
             var version1 = new Database.Models.Version
             {
-                Document = document,
                 VersionDescription = "Initial version",
                 FilePath = "test1.txt",
                 CreationDate = DateTime.Now
@@ -369,7 +366,6 @@ public class DocumentRepositoryTests
 
             var version2 = new Database.Models.Version
             {
-                Document = document,
                 VersionDescription = "Updated version",
                 FilePath = "test2.txt",
                 CreationDate = DateTime.Now
@@ -420,7 +416,6 @@ public class DocumentRepositoryTests
 
             var version1 = new Database.Models.Version
             {
-                Document = document1,
                 VersionDescription = "Initial version",
                 FilePath = "test1.txt",
                 CreationDate = DateTime.Now
@@ -428,7 +423,6 @@ public class DocumentRepositoryTests
 
             var version2 = new Database.Models.Version
             {
-                Document = document2,
                 VersionDescription = "Updated version",
                 FilePath = "test2.txt",
                 CreationDate = DateTime.Now
@@ -478,7 +472,6 @@ public class DocumentRepositoryTests
 
             var version1 = new Database.Models.Version
             {
-                Document = document,
                 VersionDescription = "Initial version",
                 FilePath = "test1.txt",
                 CreationDate = DateTime.Now
@@ -486,7 +479,6 @@ public class DocumentRepositoryTests
 
             var version2 = new Database.Models.Version
             {
-                Document = document,
                 VersionDescription = "Updated version",
                 FilePath = "test2.txt",
                 CreationDate = DateTime.Now

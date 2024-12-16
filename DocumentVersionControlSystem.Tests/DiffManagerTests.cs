@@ -1,8 +1,4 @@
-﻿using DocumentVersionControlSystem.Database.Models;
-using DocumentVersionControlSystem.Database.Repositories;
-using DocumentVersionControlSystem.DiffManager;
-
-namespace DocumentVersionControlSystem.Tests;
+﻿namespace DocumentVersionControlSystem.Tests;
 
 public class DiffManagerTests
 {

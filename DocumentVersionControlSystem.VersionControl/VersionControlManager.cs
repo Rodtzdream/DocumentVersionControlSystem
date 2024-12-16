@@ -46,7 +46,6 @@ public class VersionControlManager
             version = new Version
             {
                 DocumentId = document.Id,
-                Document = document,
                 VersionDescription = versionDescription,
                 FilePath = newFilePath,
                 CreationDate = DateTime.Now
@@ -60,7 +59,6 @@ public class VersionControlManager
             version = new Version
             {
                 DocumentId = document.Id,
-                Document = document,
                 VersionDescription = versionDescription,
                 FilePath = newFilePath,
                 CreationDate = DateTime.Now
@@ -103,7 +101,6 @@ public class VersionControlManager
         var newVersion = new Version
         {
             DocumentId = document.Id,
-            Document = document,
             VersionDescription = version.VersionDescription,
             FilePath = documentFilePath,
             CreationDate = DateTime.Now

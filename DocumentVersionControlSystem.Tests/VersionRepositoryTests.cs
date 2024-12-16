@@ -12,9 +12,8 @@ public class VersionRepositoryTests
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "AddDocument_ShouldAddDocumentToDatabase1")
+            .UseInMemoryDatabase(databaseName: "AddVersion_ShouldAddVersionToDocument")
             .Options;
-
         using (var context = new DatabaseContext(options))
         {
             var document = new Document
@@ -22,21 +21,18 @@ public class VersionRepositoryTests
                 Name = "Test Document",
                 FilePath = "C:\\Documents\\TestDocument.txt"
             };
-
             var version = new Database.Models.Version
             {
-                Document = document,
                 DocumentId = document.Id,
                 VersionDescription = "Test Version",
                 FilePath = "C:\\Documents\\TestDocument.txt"
             };
-
+            var documentRepository = new DocumentRepository(context);
             var versionRepository = new VersionRepository(context);
-
             // Act
+            documentRepository.AddDocument(document);
             versionRepository.AddVersion(document, version);
             versionRepository.SaveChanges();
-
             // Assert
             Assert.Single(context.Versions);
             Assert.Single(context.Documents);
@@ -62,8 +58,6 @@ public class VersionRepositoryTests
 
             var version = new Database.Models.Version
             {
-                Document = document,
-                DocumentId = document.Id,
                 VersionDescription = "Test Version",
                 FilePath = "C:\\Documents\\TestDocument.txt"
             };
@@ -99,7 +93,6 @@ public class VersionRepositoryTests
 
             var version1 = new Database.Models.Version
             {
-                Document = document,
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 1",
                 FilePath = "C:\\Documents\\TestDocument.txt"
@@ -107,7 +100,6 @@ public class VersionRepositoryTests
 
             var version2 = new Database.Models.Version
             {
-                Document = document,
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 2",
                 FilePath = "C:\\Documents\\TestDocument.txt"
@@ -145,7 +137,6 @@ public class VersionRepositoryTests
 
             var version = new Database.Models.Version
             {
-                Document = document,
                 DocumentId = document.Id,
                 VersionDescription = "Test Version",
                 FilePath = "C:\\Documents\\TestDocument.txt"
@@ -183,7 +174,6 @@ public class VersionRepositoryTests
 
             var version1 = new Database.Models.Version
             {
-                Document = document,
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 1",
                 FilePath = "C:\\Documents\\TestDocument.txt"
@@ -191,7 +181,6 @@ public class VersionRepositoryTests
 
             var version2 = new Database.Models.Version
             {
-                Document = document,
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 2",
                 FilePath = "C:\\Documents\\TestDocument.txt"
@@ -229,52 +218,16 @@ public class VersionRepositoryTests
 
             var version = new Database.Models.Version
             {
-                Document = document,
                 DocumentId = document.Id,
                 VersionDescription = "Test Version",
                 FilePath = "C:\\Documents\\TestDocument.txt"
             };
 
+            var documentRepository = new DocumentRepository(context);
             var versionRepository = new VersionRepository(context);
 
             // Act
-            versionRepository.AddVersion(document, version);
-            versionRepository.SaveChanges();
-
-            // Assert
-            Assert.Single(context.Versions);
-            Assert.Single(context.Documents);
-            Assert.Equal(document.Id, version.DocumentId);
-        }
-    }
-
-    [Fact]
-    public void AddVersion_ShouldAddVersionToDocument_WhenDocumentHasNoVersions()
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "AddDocument_ShouldAddDocumentToDatabase2")
-            .Options;
-
-        using (var context = new DatabaseContext(options))
-        {
-            var document = new Document
-            {
-                Name = "Test Document",
-                FilePath = "C:\\Documents\\TestDocument.txt"
-            };
-
-            var version = new Database.Models.Version
-            {
-                Document = document,
-                DocumentId = document.Id,
-                VersionDescription = "Test Version",
-                FilePath = "C:\\Documents\\TestDocument.txt"
-            };
-
-            var versionRepository = new VersionRepository(context);
-
-            // Act
+            documentRepository.AddDocument(document);
             versionRepository.AddVersion(document, version);
             versionRepository.SaveChanges();
 
@@ -290,7 +243,7 @@ public class VersionRepositoryTests
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "AddDocument_ShouldAddDocumentToDatabase3")
+            .UseInMemoryDatabase(databaseName: "AddDocument_ShouldAddDocumentToDatabase2")
             .Options;
 
         using (var context = new DatabaseContext(options))
@@ -303,7 +256,6 @@ public class VersionRepositoryTests
 
             var version1 = new Database.Models.Version
             {
-                Document = document,
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 1",
                 FilePath = "C:\\Documents\\TestDocument.txt"
@@ -311,17 +263,17 @@ public class VersionRepositoryTests
 
             var version2 = new Database.Models.Version
             {
-                Document = document,
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 2",
                 FilePath = "C:\\Documents\\TestDocument.txt"
             };
 
+            var documentRepository = new DocumentRepository(context);
             var versionRepository = new VersionRepository(context);
 
             // Act
+            documentRepository.AddDocument(document);
             versionRepository.AddVersion(document, version1);
-            versionRepository.SaveChanges();
             versionRepository.AddVersion(document, version2);
             versionRepository.SaveChanges();
 

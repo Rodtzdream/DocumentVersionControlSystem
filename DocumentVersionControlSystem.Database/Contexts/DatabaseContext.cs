@@ -39,11 +39,6 @@ public class DatabaseContext : DbContext
             .Property(v => v.CreationDate)
             .HasDefaultValueSql("GETDATE()");
 
-        modelBuilder.Entity<Version>()
-            .HasOne(v => v.Document)
-            .WithMany(d => d.Versions)
-            .HasForeignKey(v => v.DocumentId);
-
         base.OnModelCreating(modelBuilder);
     }
 }

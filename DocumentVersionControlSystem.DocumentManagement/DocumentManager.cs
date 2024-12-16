@@ -112,7 +112,6 @@ public class DocumentManager
         var version = new Database.Models.Version
         {
             DocumentId = documentId,
-            Document = document,
             VersionDescription = versionDescription,
             FilePath = FilePath,
             CreationDate = DateTime.Now
