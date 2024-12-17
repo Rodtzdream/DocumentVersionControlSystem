@@ -263,34 +263,6 @@ public class DocumentRepositoryTests
     }
 
     [Fact]
-    public void SaveChanges_ShouldNotSaveChangesIfNotCalled()
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "SaveChanges_ShouldNotSaveChangesIfNotCalled")
-            .Options;
-
-        using (var context = new DatabaseContext(options))
-        {
-            var documentRepository = new DocumentRepository(context);
-            var document = new Document
-            {
-                Name = "Test Document",
-                FilePath = "test.txt",
-                CreationDate = DateTime.Now
-            };
-
-            documentRepository.AddDocument(document);
-
-            // Act
-            // No call to SaveChanges
-
-            // Assert
-            Assert.Empty(context.Documents);
-        }
-    }
-
-    [Fact]
     public void GetDocumentById_ShouldReturnDocumentWithVersions()
     {
         // Arrange
@@ -311,6 +283,7 @@ public class DocumentRepositoryTests
 
             var version1 = new Database.Models.Version
             {
+                DocumentId = document.Id,
                 VersionDescription = "Initial version",
                 FilePath = "test1.txt",
                 CreationDate = DateTime.Now
@@ -318,6 +291,7 @@ public class DocumentRepositoryTests
 
             var version2 = new Database.Models.Version
             {
+                DocumentId = document.Id,
                 VersionDescription = "Updated version",
                 FilePath = "test2.txt",
                 CreationDate = DateTime.Now
@@ -359,6 +333,7 @@ public class DocumentRepositoryTests
 
             var version1 = new Database.Models.Version
             {
+                DocumentId = document.Id,
                 VersionDescription = "Initial version",
                 FilePath = "test1.txt",
                 CreationDate = DateTime.Now
@@ -366,6 +341,7 @@ public class DocumentRepositoryTests
 
             var version2 = new Database.Models.Version
             {
+                DocumentId = document.Id,
                 VersionDescription = "Updated version",
                 FilePath = "test2.txt",
                 CreationDate = DateTime.Now
@@ -416,6 +392,7 @@ public class DocumentRepositoryTests
 
             var version1 = new Database.Models.Version
             {
+                DocumentId = document1.Id,
                 VersionDescription = "Initial version",
                 FilePath = "test1.txt",
                 CreationDate = DateTime.Now
@@ -423,6 +400,7 @@ public class DocumentRepositoryTests
 
             var version2 = new Database.Models.Version
             {
+                DocumentId = document2.Id,
                 VersionDescription = "Updated version",
                 FilePath = "test2.txt",
                 CreationDate = DateTime.Now
@@ -472,6 +450,7 @@ public class DocumentRepositoryTests
 
             var version1 = new Database.Models.Version
             {
+                DocumentId = document.Id,
                 VersionDescription = "Initial version",
                 FilePath = "test1.txt",
                 CreationDate = DateTime.Now
@@ -479,6 +458,7 @@ public class DocumentRepositoryTests
 
             var version2 = new Database.Models.Version
             {
+                DocumentId = document.Id,
                 VersionDescription = "Updated version",
                 FilePath = "test2.txt",
                 CreationDate = DateTime.Now

@@ -25,7 +25,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version",
-                FilePath = "C:\\Documents\\TestDocument.txt"
+                CreationDate = DateTime.Now
             };
             var documentRepository = new DocumentRepository(context);
             var versionRepository = new VersionRepository(context);
@@ -58,8 +58,9 @@ public class VersionRepositoryTests
 
             var version = new Database.Models.Version
             {
+                DocumentId = document.Id,
                 VersionDescription = "Test Version",
-                FilePath = "C:\\Documents\\TestDocument.txt"
+                CreationDate = DateTime.Now
             };
 
             context.Versions.Add(version);
@@ -95,14 +96,14 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 1",
-                FilePath = "C:\\Documents\\TestDocument.txt"
+                CreationDate = DateTime.Now
             };
 
             var version2 = new Database.Models.Version
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 2",
-                FilePath = "C:\\Documents\\TestDocument.txt"
+                CreationDate = DateTime.Now
             };
 
             context.Versions.Add(version1);
@@ -139,7 +140,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version",
-                FilePath = "C:\\Documents\\TestDocument.txt"
+                CreationDate = DateTime.Now
             };
 
             context.Versions.Add(version);
@@ -176,14 +177,14 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 1",
-                FilePath = "C:\\Documents\\TestDocument.txt"
+                CreationDate = DateTime.Now
             };
 
             var version2 = new Database.Models.Version
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 2",
-                FilePath = "C:\\Documents\\TestDocument.txt"
+                CreationDate = DateTime.Now
             };
 
             context.Versions.Add(version1);
@@ -220,7 +221,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version",
-                FilePath = "C:\\Documents\\TestDocument.txt"
+                CreationDate = DateTime.Now
             };
 
             var documentRepository = new DocumentRepository(context);
@@ -258,14 +259,14 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 1",
-                FilePath = "C:\\Documents\\TestDocument.txt"
+                CreationDate = DateTime.Now
             };
 
             var version2 = new Database.Models.Version
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 2",
-                FilePath = "C:\\Documents\\TestDocument.txt"
+                CreationDate = DateTime.Now
             };
 
             var documentRepository = new DocumentRepository(context);
