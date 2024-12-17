@@ -106,14 +106,16 @@ public class DocumentManager
         return _documentRepository.GetDocumentsByName(name);
     }
 
-    public void AddDocument(string name, string FilePath)
+    public void AddDocument(string name, string filePath)
     {
+        var fileInfo = new FileInfo(filePath);
+
         var document = new Database.Models.Document
         {
             Name = name,
-            CreationDate = DateTime.Now,
+            CreationDate = fileInfo.CreationTime,
             LastModifiedDate = DateTime.Now,
-            FilePath = FilePath
+            FilePath = filePath
         };
 
         var documentDirectory = Path.Combine("Documents", document.Name);
