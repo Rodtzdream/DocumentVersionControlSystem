@@ -16,8 +16,6 @@ public class VersionRepository
         {
            document.Versions = new List<Models.Version>();
         }
-        var documentDirectory = Path.Combine("Documents", document.Name);
-        version.FilePath = Path.Combine(documentDirectory, $"Version_{version.CreationDate}.txt");
 
         document.Versions.Add(version);
         _context.Versions.Add(version);
