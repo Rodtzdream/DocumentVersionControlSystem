@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DocumentVersionControlSystem.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20241126000910_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20241217225947_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,6 +51,9 @@ namespace DocumentVersionControlSystem.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("VersionCount")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Documents");
@@ -73,7 +76,6 @@ namespace DocumentVersionControlSystem.Database.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("FilePath")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VersionDescription")
@@ -81,25 +83,7 @@ namespace DocumentVersionControlSystem.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DocumentId");
-
                     b.ToTable("Versions");
-                });
-
-            modelBuilder.Entity("DocumentVersionControlSystem.Database.Models.Version", b =>
-                {
-                    b.HasOne("DocumentVersionControlSystem.Database.Models.Document", "Document")
-                        .WithMany("Versions")
-                        .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Document");
-                });
-
-            modelBuilder.Entity("DocumentVersionControlSystem.Database.Models.Document", b =>
-                {
-                    b.Navigation("Versions");
                 });
 #pragma warning restore 612, 618
         }

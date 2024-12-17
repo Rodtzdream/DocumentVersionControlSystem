@@ -1,5 +1,6 @@
 ﻿namespace DocumentVersionControlSystem.VersionControl;
 using DocumentVersionControlSystem.Database.Models;
+using DocumentVersionControlSystem.Database.Repositories;
 
 public class VersionControlManager
 {
@@ -31,12 +32,7 @@ public class VersionControlManager
 
     public bool CreateNewVersion(Document document, string versionDescription)
     {
-        if (document.Versions == null)
-        {
-            document.Versions = new List<Version>();
-        }
-
-        if (_diffManager.IsFileChanged(document.FilePath, document.Versions.Last().FilePath))
+        if (document.VersionCount > 0 && _diffManager.IsFileChanged(document.FilePath, _versionRepository.GetVersionsByDocumentId(document.Id).Last().FilePath))
         {
             return false;
         }
@@ -46,7 +42,7 @@ public class VersionControlManager
 
         var documentDirectory = Path.Combine("Documents", document.Name);
         oldFilePath = document.FilePath;
-        newFilePath = Path.Combine(documentDirectory, $"{document.Name}.v${document.Versions.Count + 1}.txt");
+        newFilePath = Path.Combine(documentDirectory, $"{document.Name}.v${++document.VersionCount}.txt");
 
         version = new Version
         {
@@ -84,14 +80,14 @@ public class VersionControlManager
 
         FileStorage.FileStorageManager.CopyFile(versionFilePath, documentFilePath);
 
-        if (document.Versions != null)
+        if (document.VersionCount != 0)
         {
-            var versionsToDelete = document.Versions.Where(v => v.CreationDate > version.CreationDate).ToList();
+            var versionsToDelete = _versionRepository.GetVersionsByDocumentId(document.Id).Where(v => v.CreationDate > version.CreationDate).ToList();
             foreach (var v in versionsToDelete)
             {
                 FileStorage.FileStorageManager.DeleteFile(v.FilePath);
             }
-            document.Versions.RemoveAll(v => v.CreationDate > version.CreationDate);
+            _versionRepository.GetVersionsByDocumentId(document.Id).RemoveAll(v => v.CreationDate > version.CreationDate);
         }
 
         document.LastModifiedDate = DateTime.Now;
@@ -116,7 +112,7 @@ public class VersionControlManager
             CreationDate = DateTime.Now
         };
 
-        document.Versions.Add(newVersion);
+        document.VersionCount++;
         _versionRepository.AddVersion(document, newVersion);
         _logger.LogInformation($"Switched to version {version.Id} and saved as latest for document {document.Id}");
     }

@@ -273,13 +273,15 @@ public class DocumentRepositoryTests
         using (var context = new DatabaseContext(options))
         {
             var documentRepository = new DocumentRepository(context);
+
             var document = new Document
             {
                 Name = "Test Document",
                 FilePath = "test.txt",
-                CreationDate = DateTime.Now,
-                Versions = new List<Database.Models.Version>()
+                CreationDate = DateTime.Now
             };
+
+            documentRepository.AddDocument(document);
 
             var version1 = new Database.Models.Version
             {
@@ -297,18 +299,15 @@ public class DocumentRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            document.Versions.Add(version1);
-            document.Versions.Add(version2);
-
-            documentRepository.AddDocument(document);
-            documentRepository.SaveChanges();
+            document.VersionCount++;
+            document.VersionCount++;
 
             // Act
             var result = documentRepository.GetDocumentById(1);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Versions.Count);
+            Assert.Equal(2, result.VersionCount);
         }
     }
 
@@ -327,9 +326,10 @@ public class DocumentRepositoryTests
             {
                 Name = "Test Document",
                 FilePath = "test.txt",
-                CreationDate = DateTime.Now,
-                Versions = new List<Database.Models.Version>()
+                CreationDate = DateTime.Now
             };
+
+            documentRepository.AddDocument(document);
 
             var version1 = new Database.Models.Version
             {
@@ -347,11 +347,8 @@ public class DocumentRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            document.Versions.Add(version1);
-            document.Versions.Add(version2);
-
-            documentRepository.AddDocument(document);
-            documentRepository.SaveChanges();
+            document.VersionCount++;
+            document.VersionCount++;
 
             // Act
             documentRepository.DeleteDocument(document);
@@ -378,17 +375,17 @@ public class DocumentRepositoryTests
             {
                 Name = "Test Document",
                 FilePath = "test1.txt",
-                CreationDate = DateTime.Now,
-                Versions = new List<Database.Models.Version>()
+                CreationDate = DateTime.Now
             };
-
             var document2 = new Document
             {
                 Name = "Test Document",
                 FilePath = "test2.txt",
-                CreationDate = DateTime.Now,
-                Versions = new List<Database.Models.Version>()
+                CreationDate = DateTime.Now
             };
+
+            documentRepository.AddDocument(document1);
+            documentRepository.AddDocument(document2);
 
             var version1 = new Database.Models.Version
             {
@@ -406,26 +403,16 @@ public class DocumentRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            document1.Versions.Add(version1);
-            document2.Versions.Add(version2);
-
-            documentRepository.AddDocument(document1);
-            documentRepository.AddDocument(document2);
-            documentRepository.SaveChanges();
+            document1.VersionCount++;
+            document2.VersionCount++;
 
             // Act
             var result = documentRepository.GetDocumentsByName("Test Document");
 
             // Assert
             Assert.Collection(result,
-                doc => Assert.Equal("Test Document", doc.Name),
-                doc => Assert.Equal("Test Document", doc.Name));
-
-            Assert.Collection(result[0].Versions,
-                ver => Assert.Equal("Initial version", ver.VersionDescription));
-
-            Assert.Collection(result[1].Versions,
-                ver => Assert.Equal("Updated version", ver.VersionDescription));
+                doc => Assert.Equal(1, doc.VersionCount),
+                doc => Assert.Equal(1, doc.VersionCount));
         }
     }
 
@@ -444,9 +431,10 @@ public class DocumentRepositoryTests
             {
                 Name = "Test Document",
                 FilePath = "test.txt",
-                CreationDate = DateTime.Now,
-                Versions = new List<Database.Models.Version>()
+                CreationDate = DateTime.Now
             };
+
+            documentRepository.AddDocument(document);
 
             var version1 = new Database.Models.Version
             {
@@ -464,18 +452,15 @@ public class DocumentRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            document.Versions.Add(version1);
-            document.Versions.Add(version2);
-
-            documentRepository.AddDocument(document);
-            documentRepository.SaveChanges();
+            document.VersionCount++;
+            document.VersionCount++;
 
             // Act
             var result = documentRepository.GetDocumentByPath("test.txt");
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Versions.Count);
+            Assert.Equal(2, result.VersionCount);
         }
     }
 

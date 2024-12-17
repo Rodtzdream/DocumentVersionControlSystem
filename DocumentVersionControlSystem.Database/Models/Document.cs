@@ -7,6 +7,6 @@
         public DateTime CreationDate { get; set; }
         public DateTime LastModifiedDate { get; set; }
         public required string FilePath { get; set; }
-        public List<Version>? Versions { get; set; }
+        public int VersionCount { get; set; }
     }
 }

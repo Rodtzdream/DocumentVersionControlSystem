@@ -12,12 +12,7 @@ public class VersionRepository
 
     public void AddVersion(Models.Document document, Models.Version version)
     {
-        if (document.Versions == null)
-        {
-           document.Versions = new List<Models.Version>();
-        }
-
-        document.Versions.Add(version);
+        document.VersionCount++;
         _context.Versions.Add(version);
         _context.SaveChanges();
     }
