@@ -13,6 +13,7 @@ public class DocumentRepository
     public void AddDocument(Models.Document document)
     {
         _context.Documents.Add(document);
+        _context.SaveChanges();
     }
 
     public Models.Document GetDocumentById(int id)
@@ -28,12 +29,14 @@ public class DocumentRepository
     public void UpdateDocument(Models.Document document)
     {
         _context.Documents.Update(document);
+        _context.SaveChanges();
     }
 
     public void DeleteDocument(Models.Document document)
     {
         _context.Documents.Remove(document);
         _context.Versions.RemoveRange(_context.Versions.Where(v => v.DocumentId == document.Id));
+        _context.SaveChanges();
     }
 
     public List<Models.Document> GetDocumentsByName(string name)

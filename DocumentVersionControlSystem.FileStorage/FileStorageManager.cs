@@ -24,6 +24,6 @@ public static class FileStorageManager
 
     public static void CopyFile(string sourceFilePath, string destinationFilePath)
     {
-        System.IO.File.Copy(sourceFilePath, destinationFilePath);
+        System.IO.File.Copy(sourceFilePath, destinationFilePath, overwrite: true);
     }
 }

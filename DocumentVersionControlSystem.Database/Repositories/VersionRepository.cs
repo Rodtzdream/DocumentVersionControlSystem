@@ -16,8 +16,12 @@ public class VersionRepository
         {
            document.Versions = new List<Models.Version>();
         }
-        _context.Versions.Add(version);
+        var documentDirectory = Path.Combine("Documents", document.Name);
+        version.FilePath = Path.Combine(documentDirectory, $"Version_{version.CreationDate}.txt");
+
         document.Versions.Add(version);
+        _context.Versions.Add(version);
+        _context.SaveChanges();
     }
 
     public Models.Version GetVersionById(int id)
@@ -33,6 +37,7 @@ public class VersionRepository
     public void DeleteVersion(Models.Version version)
     {
         _context.Versions.Remove(version);
+        _context.SaveChanges();
     }
 
     public List<Models.Version> GetVersionsByDocumentId(int documentId)
