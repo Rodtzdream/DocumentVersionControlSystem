@@ -32,6 +32,10 @@ public class DatabaseContext : DbContext
             .Property(d => d.LastModifiedDate)
             .HasDefaultValueSql("GETDATE()");
 
+        modelBuilder.Entity<Document>()
+            .Property(d => d.VersionCount)
+            .HasDefaultValue(0);
+
         modelBuilder.Entity<Version>()
             .HasKey(v => v.Id);
 
