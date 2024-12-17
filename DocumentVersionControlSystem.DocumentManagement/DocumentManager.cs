@@ -106,21 +106,6 @@ public class DocumentManager
         return _documentRepository.GetDocumentsByName(name);
     }
 
-    public void AddVersionToDocument(int documentId, string versionDescription, string FilePath)
-    {
-        var document = _documentRepository.GetDocumentById(documentId);
-        var version = new Database.Models.Version
-        {
-            DocumentId = documentId,
-            VersionDescription = versionDescription,
-            FilePath = FilePath,
-            CreationDate = DateTime.Now
-        };
-        _versionRepository.AddVersion(document, version);
-        _versionRepository.SaveChanges();
-        _logger.LogInformation($"Version {version.Id} added to document {document.Id}");
-    }
-
     public void AddDocument(string name, string FilePath)
     {
         var document = new Database.Models.Document
@@ -130,6 +115,13 @@ public class DocumentManager
             LastModifiedDate = DateTime.Now,
             FilePath = FilePath
         };
+
+        var documentDirectory = Path.Combine("Documents", document.Name);
+        if (!Directory.Exists(documentDirectory))
+        {
+            Directory.CreateDirectory(documentDirectory);
+        }
+
         _documentRepository.AddDocument(document);
         _documentRepository.SaveChanges();
         _logger.LogInformation($"Document {document.Id} added");
@@ -157,6 +149,11 @@ public class DocumentManager
     public void DeleteDocument(int documentId)
     {
         var document = _documentRepository.GetDocumentById(documentId);
+        var documentDirectory = Path.Combine("Documents", document.Name);
+        if (Directory.Exists(documentDirectory))
+        {
+            Directory.Delete(documentDirectory, true);
+        }
         _documentRepository.DeleteDocument(document);
         _documentRepository.SaveChanges();
         _logger.LogInformation($"Document {document.Id} deleted");
