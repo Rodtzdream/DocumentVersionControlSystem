@@ -14,7 +14,6 @@ public class DiffManager
         var differ = new DiffPlex.Differ();
         var diffBuilder = new DiffPlex.DiffBuilder.SideBySideDiffBuilder(differ);
         var diffModel = diffBuilder.BuildDiffModel(textA, textB);
-        diffBuilder.Equals(diffModel);
 
         var result = new System.Text.StringBuilder();
         foreach (var line in diffModel.NewText.Lines)

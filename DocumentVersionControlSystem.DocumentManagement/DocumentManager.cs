@@ -72,8 +72,14 @@ public class DocumentManager
             CreationDate = fileInfo.CreationTime,
             LastModifiedDate = fileInfo.LastWriteTime
         };
+
+        var documentDirectory = Path.Combine("Documents", document.Name);
+        if (!Directory.Exists(documentDirectory))
+        {
+            Directory.CreateDirectory(documentDirectory);
+        }
+
         _documentRepository.AddDocument(document);
-        _documentRepository.SaveChanges();
         _logger.LogInformation($"Document {document.Id} added");
     }
 
@@ -106,29 +112,6 @@ public class DocumentManager
         return _documentRepository.GetDocumentsByName(name);
     }
 
-    public void AddDocument(string name, string filePath)
-    {
-        var fileInfo = new FileInfo(filePath);
-
-        var document = new Database.Models.Document
-        {
-            Name = name,
-            CreationDate = fileInfo.CreationTime,
-            LastModifiedDate = DateTime.Now,
-            FilePath = filePath
-        };
-
-        var documentDirectory = Path.Combine("Documents", document.Name);
-        if (!Directory.Exists(documentDirectory))
-        {
-            Directory.CreateDirectory(documentDirectory);
-        }
-
-        _documentRepository.AddDocument(document);
-        _documentRepository.SaveChanges();
-        _logger.LogInformation($"Document {document.Id} added");
-    }
-
     public void UpdateDocument(int documentId, string name)
     {
         var document = _documentRepository.GetDocumentById(documentId);
@@ -152,10 +135,12 @@ public class DocumentManager
     {
         var document = _documentRepository.GetDocumentById(documentId);
         var documentDirectory = Path.Combine("Documents", document.Name);
+
         if (Directory.Exists(documentDirectory))
         {
             Directory.Delete(documentDirectory, true);
         }
+
         _documentRepository.DeleteDocument(document);
         _documentRepository.SaveChanges();
         _logger.LogInformation($"Document {document.Id} deleted");
