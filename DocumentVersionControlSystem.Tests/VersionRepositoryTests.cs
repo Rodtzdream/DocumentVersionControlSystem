@@ -154,7 +154,6 @@ public class VersionRepositoryTests
 
             // Act
             versionRepository.DeleteVersion(version);
-            versionRepository.SaveChanges();
 
             // Assert
             Assert.Empty(context.Versions);
