@@ -27,7 +27,6 @@ public class DocumentRepositoryTests
 
             // Act
             documentRepository.AddDocument(document);
-            documentRepository.SaveChanges();
 
             // Assert
             Assert.Single(context.Documents);
@@ -53,7 +52,6 @@ public class DocumentRepositoryTests
             };
 
             documentRepository.AddDocument(document);
-            documentRepository.SaveChanges();
 
             // Act
             var result = documentRepository.GetDocumentById(1);
@@ -90,7 +88,6 @@ public class DocumentRepositoryTests
 
             documentRepository.AddDocument(document1);
             documentRepository.AddDocument(document2);
-            documentRepository.SaveChanges();
 
             // Act
             var result = documentRepository.GetAllDocuments();
@@ -123,12 +120,10 @@ public class DocumentRepositoryTests
             };
 
             documentRepository.AddDocument(document);
-            documentRepository.SaveChanges();
 
             // Act
             document.Name = "Updated Test Document";
             documentRepository.UpdateDocument(document);
-            documentRepository.SaveChanges();
 
             // Assert
             var result = documentRepository.GetDocumentById(1);
@@ -155,11 +150,9 @@ public class DocumentRepositoryTests
             };
 
             documentRepository.AddDocument(document);
-            documentRepository.SaveChanges();
 
             // Act
             documentRepository.DeleteDocument(document);
-            documentRepository.SaveChanges();
 
             // Assert
             Assert.Empty(context.Documents);
@@ -193,7 +186,6 @@ public class DocumentRepositoryTests
 
             documentRepository.AddDocument(document1);
             documentRepository.AddDocument(document2);
-            documentRepository.SaveChanges();
 
             // Act
             var result = documentRepository.GetDocumentsByName("Test Document");
@@ -224,7 +216,6 @@ public class DocumentRepositoryTests
             };
 
             documentRepository.AddDocument(document);
-            documentRepository.SaveChanges();
 
             // Act
             var result = documentRepository.GetDocumentByPath("test.txt");
@@ -255,7 +246,6 @@ public class DocumentRepositoryTests
             documentRepository.AddDocument(document);
 
             // Act
-            documentRepository.SaveChanges();
 
             // Assert
             Assert.Single(context.Documents);
@@ -352,7 +342,6 @@ public class DocumentRepositoryTests
 
             // Act
             documentRepository.DeleteDocument(document);
-            documentRepository.SaveChanges();
 
             // Assert
             Assert.Empty(context.Documents);

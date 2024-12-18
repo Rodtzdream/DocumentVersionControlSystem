@@ -2,6 +2,7 @@
 using DocumentVersionControlSystem.Database.Contexts;
 using DocumentVersionControlSystem.Database.Models;
 using DocumentVersionControlSystem.Database.Repositories;
+using System;
 
 namespace DocumentVersionControlSystem.Tests;
 
@@ -54,6 +55,8 @@ public class VersionRepositoryTests
 
         using (var context = new DatabaseContext(options))
         {
+            VersionRepository versionRepository = new VersionRepository(context);
+
             var document = new Document
             {
                 Name = "Test Document",
@@ -67,10 +70,7 @@ public class VersionRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            context.Versions.Add(version);
-            context.SaveChanges();
-
-            var versionRepository = new VersionRepository(context);
+            versionRepository.AddVersion(document, version);
 
             // Act
             var result = versionRepository.GetVersionById(version.Id);
@@ -90,11 +90,15 @@ public class VersionRepositoryTests
 
         using (var context = new DatabaseContext(options))
         {
+            DocumentRepository documentRepository = new DocumentRepository(context);
+
             var document = new Document
             {
                 Name = "Test Document",
                 FilePath = "C:\\Documents\\TestDocument.txt"
             };
+
+            documentRepository.AddDocument(document);
 
             var version1 = new Database.Models.Version
             {
@@ -110,11 +114,10 @@ public class VersionRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            context.Versions.Add(version1);
-            context.Versions.Add(version2);
-            context.SaveChanges();
-
             var versionRepository = new VersionRepository(context);
+
+            versionRepository.AddVersion(document, version1);
+            versionRepository.AddVersion(document, version2);
 
             // Act
             var result = versionRepository.GetAllVersions();
@@ -134,11 +137,16 @@ public class VersionRepositoryTests
 
         using (var context = new DatabaseContext(options))
         {
+            DocumentRepository documentRepository = new DocumentRepository(context);
+            VersionRepository versionRepository = new VersionRepository(context);
+
             var document = new Document
             {
                 Name = "Test Document",
                 FilePath = "C:\\Documents\\TestDocument.txt"
             };
+
+            documentRepository.AddDocument(document);
 
             var version = new Database.Models.Version
             {
@@ -147,10 +155,7 @@ public class VersionRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            context.Versions.Add(version);
-            context.SaveChanges();
-
-            var versionRepository = new VersionRepository(context);
+            versionRepository.AddVersion(document, version);
 
             // Act
             versionRepository.DeleteVersion(version);
@@ -170,6 +175,9 @@ public class VersionRepositoryTests
 
         using (var context = new DatabaseContext(options))
         {
+            DocumentRepository documentRepository = new DocumentRepository(context);
+            VersionRepository versionRepository = new VersionRepository(context);
+
             var document = new Document
             {
                 Name = "Test Document",
@@ -190,11 +198,8 @@ public class VersionRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            context.Versions.Add(version1);
-            context.Versions.Add(version2);
-            context.SaveChanges();
-
-            var versionRepository = new VersionRepository(context);
+            versionRepository.AddVersion(document, version1);
+            versionRepository.AddVersion(document, version2);
 
             // Act
             var result = versionRepository.GetVersionsByDocumentId(document.Id);
