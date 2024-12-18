@@ -235,7 +235,6 @@ public class VersionRepositoryTests
 
             // Act
             versionRepository.AddVersion(document, version);
-            versionRepository.SaveChanges();
 
             // Assert
             Assert.Single(context.Versions);
