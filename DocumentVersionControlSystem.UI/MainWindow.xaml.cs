@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DocumentVersionControlSystem.UI
 {
@@ -23,39 +25,90 @@ namespace DocumentVersionControlSystem.UI
         public MainWindow()
         {
             InitializeComponent();
-            AddButtonsToGrid();
+            InitializeDynamicGrid();
+            AdjustGridLayout(120);
             AddVersionButtonsToGrid();
         }
 
-        private void AddButtonsToGrid()
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            int totalButtons = 12; // Кількість кнопок
-            int columns = ButtonGrid.ColumnDefinitions.Count; // Кількість стовпців
-            int rows = ButtonGrid.RowDefinitions.Count; // Кількість рядків
+            AdjustGridLayout(120); // Перераховує сітку після того, як вікно завантажене
+        }
 
-            // Створення кнопки
-            Button button = new Button
+        private void InitializeDynamicGrid()
+        {
+            // Прив'язка події зміни розміру вікна
+            this.SizeChanged += OnWindowSizeChanged;
+            this.StateChanged += MainWindow_StateChanged;
+        }
+
+        private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            // Перерахунок сітки при зміні розміру
+            AdjustGridLayout(120);
+        }
+
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            if (WindowState == WindowState.Maximized || WindowState == WindowState.Normal)
             {
-                Content = $"Add document",
-                Style = (Style)FindResource("AddButtonStyle"), // Застосування стилю
-                Margin = new Thickness(0, 6, 0, 0)
-            };
+                // Перерахунок сітки тільки при зміні стану на нормальний чи повноекранний
+                AdjustGridLayout(120);
+            }
+        }
+
+        private void AdjustGridLayout(int totalButtons)
+        {
+            // Отримуємо ширину і висоту контейнера
+            double windowWidth = this.ActualWidth - 350;
+            double windowHeight = this.ActualHeight - 32;
+
+            // Визначаємо кількість стовпців і рядків на основі розміру вікна
+            int columns = (int)(windowWidth / 100);
+            int rows = totalButtons - columns;
+
+            // Якщо кількість стовпців або рядків менша ніж 1, робимо їх мінімум 1
+            columns = Math.Max(columns, 1);
+            rows = Math.Max(rows, 1);
+
+            // Очищаємо існуючі стовпці і рядки
+            ButtonGrid.ColumnDefinitions.Clear();
+            ButtonGrid.RowDefinitions.Clear();
+
+            // Додаємо нові стовпці і рядки
+            for (int i = 0; i < columns; i++)
+            {
+                ButtonGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+
+            for (int i = 0; i < rows; i++)
+            {
+                ButtonGrid.RowDefinitions.Add(new RowDefinition());
+            }
+
+            // Додаємо кнопки в сітку
+            AddButtonsToGrid(columns, rows);
+        }
+
+        private void AddButtonsToGrid(int columns, int rows)
+        {
+            // Очистити старі кнопки
+            ButtonGrid.Children.Clear();
+
+            int totalButtons = 120; // Кількість кнопок
+
+            Button button = CreateButton($"Add document", "AddButtonStyle");
 
             // Додавання кнопки до сітки
             Grid.SetColumn(button, 0);
             Grid.SetRow(button, 0);
             ButtonGrid.Children.Add(button);
 
-            for (int i = 1; i < totalButtons; i++)
+            for (int i = 1; i <= totalButtons; i++)
             {
                 // Створення кнопки
-                button = new Button
-                {
-                    Content = $"Document {i}",
-                    Tag = $"Document {i}",
-                    Style = (Style)FindResource("SquareButtonStyle"), // Застосування стилю
-                    Margin = new Thickness(0, i < columns ? 6 : 8, 0, 0)
-                };
+                button = CreateButton($"Document {i}", "SquareButtonStyle");
+                button.Tag = $"Document {i}";
 
                 // Обчислення стовпця та рядка для кнопки
                 int column = i % columns;
@@ -68,6 +121,16 @@ namespace DocumentVersionControlSystem.UI
             }
         }
 
+        private Button CreateButton(string content, string styleKey)
+        {
+            return new Button
+            {
+                Content = content,
+                Style = (Style)FindResource(styleKey),
+                Margin = new Thickness(5)
+            };
+        }
+
         public void AddVersionButtonsToGrid()
         {
             // Отримати StackPanel за ім'ям
@@ -76,7 +139,7 @@ namespace DocumentVersionControlSystem.UI
             if (stackPanel != null)
             {
                 // Додати кнопки
-                for (int i = 1; i <= 3; i++) // Змінити кількість кнопок за потребою
+                for (int i = 1; i <= 10; i++) // Змінити кількість кнопок за потребою
                 {
                     Button button = new Button
                     {

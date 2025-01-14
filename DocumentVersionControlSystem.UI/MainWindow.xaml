@@ -5,51 +5,39 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DocumentVersionControlSystem.UI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="400" Width="750" Background="#D9D9D9">
+        Title="MainWindow" Height="515" Width="850" Background="#D9D9D9"
+        ResizeMode="CanResize" Loaded="Window_Loaded">
     <Border BorderBrush="Black" BorderThickness="1">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="203" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <ScrollViewer>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="203" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="32" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="32" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-            <TextBlock Text="Document Versions" Grid.Column="0" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Height="29" Width="203"/>
+                <TextBlock Text="Document Versions" Grid.Column="0" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Height="29" Width="203"/>
 
-            <TextBlock Text="Document Version Control System" Grid.Column="1" Grid.Row="0" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Height="29" Width="545"/>
+                <TextBlock Text="Document Version Control System" Grid.Column="1" Grid.Row="0" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Height="29" Width="545"/>
 
-            <GridSplitter Grid.Column="0" Grid.RowSpan="2" Width="3" Background="Black"
-                  HorizontalAlignment="Stretch" Margin="200,0,0,0" />
+                <GridSplitter Grid.Column="0" Grid.RowSpan="2" Width="3" Background="Black"
+                  HorizontalAlignment="Stretch" Margin="200,0,0,0" Cursor="Arrow"/>
 
-            <GridSplitter Grid.Row="0" Grid.ColumnSpan="2" Height="3" Background="Black"
-                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,28,0,0" />
+                <GridSplitter Grid.Row="0" Grid.ColumnSpan="2" Height="3" Background="Black"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,28,0,0" Cursor="Arrow" />
 
-            <!-- Кнопки у лівій колонці -->
-            <StackPanel x:Name="ButtonStackPanel" Grid.Column="0" Grid.Row="1"/>
+                <!-- Кнопки у лівій колонці -->
+                <StackPanel x:Name="ButtonStackPanel" Grid.Column="0" Grid.Row="1"/>
 
-            <StackPanel Grid.Column="1" Grid.Row="1">
-                <Grid x:Name="ButtonGrid">
-                    <!-- Визначення стовпців -->
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Визначення рядків -->
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                </Grid>
-            </StackPanel>
-            <!-- Кнопка додавання документу -->
-        </Grid>
+                <!-- Кнопки у правій колонці -->
+                <StackPanel Grid.Column="1" Grid.Row="1">
+                    <Grid x:Name="ButtonGrid"/>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
     </Border>
 </Window>
