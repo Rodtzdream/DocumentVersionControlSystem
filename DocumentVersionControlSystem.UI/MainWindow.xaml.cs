@@ -22,6 +22,8 @@ namespace DocumentVersionControlSystem.UI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Button _selectedButton;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -98,6 +100,7 @@ namespace DocumentVersionControlSystem.UI
             int totalButtons = 120; // Кількість кнопок
 
             Button button = CreateButton($"Add document", "AddButtonStyle");
+            button.Click += OnButtonClicked;
 
             // Додавання кнопки до сітки
             Grid.SetColumn(button, 0);
@@ -109,6 +112,7 @@ namespace DocumentVersionControlSystem.UI
                 // Створення кнопки
                 button = CreateButton($"Document {i}", "SquareButtonStyle");
                 button.Tag = $"Document {i}";
+                button.Click += OnButtonClicked;
 
                 // Обчислення стовпця та рядка для кнопки
                 int column = i % columns;
@@ -130,6 +134,21 @@ namespace DocumentVersionControlSystem.UI
                 Margin = new Thickness(5)
             };
         }
+
+        private void OnButtonClicked(object sender, RoutedEventArgs e)
+        {
+            if (_selectedButton != null)
+            {
+                _selectedButton.ClearValue(Button.BorderBrushProperty);
+                _selectedButton.ClearValue(Button.BorderThicknessProperty);
+            }
+
+            Button clickedButton = sender as Button;
+            _selectedButton = clickedButton;
+            clickedButton.BorderBrush = Brushes.Gray;
+            clickedButton.BorderThickness = new Thickness(3);
+        }
+
 
         public void AddVersionButtonsToGrid()
         {
