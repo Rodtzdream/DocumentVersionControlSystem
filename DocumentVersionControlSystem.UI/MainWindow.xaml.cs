@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentVersionControlSystem.UI.Windows;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -29,7 +30,11 @@ namespace DocumentVersionControlSystem.UI
             InitializeComponent();
             InitializeDynamicGrid();
             AdjustGridLayout(120);
-            AddVersionButtonsToGrid();
+            AddVersionButtons();
+            DocumentDetailsWindow documentDetailsWindow = new DocumentDetailsWindow();
+            documentDetailsWindow.Show();
+            VersionHistoryWindow versionHistoryWindow = new VersionHistoryWindow();
+            versionHistoryWindow.Show();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -97,7 +102,7 @@ namespace DocumentVersionControlSystem.UI
             // Очистити старі кнопки
             ButtonGrid.Children.Clear();
 
-            int totalButtons = 120; // Кількість кнопок
+            int totalButtons = 10; // Кількість кнопок
 
             Button button = CreateButton($"Add document", "AddButtonStyle");
             button.Click += OnButtonClicked;
@@ -150,7 +155,7 @@ namespace DocumentVersionControlSystem.UI
         }
 
 
-        public void AddVersionButtonsToGrid()
+        public void AddVersionButtons()
         {
             // Отримати StackPanel за ім'ям
             StackPanel stackPanel = (StackPanel)FindName("ButtonStackPanel");

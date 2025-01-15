@@ -5,8 +5,44 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DocumentVersionControlSystem.UI.Windows"
         mc:Ignorable="d"
-        Title="VersionHistoryWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="515" Width="850" Background="#D9D9D9">
+    <Border BorderBrush="Black" BorderThickness="1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="203" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Document Versions" Grid.Column="0" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Height="29" Width="203"/>
+
+            <TextBlock Text="Document Version Control System" Grid.Column="1" Grid.Row="0" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Height="29" Width="545"/>
+
+            <GridSplitter Grid.Column="0" Grid.RowSpan="2" Width="3" Background="Black"
+              HorizontalAlignment="Stretch" Margin="200,0,0,0" Cursor="Arrow"/>
+
+            <GridSplitter Grid.Row="0" Grid.ColumnSpan="2" Height="3" Background="Black"
+              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,28,0,0" Cursor="Arrow" />
+
+            <!-- Кнопки у лівій колонці -->
+            <ScrollViewer Grid.Column="0" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="ButtonStackPanel" Grid.Column="0" Grid.Row="1"/>
+            </ScrollViewer>
+
+            <TextBox x:Name="TextBox" IsReadOnly="True" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,10,10,80" BorderBrush="Black" BorderThickness="1.5" Style="{StaticResource TextBoxStyle}"/>
+
+            <TextBlock x:Name="TextBlock" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,0,0,50" VerticalAlignment="Bottom"/>
+
+            <Button Grid.Column="1" Content="Open in external editor" Margin="10,4,0,0" Style="{StaticResource CustomButtonStyle}" Width="150" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="12" />
+
+            <Button Grid.Column="1" Content="Create new version" Margin="0,4,35,0" Style="{StaticResource CustomButtonStyle}" Width="120" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="12" />
+
+            <Button Grid.Column="1" Margin="0,4,10,0" Style="{StaticResource RefreshButtonStyle}" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="12" />
+
+        </Grid>
+    </Border>
 </Window>
