@@ -1,4 +1,5 @@
-﻿using DocumentVersionControlSystem.UI.Windows;
+﻿using DocumentVersionControlSystem.UI.Popups;
+using DocumentVersionControlSystem.UI.Windows;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,10 +32,8 @@ namespace DocumentVersionControlSystem.UI
             InitializeDynamicGrid();
             AdjustGridLayout(120);
             AddVersionButtons();
-            DocumentDetailsWindow documentDetailsWindow = new DocumentDetailsWindow();
-            documentDetailsWindow.Show();
-            VersionHistoryWindow versionHistoryWindow = new VersionHistoryWindow();
-            versionHistoryWindow.Show();
+            InfoPopup infoPopup = new InfoPopup(InfoPopupType.VersionCreatedSuccessfully);
+            infoPopup.ShowDialog();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
