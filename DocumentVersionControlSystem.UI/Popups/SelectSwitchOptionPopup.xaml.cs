@@ -19,9 +19,17 @@ namespace DocumentVersionControlSystem.UI.Popups
     /// </summary>
     public partial class SelectSwitchOptionPopup : Window
     {
+        EnterDescriptionPopup enterDescriptionPopup;
         public SelectSwitchOptionPopup()
         {
             InitializeComponent();
+        }
+
+        private void OkButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+            enterDescriptionPopup = new EnterDescriptionPopup();
+            enterDescriptionPopup.ShowDialog();
         }
     }
 }
