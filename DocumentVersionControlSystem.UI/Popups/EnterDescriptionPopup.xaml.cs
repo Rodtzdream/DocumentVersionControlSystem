@@ -19,9 +19,24 @@ namespace DocumentVersionControlSystem.UI.Popups
     /// </summary>
     public partial class EnterDescriptionPopup : Window
     {
+        InfoPopup infoPopup;
         public EnterDescriptionPopup()
         {
             InitializeComponent();
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+            infoPopup = new InfoPopup(InfoPopupType.VersionCreationCanceled);
+            infoPopup.ShowDialog();
+        }
+
+        private void ConfirmButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+            infoPopup = new InfoPopup(InfoPopupType.VersionCreatedSuccessfully);
+            infoPopup.ShowDialog();
         }
     }
 }

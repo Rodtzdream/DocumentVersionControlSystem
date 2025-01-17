@@ -32,8 +32,6 @@ namespace DocumentVersionControlSystem.UI
             InitializeDynamicGrid();
             AdjustGridLayout(120);
             AddVersionButtons();
-            InfoPopup infoPopup = new InfoPopup(InfoPopupType.VersionCreatedSuccessfully);
-            infoPopup.ShowDialog();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
