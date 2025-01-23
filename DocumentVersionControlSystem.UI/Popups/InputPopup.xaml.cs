@@ -15,12 +15,12 @@ using System.Windows.Shapes;
 namespace DocumentVersionControlSystem.UI.Popups
 {
     /// <summary>
-    /// Interaction logic for EnterDescriptionPopup.xaml
+    /// Interaction logic for 
+    /// .xaml
     /// </summary>
-    public partial class EnterDescriptionPopup : Window
+    public partial class InputPopup : Window
     {
-        InfoPopup infoPopup;
-        public EnterDescriptionPopup()
+        public InputPopup()
         {
             InitializeComponent();
         }
@@ -28,15 +28,11 @@ namespace DocumentVersionControlSystem.UI.Popups
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
-            infoPopup = new InfoPopup(InfoPopupType.VersionCreationCanceled);
-            infoPopup.ShowDialog();
         }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
-            infoPopup = new InfoPopup(InfoPopupType.VersionCreatedSuccessfully);
-            infoPopup.ShowDialog();
         }
     }
 }

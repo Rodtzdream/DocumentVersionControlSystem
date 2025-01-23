@@ -1,10 +1,10 @@
-﻿<Window x:Class="DocumentVersionControlSystem.UI.Popups.EnterDescriptionPopup"
+﻿<Window x:Class="DocumentVersionControlSystem.UI.Popups.InputPopup"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Information" Height="160" Width="400" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Grid>
         <!-- Заголовок -->
-        <TextBlock x:Name="TitleText" Text="Enter version description:" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0"/>
+        <TextBlock x:Name="TitleText" Text="" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0"/>
 
         <!-- Розділювач -->
         <GridSplitter Height="1.5" Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,40,0,0" Cursor="Arrow" />
