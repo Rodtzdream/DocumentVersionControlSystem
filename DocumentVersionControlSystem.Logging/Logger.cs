@@ -3,7 +3,7 @@ using Serilog;
 
 public class Logger
 {
-    Logger()
+    public Logger()
     {
         Log.Logger = new LoggerConfiguration()
             .WriteTo.File("log.txt")
@@ -13,6 +13,11 @@ public class Logger
     public void LogInformation(string message)
     {
         Log.Information(message);
+    }
+
+    public void LogWarning(string message)
+    {
+        Log.Warning(message);
     }
 
     public void LogError(string message)
