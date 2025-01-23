@@ -23,7 +23,7 @@ public class VersionRepositoryTests
 
             var document = new Document
             {
-                Name = "Test Document",
+                Name = "Test_Document",
                 FilePath = "C:\\Documents\\TestDocument.txt"
             };
 
@@ -33,6 +33,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version",
+                FilePath = "C:\\Documents\\Test_Document.v1.txt",
                 CreationDate = DateTime.Now
             };
 
@@ -67,6 +68,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version",
+                FilePath = "C:\\Documents\\Test_Document.v1.txt",
                 CreationDate = DateTime.Now
             };
 
@@ -104,6 +106,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 1",
+                FilePath = "C:\\Documents\\Test_Document.v1.txt",
                 CreationDate = DateTime.Now
             };
 
@@ -111,6 +114,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 2",
+                FilePath = "C:\\Documents\\Test_Document.v2.txt",
                 CreationDate = DateTime.Now
             };
 
@@ -152,6 +156,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version",
+                FilePath = "C:\\Documents\\Test_Document.v1.txt",
                 CreationDate = DateTime.Now
             };
 
@@ -188,6 +193,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 1",
+                FilePath = "C:\\Documents\\Test_Document.v1.txt",
                 CreationDate = DateTime.Now
             };
 
@@ -195,6 +201,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 2",
+                FilePath = "C:\\Documents\\Test_Document.v2.txt",
                 CreationDate = DateTime.Now
             };
 
@@ -234,6 +241,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version",
+                FilePath = "C:\\Documents\\Test_Document.v1.txt",
                 CreationDate = DateTime.Now
             };
 
@@ -272,6 +280,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 1",
+                FilePath = "C:\\Documents\\Test_Document.v1.txt",
                 CreationDate = DateTime.Now
             };
 
@@ -279,6 +288,7 @@ public class VersionRepositoryTests
             {
                 DocumentId = document.Id,
                 VersionDescription = "Test Version 2",
+                FilePath = "C:\\Documents\\Test_Document.v2.txt",
                 CreationDate = DateTime.Now
             };
 

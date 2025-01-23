@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DocumentVersionControlSystem.DocumentManagement\DocumentVersionControlSystem.DocumentManagement.csproj" />
+    <ProjectReference Include="..\DocumentVersionControlSystem.VersionControl\DocumentVersionControlSystem.VersionControl.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images/document_icon.png" />

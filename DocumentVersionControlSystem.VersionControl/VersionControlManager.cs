@@ -1,17 +1,21 @@
 ﻿namespace DocumentVersionControlSystem.VersionControl;
+
+using DocumentVersionControlSystem.Database.Contexts;
 using DocumentVersionControlSystem.Database.Models;
 using DocumentVersionControlSystem.Database.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 public class VersionControlManager
 {
     private readonly Database.Repositories.VersionRepository _versionRepository;
-    private readonly DiffManager.DiffManager _diffManager;
+    private readonly DiffManager.DiffManager _diffManager = new();
     private readonly Logging.Logger _logger;
 
-    public VersionControlManager(Database.Repositories.VersionRepository versionRepository, DiffManager.DiffManager diffManager, Logging.Logger logger)
+    public VersionControlManager(Logging.Logger logger)
     {
-        _versionRepository = versionRepository;
-        _diffManager = diffManager;
+        var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
+        optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DocVerControlDB;Integrated Security=True"); // Replace with your actual connection string
+        _versionRepository = new VersionRepository(new DatabaseContext(optionsBuilder.Options));
         _logger = logger;
     }
 
