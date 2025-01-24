@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 public class VersionControlManager
 {
-    private readonly Database.Repositories.VersionRepository _versionRepository;
+    private readonly VersionRepository _versionRepository;
+    private readonly DocumentRepository _documentRepository;
     private readonly DiffManager.DiffManager _diffManager = new();
     private readonly Logging.Logger _logger;
 
@@ -16,6 +17,7 @@ public class VersionControlManager
         var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
         optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DocVerControlDB;Integrated Security=True"); // Replace with your actual connection string
         _versionRepository = new VersionRepository(new DatabaseContext(optionsBuilder.Options));
+        _documentRepository = new DocumentRepository(new DatabaseContext(optionsBuilder.Options));
         _logger = logger;
     }
 
@@ -36,7 +38,7 @@ public class VersionControlManager
 
     public bool CreateNewVersion(Document document, string versionDescription)
     {
-        if (document.VersionCount > 0 && _diffManager.IsFileChanged(document.FilePath, _versionRepository.GetVersionsByDocumentId(document.Id).Last().FilePath))
+        if (document.VersionCount > 0 && !_diffManager.IsFileChanged(document.FilePath, _versionRepository.GetVersionsByDocumentId(document.Id).Last().FilePath))
         {
             return false;
         }
@@ -46,7 +48,7 @@ public class VersionControlManager
 
         var documentDirectory = Path.Combine("Documents", document.Name);
         oldFilePath = document.FilePath;
-        newFilePath = Path.Combine(documentDirectory, $"{document.Name}.v${++document.VersionCount}.txt");
+        newFilePath = Path.Combine(documentDirectory, $"{document.Name}_v{document.VersionCount + 1}.txt");
 
         version = new Version
         {
@@ -60,6 +62,7 @@ public class VersionControlManager
         FileStorage.FileStorageManager.CopyFile(oldFilePath, newFilePath);
         _logger.LogInformation($"New version {version.Id} created for document {document.Id}");
 
+        _documentRepository.SaveChanges();
         return true;
     }
 
@@ -116,16 +119,15 @@ public class VersionControlManager
             CreationDate = DateTime.Now
         };
 
-        document.VersionCount++;
         _versionRepository.AddVersion(document, newVersion);
         _logger.LogInformation($"Switched to version {version.Id} and saved as latest for document {document.Id}");
     }
 
-    public void ChangeVersionDescription(Version version, string newDescription)
+    public void ChangeVersionDescription(int versionId, string newDescription)
     {
-        version.VersionDescription = newDescription;
+        GetVersionById(versionId).VersionDescription = newDescription;
         _versionRepository.SaveChanges();
-        _logger.LogInformation($"Version {version.Id} description changed to '{newDescription}'");
+        _logger.LogInformation($"Version {versionId} description changed to '{newDescription}'");
     }
 
     public void DeleteVersion(Version version)

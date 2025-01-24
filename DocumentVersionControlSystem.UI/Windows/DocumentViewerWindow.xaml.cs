@@ -1,5 +1,6 @@
 ﻿using DocumentVersionControlSystem.Database.Models;
 using DocumentVersionControlSystem.DocumentManagement;
+using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.VersionControl;
 using System;
 using System.Collections.Generic;
@@ -64,12 +65,14 @@ namespace DocumentVersionControlSystem.UI.Windows
                 {
                     Button button = new Button
                     {
-                        Content = version.CreationDate,
+                        Content = version.CreationDate.ToString(),
                         Tag = version.VersionDescription,
                         Style = (Style)FindResource("RectangleButtonStyle"), // Стиль із ресурсів
-                        Margin = new Thickness(0, 8, 0, 0) // Відступи
+                        Margin = new Thickness(0, 8, 0, 0), // Відступи
+                        CommandParameter = version.Id
                     };
 
+                    CreateContextMenuForButton(button);
                     stackPanel.Children.Add(button);
                 }
             }
@@ -95,6 +98,104 @@ namespace DocumentVersionControlSystem.UI.Windows
         {
             string documentText = File.ReadAllText(_document.FilePath);
             textForm.Text = documentText;
+        }
+
+        private void CreateNewVersionButton_Click(object sender, RoutedEventArgs e)
+        {
+            InputPopup inputPopup = new InputPopup();
+            inputPopup.Title = "Description";
+            inputPopup.TitleText.Text = "Enter version description:";
+            inputPopup.ShowDialog();
+
+            if (inputPopup.DialogResult == true)
+            {
+                string _versionDescription = inputPopup.MessageText.Text;
+                bool versionCreated = _versionControlManager.CreateNewVersion(_document, _versionDescription);
+                if (versionCreated)
+                {
+                    AddVersionButtons();
+                    InfoPopup infoPopup = new InfoPopup(InfoPopupType.VersionCreatedSuccessfully);
+                    infoPopup.ShowDialog();
+                }
+                else
+                {
+                    InfoPopup infoPopup = new InfoPopup(InfoPopupType.NoChangesDetected);
+                    infoPopup.ShowDialog();
+                }
+            }
+        }
+
+        private void CreateContextMenuForButton(Button button)
+        {
+            ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem item1 = new MenuItem { Header = "Open" };
+            item1.Click += Open_Click;
+
+            MenuItem item2 = new MenuItem { Header = "Rename" };
+            item2.Click += ChangeDescription_Click;
+
+            MenuItem item3 = new MenuItem { Header = "Remove" };
+            item3.Click += Delete_Click;
+
+            contextMenu.Items.Add(item1);
+            contextMenu.Items.Add(item2);
+            contextMenu.Items.Add(item3);
+
+            button.ContextMenu = contextMenu;
+        }
+
+        private void Open_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
+            {
+                Button parentButton = contextMenu.PlacementTarget as Button;
+
+                if (parentButton != null)
+                {
+                    int versionId = (int)parentButton.CommandParameter;
+
+                    Database.Models.Version version = _versionControlManager.GetVersionById(versionId);
+
+                    VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version);
+                    versionDetailsWindow.ShowDialog();
+                }
+            }
+        }
+
+        private void ChangeDescription_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
+            {
+                Button parentButton = contextMenu.PlacementTarget as Button;
+
+                if (parentButton != null)
+                {
+                    InputPopup popup = new InputPopup();
+                    popup.TitleText.Text = "Change version description";
+                    popup.MessageText.Text = parentButton.Tag.ToString();
+                    popup.ShowDialog();
+
+                    string newName = popup.MessageText.Text;
+                    _versionControlManager.ChangeVersionDescription((int)parentButton.CommandParameter, newName);
+                    AddVersionButtons();
+                }
+            }
+        }
+
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
+            {
+                Button parentButton = contextMenu.PlacementTarget as Button;
+
+                if (parentButton != null)
+                {
+                    var version = _versionControlManager.GetVersionById((int)parentButton.CommandParameter);
+                    _versionControlManager.DeleteVersion(version);
+                    AddVersionButtons();
+                }
+            }
         }
     }
 }
