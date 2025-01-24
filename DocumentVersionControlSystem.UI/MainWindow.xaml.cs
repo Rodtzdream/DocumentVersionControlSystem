@@ -1,5 +1,6 @@
 ﻿using DocumentVersionControlSystem.DocumentManagement;
 using DocumentVersionControlSystem.UI.Popups;
+using DocumentVersionControlSystem.UI.Windows;
 using DocumentVersionControlSystem.VersionControl;
 using System;
 using System.Collections.Generic;
@@ -184,6 +185,11 @@ namespace DocumentVersionControlSystem.UI
             clickedButton.BorderThickness = new Thickness(3);
 
             AddVersionButtons(_selectedButton);
+
+            Database.Models.Document document = _documentManager.GetDocumentsByName(clickedButton.Content.ToString()).First();
+
+            DocumentViewerWindow documentViewerWindow = new DocumentViewerWindow(_documentManager, _versionControlManager, document);
+            documentViewerWindow.ShowDialog();
         }
 
         private void AddDocumentClicked(object sender, RoutedEventArgs e)
