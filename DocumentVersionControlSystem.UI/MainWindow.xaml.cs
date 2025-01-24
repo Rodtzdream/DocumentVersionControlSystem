@@ -134,7 +134,7 @@ namespace DocumentVersionControlSystem.UI
             }
         }
 
-        public void AddVersionButtons(Button button)
+        public void AddVersionButtons()
         {
             // Отримати StackPanel за ім'ям
             StackPanel stackPanel = (StackPanel)FindName("ButtonStackPanel");
@@ -143,20 +143,22 @@ namespace DocumentVersionControlSystem.UI
             {
                 stackPanel.Children.Clear();
 
-                var documentId = _documentManager.GetDocumentsByName(button.Content.ToString()).First().Id;
+                var documentId = _documentManager.GetDocumentsByName(_selectedButton.Content.ToString()).First().Id;
                 var versions = _versionControlManager.GetVersionsByDocumentId(documentId);
 
                 // Додати кнопки
                 foreach (var version in versions) // Змінити кількість кнопок за потребою
                 {
-                    button = new Button
+                    Button button = new Button
                     {
-                        Content = version.CreationDate,
+                        Content = version.CreationDate.ToString(),
                         Tag = version.VersionDescription,
                         Style = (Style)FindResource("RectangleButtonStyle"), // Стиль із ресурсів
-                        Margin = new Thickness(0, 8, 0, 0) // Відступи
+                        Margin = new Thickness(0, 8, 0, 0), // Відступи
+                        CommandParameter = version.Id
                     };
 
+                    CreateContextMenuForVersionButton(button);
                     stackPanel.Children.Add(button);
                 }
             }
@@ -185,7 +187,7 @@ namespace DocumentVersionControlSystem.UI
             clickedButton.BorderBrush = Brushes.Gray;
             clickedButton.BorderThickness = new Thickness(3);
 
-            AddVersionButtons(_selectedButton);
+            AddVersionButtons();
         }
 
         private void OnButtonDoubleClicked(object sender, RoutedEventArgs e)
@@ -258,7 +260,29 @@ namespace DocumentVersionControlSystem.UI
 
         private void Open_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Open...", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (_selectedButton != null)
+            {
+                // Отримати кнопку, до якої прив'язане контекстне меню
+                if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
+                {
+                    Button parentButton = contextMenu.PlacementTarget as Button;
+
+                    if (parentButton != null)
+                    {
+                        Database.Models.Document document = _documentManager
+                            .GetDocumentsByName(parentButton.Content.ToString())
+                            .First();
+
+                        DocumentViewerWindow documentViewerWindow = new DocumentViewerWindow(
+                            _documentManager,
+                            _versionControlManager,
+                            document
+                        );
+
+                        documentViewerWindow.ShowDialog();
+                    }
+                }
+            }
         }
 
         private void Rename_Click(object sender, RoutedEventArgs e)
@@ -280,6 +304,79 @@ namespace DocumentVersionControlSystem.UI
             _documentManager.DeleteDocument(document);
             AdjustGridLayout(totalButtons);
             MessageBox.Show("Document have been removed...", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void CreateContextMenuForVersionButton(Button button)
+        {
+            ContextMenu contextMenu = new ContextMenu();
+
+            MenuItem item1 = new MenuItem { Header = "Open" };
+            item1.Click += OpenVersion_Click;
+
+            MenuItem item2 = new MenuItem { Header = "Change description" };
+            item2.Click += ChangeDescription_Click;
+
+            MenuItem item3 = new MenuItem { Header = "Delete" };
+            item3.Click += DeleteVersion_Click;
+
+            contextMenu.Items.Add(item1);
+            contextMenu.Items.Add(item2);
+            contextMenu.Items.Add(item3);
+
+            button.ContextMenu = contextMenu;
+        }
+
+        private void OpenVersion_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
+            {
+                Button parentButton = contextMenu.PlacementTarget as Button;
+
+                if (parentButton != null)
+                {
+                    int versionId = (int)parentButton.CommandParameter;
+
+                    Database.Models.Version version = _versionControlManager.GetVersionById(versionId);
+
+                    VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version);
+                    versionDetailsWindow.ShowDialog();
+                }
+            }
+        }
+
+        private void ChangeDescription_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
+            {
+                Button parentButton = contextMenu.PlacementTarget as Button;
+
+                if (parentButton != null)
+                {
+                    InputPopup popup = new InputPopup();
+                    popup.TitleText.Text = "Change version description";
+                    popup.MessageText.Text = parentButton.Tag.ToString();
+                    popup.ShowDialog();
+
+                    string newName = popup.MessageText.Text;
+                    _versionControlManager.ChangeVersionDescription((int)parentButton.CommandParameter, newName);
+                    AddVersionButtons();
+                }
+            }
+        }
+
+        private void DeleteVersion_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
+            {
+                Button parentButton = contextMenu.PlacementTarget as Button;
+
+                if (parentButton != null)
+                {
+                    var version = _versionControlManager.GetVersionById((int)parentButton.CommandParameter);
+                    _versionControlManager.DeleteVersion(version);
+                    AddVersionButtons();
+                }
+            }
         }
     }
 }
