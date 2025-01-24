@@ -118,6 +118,7 @@ namespace DocumentVersionControlSystem.UI
                 button = CreateButton(document.Name, "SquareButtonStyle");
                 button.Tag = document.Name + ".txt";
                 button.Click += OnButtonClicked;
+                button.MouseDoubleClick += OnButtonDoubleClicked;
                 button.PreviewMouseRightButtonDown += OnButtonClicked;
                 CreateContextMenuForButton(button);
 
@@ -185,11 +186,18 @@ namespace DocumentVersionControlSystem.UI
             clickedButton.BorderThickness = new Thickness(3);
 
             AddVersionButtons(_selectedButton);
+        }
 
-            Database.Models.Document document = _documentManager.GetDocumentsByName(clickedButton.Content.ToString()).First();
+        private void OnButtonDoubleClicked(object sender, RoutedEventArgs e)
+        {
+            if (_selectedButton != null)
+            {
+                Button clickedButton = sender as Button;
+                Database.Models.Document document = _documentManager.GetDocumentsByName(clickedButton.Content.ToString()).First();
 
-            DocumentViewerWindow documentViewerWindow = new DocumentViewerWindow(_documentManager, _versionControlManager, document);
-            documentViewerWindow.ShowDialog();
+                DocumentViewerWindow documentViewerWindow = new DocumentViewerWindow(_documentManager, _versionControlManager, document);
+                documentViewerWindow.ShowDialog();
+            }
         }
 
         private void AddDocumentClicked(object sender, RoutedEventArgs e)
