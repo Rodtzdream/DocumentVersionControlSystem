@@ -10,8 +10,8 @@
         <GridSplitter Height="1.5" Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,40,0,0" Cursor="Arrow" />
         
         <!-- Текст повідомлення -->
-        <RadioButton x:Name="RadioButton1" Content="Switch to this version and delete newer versions" FontSize="14" Margin="10,50,10,0" VerticalAlignment="Top" GroupName="SwitchOption" IsChecked="True"/>
-        <RadioButton x:Name="RadioButton2" Content="Switch to this version and save it as the latest version" FontSize="14" Margin="10,75,10,0" VerticalAlignment="Top" GroupName="SwitchOption"/>
+        <RadioButton x:Name="RadioButton1" Content="Switch to this version and delete newer versions" FontSize="14" Margin="10,50,10,0" VerticalAlignment="Top" GroupName="SwitchOption" IsChecked="True" Checked="DeleteNewer_Checked"/>
+        <RadioButton x:Name="RadioButton2" Content="Switch to this version and save it as the latest version" FontSize="14" Margin="10,75,10,0" VerticalAlignment="Top" GroupName="SwitchOption" Checked="SaveAsTheLatest_Checked"/>
 
         <!-- Кнопка "OK" -->
         <Button Content="OK" Width="80" Height="30" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10" Click="OkButton_Click" Style="{StaticResource CustomButtonStyle}"/>
