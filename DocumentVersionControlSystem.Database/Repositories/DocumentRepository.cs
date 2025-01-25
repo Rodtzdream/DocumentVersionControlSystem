@@ -52,6 +52,7 @@ public class DocumentRepository
             _context.Documents.Remove(document);
             if(document.VersionCount > 0)
                 _context.Versions.RemoveRange(_context.Versions.Where(v => v.DocumentId == document.Id));
+            _context.SaveChanges();
         }
     }
 

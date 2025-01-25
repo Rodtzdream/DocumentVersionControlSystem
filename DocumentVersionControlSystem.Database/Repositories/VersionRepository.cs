@@ -38,6 +38,12 @@ public class VersionRepository
         return _context.Versions.Where(v => v.DocumentId == documentId).ToList();
     }
 
+    public void UpdateVersion(Models.Version version)
+    {
+        _context.Versions.Update(version);
+        _context.SaveChanges();
+    }
+
     public void SaveChanges()
     {
         _context.SaveChanges();
