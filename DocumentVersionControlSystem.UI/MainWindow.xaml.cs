@@ -338,7 +338,7 @@ namespace DocumentVersionControlSystem.UI
 
                     Database.Models.Version version = _versionControlManager.GetVersionById(versionId);
 
-                    VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version);
+                    VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version, _versionControlManager);
                     versionDetailsWindow.ShowDialog();
                 }
             }

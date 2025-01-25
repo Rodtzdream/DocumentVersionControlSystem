@@ -32,11 +32,11 @@
             <ScrollViewer Grid.Column="0" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel x:Name="ButtonStackPanel" Grid.Column="0" Grid.Row="1"/>
             </ScrollViewer>
-            
+
             <TextBox x:Name="TextBox" IsReadOnly="True" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,10,10,80" BorderBrush="Black" BorderThickness="1.5" Style="{StaticResource TextBoxStyle}"/>
 
             <TextBlock x:Name="TextBlock" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,0,0,50" VerticalAlignment="Bottom"/>
-            <Button Grid.Column="1" Content="Apply version" Margin="0,4,10,0" Style="{StaticResource CustomButtonStyle}" Width="100" Height="20" HorizontalAlignment="Right" FontSize="12" />
+            <Button Grid.Column="1" Content="Apply version" Margin="0,0,10,8" Style="{StaticResource CustomButtonStyle}" Width="100" Height="20" HorizontalAlignment="Right" FontSize="12" VerticalAlignment="Bottom" Click="ApplyVersionButton_Click" />
 
         </Grid>
     </Border>

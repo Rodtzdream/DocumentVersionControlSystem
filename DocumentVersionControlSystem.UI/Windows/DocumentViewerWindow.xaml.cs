@@ -98,10 +98,14 @@ namespace DocumentVersionControlSystem.UI.Windows
         {
             string documentText = File.ReadAllText(_document.FilePath);
             textForm.Text = documentText;
+            AddVersionButtons();
         }
 
         private void CreateNewVersionButton_Click(object sender, RoutedEventArgs e)
         {
+            string documentText = File.ReadAllText(_document.FilePath);
+            textForm.Text = documentText;
+
             InputPopup inputPopup = new InputPopup();
             inputPopup.Title = "Description";
             inputPopup.TitleText.Text = "Enter version description:";
@@ -157,7 +161,7 @@ namespace DocumentVersionControlSystem.UI.Windows
 
                     Database.Models.Version version = _versionControlManager.GetVersionById(versionId);
 
-                    VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version);
+                    VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version, _versionControlManager);
                     versionDetailsWindow.ShowDialog();
                 }
             }

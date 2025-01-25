@@ -43,14 +43,11 @@ public class VersionControlManager
             return false;
         }
 
-        Version version;
-        string oldFilePath, newFilePath;
-
         var documentDirectory = Path.Combine("Documents", document.Name);
-        oldFilePath = document.FilePath;
-        newFilePath = Path.Combine(documentDirectory, $"{document.Name}_v{document.VersionCount + 1}.txt");
+        string oldFilePath = document.FilePath;
+        string newFilePath = Path.Combine(documentDirectory, $"{document.Name}_v{document.VersionCount + 1}.txt");
 
-        version = new Version
+        Version version = new()
         {
             DocumentId = document.Id,
             VersionDescription = versionDescription,
@@ -62,7 +59,7 @@ public class VersionControlManager
         FileStorage.FileStorageManager.CopyFile(oldFilePath, newFilePath);
         _logger.LogInformation($"New version {version.Id} created for document {document.Id}");
 
-        _documentRepository.SaveChanges();
+        _documentRepository.UpdateDocument(document);
         return true;
     }
 
@@ -78,9 +75,16 @@ public class VersionControlManager
         return _diffManager.GetDiff(oldFilePath, newFilePath);
     }
 
-    public void SwitchToVersionAndDeleteNewer(Document document, int versionId)
+    public void SwitchToVersionAndDeleteNewer(int documentId, int versionId, string description)
     {
         Version version = GetVersionById(versionId);
+        Document? document = _documentRepository.GetDocumentById(documentId);
+
+        if (document == null)
+        {
+            _logger.LogError($"Document with ID {documentId} not found.");
+            throw new InvalidOperationException($"Document with ID {documentId} not found.");
+        }
 
         var documentFilePath = document.FilePath;
         var versionFilePath = version.FilePath;
@@ -93,34 +97,56 @@ public class VersionControlManager
             foreach (var v in versionsToDelete)
             {
                 FileStorage.FileStorageManager.DeleteFile(v.FilePath);
+                _versionRepository.DeleteVersion(v);
+                document.VersionCount--;
             }
-            _versionRepository.GetVersionsByDocumentId(document.Id).RemoveAll(v => v.CreationDate > version.CreationDate);
         }
 
         document.LastModifiedDate = DateTime.Now;
+        _documentRepository.UpdateDocument(document);
+        version.VersionDescription = description;
+        _versionRepository.UpdateVersion(version);
         _logger.LogInformation($"Switched to version {version.Id} for document {document.Id}");
     }
 
-    public void SwitchToVersionAndSaveAsLatest(Document document, int versionId)
+    public Version SwitchToVersionAndSaveAsLatest(int documentId, int versionId, string description)
     {
         Version version = GetVersionById(versionId);
+        Document? document = _documentRepository.GetDocumentById(documentId);
+
+        if (document == null)
+        {
+            _logger.LogError($"Document with ID {documentId} not found.");
+            throw new InvalidOperationException($"Document with ID {documentId} not found.");
+        }
+
+        var documentDirectory = Path.Combine("Documents", document.Name);
+        string newFilePath = Path.Combine(documentDirectory, $"{document.Name}_v{document.VersionCount + 1}.txt");
 
         var documentFilePath = document.FilePath;
         var versionFilePath = version.FilePath;
 
         FileStorage.FileStorageManager.CopyFile(versionFilePath, documentFilePath);
-        document.LastModifiedDate = DateTime.Now;
 
         var newVersion = new Version
         {
             DocumentId = document.Id,
-            VersionDescription = version.VersionDescription,
-            FilePath = documentFilePath,
+            VersionDescription = description,
+            FilePath = newFilePath,
             CreationDate = DateTime.Now
         };
 
         _versionRepository.AddVersion(document, newVersion);
+        _versionRepository.UpdateVersion(version);
+
+        document.LastModifiedDate = DateTime.Now;
+        FileStorage.FileStorageManager.CopyFile(documentFilePath, newFilePath);
+        document.VersionCount++;
+        _documentRepository.UpdateDocument(document);
+
         _logger.LogInformation($"Switched to version {version.Id} and saved as latest for document {document.Id}");
+
+        return newVersion;
     }
 
     public void ChangeVersionDescription(int versionId, string newDescription)
