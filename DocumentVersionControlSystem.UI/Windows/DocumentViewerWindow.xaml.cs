@@ -26,6 +26,7 @@ namespace DocumentVersionControlSystem.UI.Windows
     /// </summary>
     public partial class DocumentViewerWindow : Window
     {
+        private Button _selectedVersionButton;
         private readonly DocumentManager _documentManager;
         private readonly VersionControlManager _versionControlManager;
         private Database.Models.Document _document;
@@ -71,6 +72,8 @@ namespace DocumentVersionControlSystem.UI.Windows
                         Margin = new Thickness(0, 8, 0, 0), // Відступи
                         CommandParameter = version.Id
                     };
+
+                    button.Click += OnButtonVersionClicked;
 
                     CreateContextMenuForButton(button);
                     stackPanel.Children.Add(button);
@@ -147,6 +150,24 @@ namespace DocumentVersionControlSystem.UI.Windows
             contextMenu.Items.Add(item3);
 
             button.ContextMenu = contextMenu;
+        }
+
+        private void OnButtonVersionClicked(object sender, RoutedEventArgs e)
+        {
+            if (_selectedVersionButton != null)
+            {
+                _selectedVersionButton.ClearValue(Button.BorderBrushProperty);
+                _selectedVersionButton.ClearValue(Button.BorderThicknessProperty);
+            }
+
+            Button clickedButton = sender as Button;
+            _selectedVersionButton = clickedButton;
+            clickedButton.BorderBrush = Brushes.Gray;
+            clickedButton.BorderThickness = new Thickness(3);
+
+            var versionId = _versionControlManager.GetVersionById((int)clickedButton.CommandParameter);
+            VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(versionId, _versionControlManager);
+            versionDetailsWindow.ShowDialog();
         }
 
         private void Open_Click(object sender, RoutedEventArgs e)

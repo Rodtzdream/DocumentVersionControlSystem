@@ -17,6 +17,7 @@ namespace DocumentVersionControlSystem.UI
     public partial class MainWindow : Window
     {
         private Button _selectedButton;
+        private Button _selectedVersionButton;
         private DocumentManager _documentManager;
         private VersionControlManager _versionControlManager;
         private Logging.Logger _logger;
@@ -158,6 +159,8 @@ namespace DocumentVersionControlSystem.UI
                         CommandParameter = version.Id
                     };
 
+                    button.Click += OnButtonVersionClicked;
+
                     CreateContextMenuForVersionButton(button);
                     stackPanel.Children.Add(button);
                 }
@@ -188,6 +191,24 @@ namespace DocumentVersionControlSystem.UI
             clickedButton.BorderThickness = new Thickness(3);
 
             AddVersionButtons();
+        }
+
+        private void OnButtonVersionClicked(object sender, RoutedEventArgs e)
+        {
+            if (_selectedVersionButton != null)
+            {
+                _selectedVersionButton.ClearValue(Button.BorderBrushProperty);
+                _selectedVersionButton.ClearValue(Button.BorderThicknessProperty);
+            }
+
+            Button clickedButton = sender as Button;
+            _selectedVersionButton = clickedButton;
+            clickedButton.BorderBrush = Brushes.Gray;
+            clickedButton.BorderThickness = new Thickness(3);
+
+            var version = _versionControlManager.GetVersionById((int)clickedButton.CommandParameter);
+            VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version, _versionControlManager);
+            versionDetailsWindow.ShowDialog();
         }
 
         private void OnButtonDoubleClicked(object sender, RoutedEventArgs e)

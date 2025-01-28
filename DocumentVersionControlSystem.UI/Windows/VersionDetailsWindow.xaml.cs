@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection.Metadata;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace DocumentVersionControlSystem.UI.Windows
 {
@@ -15,6 +16,7 @@ namespace DocumentVersionControlSystem.UI.Windows
     /// </summary>
     public partial class VersionDetailsWindow : Window
     {
+        Button _selectedVersionButton;
         Database.Models.Version _version;
         private readonly VersionControlManager _versionControlManager;
 
@@ -28,6 +30,7 @@ namespace DocumentVersionControlSystem.UI.Windows
             ReadDescription();
             AddVersionButtons();
         }
+
         public void ReadDocument()
         {
             string documentVersionText = File.ReadAllText(_version.FilePath);
@@ -65,6 +68,15 @@ namespace DocumentVersionControlSystem.UI.Windows
                         CommandParameter = version.Id
                     };
 
+                    if (version.Id == _version.Id)
+                    {
+                        button.BorderBrush = Brushes.Gray;
+                        button.BorderThickness = new Thickness(3);
+                        _selectedVersionButton = button;
+                    }
+
+                    button.Click += OnButtonVersionClicked;
+
                     CreateContextMenuForVersionButton(button);
                     stackPanel.Children.Add(button);
                 }
@@ -96,6 +108,25 @@ namespace DocumentVersionControlSystem.UI.Windows
             ReadDocument();
             ReadDescription();
             AddVersionButtons();
+        }
+
+        private void OnButtonVersionClicked(object sender, RoutedEventArgs e)
+        {
+            if (_selectedVersionButton != null)
+            {
+                _selectedVersionButton.ClearValue(Button.BorderBrushProperty);
+                _selectedVersionButton.ClearValue(Button.BorderThicknessProperty);
+            }
+
+            Button clickedButton = sender as Button;
+            _selectedVersionButton = clickedButton;
+            clickedButton.BorderBrush = Brushes.Gray;
+            clickedButton.BorderThickness = new Thickness(3);
+
+            _version = _versionControlManager.GetVersionById((int)clickedButton.CommandParameter);
+
+            ReadDocument();
+            ReadDescription();
         }
 
         private void OpenVersion_Click(object sender, RoutedEventArgs e)
