@@ -35,7 +35,8 @@ public class VersionRepository
 
     public List<Models.Version> GetVersionsByDocumentId(int documentId)
     {
-        return _context.Versions.Where(v => v.DocumentId == documentId).ToList();
+        var versions = _context.Versions.Where(v => v.DocumentId == documentId).ToList();
+        return versions.OrderByDescending(v => v.CreationDate).ToList();
     }
 
     public void UpdateVersion(Models.Version version)
