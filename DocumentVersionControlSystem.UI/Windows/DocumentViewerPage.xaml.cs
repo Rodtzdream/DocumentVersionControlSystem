@@ -22,10 +22,12 @@ using System.Windows.Shapes;
 namespace DocumentVersionControlSystem.UI.Windows
 {
     /// <summary>
-    /// Interaction logic for DocumentViewerWindow.xaml
+    /// Interaction logic for DocumentViewerPage.xaml
     /// </summary>
-    public partial class DocumentViewerWindow : Window
+    public partial class DocumentViewerPage : Page
     {
+        private MainWindow _mainWindow;
+
         private Button _selectedVersionButton;
         private readonly DocumentManager _documentManager;
         private readonly VersionControlManager _versionControlManager;
@@ -33,27 +35,27 @@ namespace DocumentVersionControlSystem.UI.Windows
 
         private TextBox textForm;
 
-        public DocumentViewerWindow(DocumentManager documentManagement, VersionControlManager versionControl, Database.Models.Document document)
+        public DocumentViewerPage(MainWindow mainWindow, DocumentManager documentManagement, VersionControlManager versionControl, Database.Models.Document document)
         {
             _documentManager = documentManagement;
             _versionControlManager = versionControl;
             _document = document;
 
             InitializeComponent();
+            _mainWindow = mainWindow;
             ReadDocument();
             AddVersionButtons();
         }
         public void ReadDocument()
         {
             string documentText = File.ReadAllText(_document.FilePath);
-            textForm = (TextBox)FindName("TextBox");
-            textForm.Text = documentText;
+            TextBox.Text = documentText;
         }
 
         public void AddVersionButtons()
         {
             // Отримати StackPanel за ім'ям
-            StackPanel stackPanel = (StackPanel)FindName("ButtonStackPanel");
+            StackPanel stackPanel = ButtonStackPanel;
             if (stackPanel != null)
             {
                 stackPanel.Children.Clear();
@@ -68,7 +70,7 @@ namespace DocumentVersionControlSystem.UI.Windows
                     {
                         Content = version.CreationDate.ToString(),
                         Tag = version.VersionDescription,
-                        Style = (Style)FindResource("RectangleButtonStyle"), // Стиль із ресурсів
+                        Style = (Style)Application.Current.FindResource("RectangleButtonStyle"), // Стиль із ресурсів
                         Margin = new Thickness(0, 8, 0, 0), // Відступи
                         CommandParameter = version.Id
                     };
@@ -166,8 +168,8 @@ namespace DocumentVersionControlSystem.UI.Windows
             clickedButton.BorderThickness = new Thickness(3);
 
             var versionId = _versionControlManager.GetVersionById((int)clickedButton.CommandParameter);
-            VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(versionId, _versionControlManager);
-            versionDetailsWindow.ShowDialog();
+            VersionDetailsPage versionDetailsWindow = new VersionDetailsPage(_mainWindow, versionId, _versionControlManager);
+            NavigationService.Navigate(versionDetailsWindow);
         }
 
         private void Open_Click(object sender, RoutedEventArgs e)
@@ -182,8 +184,8 @@ namespace DocumentVersionControlSystem.UI.Windows
 
                     Database.Models.Version version = _versionControlManager.GetVersionById(versionId);
 
-                    VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version, _versionControlManager);
-                    versionDetailsWindow.ShowDialog();
+                    VersionDetailsPage versionDetailsWindow = new VersionDetailsPage(_mainWindow, version, _versionControlManager);
+                    NavigationService.Navigate(versionDetailsWindow);
                 }
             }
         }

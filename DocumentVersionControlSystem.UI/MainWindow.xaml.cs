@@ -207,8 +207,8 @@ namespace DocumentVersionControlSystem.UI
             clickedButton.BorderThickness = new Thickness(3);
 
             var version = _versionControlManager.GetVersionById((int)clickedButton.CommandParameter);
-            VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version, _versionControlManager);
-            versionDetailsWindow.ShowDialog();
+            VersionDetailsPage versionDetailsWindow = new VersionDetailsPage(this, version, _versionControlManager);
+            MainFrame.Navigate(versionDetailsWindow);
         }
 
         private void OnButtonDoubleClicked(object sender, RoutedEventArgs e)
@@ -218,8 +218,9 @@ namespace DocumentVersionControlSystem.UI
                 Button clickedButton = sender as Button;
                 Database.Models.Document document = _documentManager.GetDocumentsByName(clickedButton.Content.ToString()).First();
 
-                DocumentViewerWindow documentViewerWindow = new DocumentViewerWindow(_documentManager, _versionControlManager, document);
-                documentViewerWindow.ShowDialog();
+                DocumentViewerPage documentViewerWindow = new DocumentViewerPage(this, _documentManager, _versionControlManager, document);
+                //documentViewerWindow.ShowDialog();
+                MainFrame.Navigate(documentViewerWindow);
             }
         }
 
@@ -294,13 +295,14 @@ namespace DocumentVersionControlSystem.UI
                             .GetDocumentsByName(parentButton.Content.ToString())
                             .First();
 
-                        DocumentViewerWindow documentViewerWindow = new DocumentViewerWindow(
+                        DocumentViewerPage documentViewerWindow = new DocumentViewerPage(
+                            this,
                             _documentManager,
                             _versionControlManager,
                             document
                         );
 
-                        documentViewerWindow.ShowDialog();
+                        MainFrame.Navigate(documentViewerWindow);
                     }
                 }
             }
@@ -359,8 +361,8 @@ namespace DocumentVersionControlSystem.UI
 
                     Database.Models.Version version = _versionControlManager.GetVersionById(versionId);
 
-                    VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version, _versionControlManager);
-                    versionDetailsWindow.ShowDialog();
+                    VersionDetailsPage versionDetailsWindow = new VersionDetailsPage(this, version, _versionControlManager);
+                    MainFrame.Navigate(versionDetailsWindow);
                 }
             }
         }

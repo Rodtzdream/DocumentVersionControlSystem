@@ -12,20 +12,23 @@ using System.Windows.Media;
 namespace DocumentVersionControlSystem.UI.Windows
 {
     /// <summary>
-    /// Interaction logic for VersionDetailsWindow.xaml
+    /// Interaction logic for VersionDetailsPage.xaml
     /// </summary>
-    public partial class VersionDetailsWindow : Window
+    public partial class VersionDetailsPage : Page
     {
+        MainWindow _mainWindow;
+
         Button _selectedVersionButton;
         Database.Models.Version _version;
         private readonly VersionControlManager _versionControlManager;
 
-        public VersionDetailsWindow(Database.Models.Version version, VersionControlManager versionControlManager)
+        public VersionDetailsPage(MainWindow mainWindow, Database.Models.Version version, VersionControlManager versionControlManager)
         {
             _version = version;
             _versionControlManager = versionControlManager;
 
             InitializeComponent();
+            _mainWindow = mainWindow;
             ReadDocument();
             ReadDescription();
             AddVersionButtons();

@@ -37,6 +37,8 @@
                 <StackPanel Grid.Column="1" Grid.Row="1">
                     <Grid x:Name="ButtonGrid"/>
                 </StackPanel>
+
+                <Frame x:Name="MainFrame" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" NavigationUIVisibility="Hidden" />
             </Grid>
         </ScrollViewer>
     </Border>
