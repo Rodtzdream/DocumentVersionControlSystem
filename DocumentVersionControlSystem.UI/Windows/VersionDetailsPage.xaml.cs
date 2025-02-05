@@ -27,11 +27,20 @@ namespace DocumentVersionControlSystem.UI.Windows
             ReadDescription();
         }
 
-        public void ReadDocument()
+        public bool ReadDocument()
         {
-            string documentVersionText = File.ReadAllText(_version.FilePath);
-            TextBox textBox = (TextBox)FindName("TextBox");
-            textBox.Text = documentVersionText;
+            try
+            {
+                string documentVersionText = File.ReadAllText(_version.FilePath);
+                TextBox textBox = (TextBox)FindName("TextBox");
+                textBox.Text = documentVersionText;
+            }
+            catch (System.Exception)
+            {
+                return false;
+                throw new System.Exception("Failed to read document version file.");
+            }
+            return true;
         }
 
         public void ReadDescription()
@@ -41,11 +50,14 @@ namespace DocumentVersionControlSystem.UI.Windows
             textBox.Text = descriptionText;
         }
 
-        public void RefreshWindow()
+        public bool RefreshWindow()
         {
-            ReadDocument();
+            if (!ReadDocument())
+                return false;
+
             ReadDescription();
             _mainWindow.AddVersionButtons();
+            return true;
         }
 
         private void ApplyVersionButton_Click(object sender, RoutedEventArgs e)

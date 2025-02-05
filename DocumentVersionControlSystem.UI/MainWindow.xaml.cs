@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace DocumentVersionControlSystem.UI
 {
@@ -206,22 +207,31 @@ namespace DocumentVersionControlSystem.UI
         {
             if (MainFrame.CanGoBack)
             {
-                // Додаткова логіка перед навігацією назад
                 MainFrame.GoBack();
-                // Додаткова логіка після навігації назад
-                var currentPage = MainFrame.Content as Page;
-                if (currentPage is HomePage homePage)
+
+                Dispatcher.Invoke(() =>
                 {
-                    homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
-                }
-                else if (currentPage is VersionDetailsPage versionDetailsPage)
-                {
-                    versionDetailsPage.RefreshWindow();
-                }
-                else if (currentPage is DocumentViewerPage documentViewerPage)
-                {
-                    documentViewerPage.ReadDocument();
-                }
+                    var currentPage = MainFrame.Content as Page;
+                    if (currentPage is HomePage homePage)
+                    {
+                        homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                        ClearVersionButtons();
+                    }
+                    else if (currentPage is VersionDetailsPage versionDetailsPage)
+                    {
+                        if (!versionDetailsPage.RefreshWindow())
+                        {
+                            MainFrame.Navigate(_homePage);
+                            _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                            ClearVersionButtons();
+                            MessageBox.Show("Failed to load version. Returning to the home page.");
+                        }
+                    }
+                    else if (currentPage is DocumentViewerPage documentViewerPage)
+                    {
+                        documentViewerPage.ReadDocument();
+                    }
+                }, DispatcherPriority.Background);
             }
         }
 
@@ -229,22 +239,31 @@ namespace DocumentVersionControlSystem.UI
         {
             if (MainFrame.CanGoForward)
             {
-                // Додаткова логіка перед навігацією назад
                 MainFrame.GoForward();
-                // Додаткова логіка після навігації назад
-                var currentPage = MainFrame.Content as Page;
-                if (currentPage is HomePage homePage)
+
+                Dispatcher.Invoke(() =>
                 {
-                    homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
-                }
-                else if (currentPage is VersionDetailsPage versionDetailsPage)
-                {
-                    versionDetailsPage.RefreshWindow();
-                }
-                else if (currentPage is DocumentViewerPage documentViewerPage)
-                {
-                    documentViewerPage.ReadDocument();
-                }
+                    var currentPage = MainFrame.Content as Page;
+                    if (currentPage is HomePage homePage)
+                    {
+                        homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                        ClearVersionButtons();
+                    }
+                    else if (currentPage is VersionDetailsPage versionDetailsPage)
+                    {
+                        if (!versionDetailsPage.RefreshWindow())
+                        {
+                            MainFrame.Navigate(_homePage);
+                            _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                            ClearVersionButtons();
+                            MessageBox.Show("Failed to load version. Returning to the home page.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    else if (currentPage is DocumentViewerPage documentViewerPage)
+                    {
+                        documentViewerPage.ReadDocument();
+                    }
+                }, DispatcherPriority.Background);
             }
         }
     }
