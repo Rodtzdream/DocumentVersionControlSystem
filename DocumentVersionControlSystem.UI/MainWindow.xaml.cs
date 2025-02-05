@@ -2,12 +2,11 @@
 using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.UI.Windows;
 using DocumentVersionControlSystem.VersionControl;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace DocumentVersionControlSystem.UI
 {
@@ -21,118 +20,61 @@ namespace DocumentVersionControlSystem.UI
         private DocumentManager _documentManager;
         private VersionControlManager _versionControlManager;
         private Logging.Logger _logger;
-        int totalButtons = 0;
+
+        private HomePage _homePage;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            _logger = new Logging.Logger();
+            _documentManager = new DocumentManager(_logger);
+            _versionControlManager = new VersionControlManager(_logger);
+            _homePage = new HomePage(this, _documentManager, _versionControlManager);
+
             InitializeDynamicGrid();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            AdjustGridLayout(totalButtons); // Перераховує сітку після того, як вікно завантажене
+            MainFrame.Navigate(_homePage);
+        }
+
+        private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            // Перерахунок сітки при зміні розміру
+            _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
         }
 
         private void InitializeDynamicGrid()
         {
             // Прив'язка події зміни розміру вікна
             this.SizeChanged += OnWindowSizeChanged;
-            this.StateChanged += MainWindow_StateChanged;
 
-            _logger = new Logging.Logger();
-
-            _documentManager = new DocumentManager(_logger);
             _documentManager.InitializeFileWatchers();
-            totalButtons = _documentManager.GetAllDocuments().Count + 1;
-
-            _versionControlManager = new VersionControlManager(_logger);
         }
 
-        private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        private void OnButtonVersionClicked(object sender, RoutedEventArgs e)
         {
-            // Перерахунок сітки при зміні розміру
-            AdjustGridLayout(totalButtons);
+            if (_selectedVersionButton != null)
+            {
+                _selectedVersionButton.ClearValue(Button.BorderBrushProperty);
+                _selectedVersionButton.ClearValue(Button.BorderThicknessProperty);
+            }
+
+            Button clickedButton = sender as Button;
+            _selectedVersionButton = clickedButton;
+            clickedButton.BorderBrush = Brushes.Gray;
+            clickedButton.BorderThickness = new Thickness(3);
+
+            var version = _versionControlManager.GetVersionById((int)clickedButton.CommandParameter);
+            OpenVersionViewer(version);
         }
 
-        private void MainWindow_StateChanged(object sender, EventArgs e)
+        private void OpenVersionViewer(Database.Models.Version version)
         {
-            if (WindowState == WindowState.Maximized || WindowState == WindowState.Normal)
-            {
-                // Перерахунок сітки тільки при зміні стану на нормальний чи повноекранний
-                AdjustGridLayout(totalButtons);
-            }
-        }
-
-        private void AdjustGridLayout(int totalButtons)
-        {
-            // Отримуємо ширину і висоту контейнера
-            double windowWidth = this.ActualWidth - 350;
-            double windowHeight = this.ActualHeight - 32;
-
-            // Визначаємо кількість стовпців і рядків на основі розміру вікна
-            int columns = (int)(windowWidth / 100);
-            int rows = totalButtons - columns + 1;
-
-            // Якщо кількість стовпців або рядків менша ніж 1, робимо їх мінімум 1
-            columns = Math.Max(columns, 1);
-            rows = Math.Max(rows, 1);
-
-            // Очищаємо існуючі стовпці і рядки
-            ButtonGrid.ColumnDefinitions.Clear();
-            ButtonGrid.RowDefinitions.Clear();
-
-            // Додаємо нові стовпці і рядки
-            for (int i = 0; i < columns; i++)
-            {
-                ButtonGrid.ColumnDefinitions.Add(new ColumnDefinition());
-            }
-
-            for (int i = 0; i < rows; i++)
-            {
-                ButtonGrid.RowDefinitions.Add(new RowDefinition());
-            }
-
-            // Додаємо кнопки в сітку
-            AddButtonsToGrid(columns, rows, totalButtons);
-        }
-
-        private void AddButtonsToGrid(int columns, int rows, int totalButtons)
-        {
-            List<Database.Models.Document> documents = _documentManager.GetAllDocuments();
-
-            // Очистити старі кнопки
-            ButtonGrid.Children.Clear();
-
-            Button button = CreateButton($"Add document", "AddButtonStyle");
-            button.Click += AddDocumentClicked;
-
-            // Додавання кнопки до сітки
-            Grid.SetColumn(button, 0);
-            Grid.SetRow(button, 0);
-            ButtonGrid.Children.Add(button);
-
-            int i = 1;
-            foreach (var document in documents)
-            {
-                // Створення кнопки
-                button = CreateButton(document.Name, "SquareButtonStyle");
-                button.Tag = document.Name + ".txt";
-                button.Click += OnButtonClicked;
-                button.MouseDoubleClick += OnButtonDoubleClicked;
-                button.PreviewMouseRightButtonDown += OnButtonClicked;
-                CreateContextMenuForButton(button);
-
-                // Обчислення стовпця та рядка для кнопки
-                int column = i % columns;
-                int row = i / columns;
-
-                // Додавання кнопки до сітки
-                Grid.SetColumn(button, column);
-                Grid.SetRow(button, row);
-                ButtonGrid.Children.Add(button);
-                ++i;
-            }
+            VersionDetailsPage versionDetailsWindow = new VersionDetailsPage(this, version, _versionControlManager);
+            MainFrame.Navigate(versionDetailsWindow);
         }
 
         public void AddVersionButtons()
@@ -144,6 +86,7 @@ namespace DocumentVersionControlSystem.UI
             {
                 stackPanel.Children.Clear();
 
+                _selectedButton = _homePage.GetSelectedButton();
                 var documentId = _documentManager.GetDocumentsByName(_selectedButton.Content.ToString()).First().Id;
                 var versions = _versionControlManager.GetVersionsByDocumentId(documentId);
 
@@ -167,164 +110,13 @@ namespace DocumentVersionControlSystem.UI
             }
         }
 
-        private Button CreateButton(string content, string styleKey)
+        public void ClearVersionButtons()
         {
-            return new Button
+            StackPanel stackPanel = (StackPanel)FindName("ButtonStackPanel");
+            if (stackPanel != null)
             {
-                Content = content,
-                Style = (Style)FindResource(styleKey),
-                Margin = new Thickness(5)
-            };
-        }
-
-        private void OnButtonClicked(object sender, RoutedEventArgs e)
-        {
-            if (_selectedButton != null)
-            {
-                _selectedButton.ClearValue(Button.BorderBrushProperty);
-                _selectedButton.ClearValue(Button.BorderThicknessProperty);
+                stackPanel.Children.Clear();
             }
-
-            Button clickedButton = sender as Button;
-            _selectedButton = clickedButton;
-            clickedButton.BorderBrush = Brushes.Gray;
-            clickedButton.BorderThickness = new Thickness(3);
-
-            AddVersionButtons();
-        }
-
-        private void OnButtonVersionClicked(object sender, RoutedEventArgs e)
-        {
-            if (_selectedVersionButton != null)
-            {
-                _selectedVersionButton.ClearValue(Button.BorderBrushProperty);
-                _selectedVersionButton.ClearValue(Button.BorderThicknessProperty);
-            }
-
-            Button clickedButton = sender as Button;
-            _selectedVersionButton = clickedButton;
-            clickedButton.BorderBrush = Brushes.Gray;
-            clickedButton.BorderThickness = new Thickness(3);
-
-            var version = _versionControlManager.GetVersionById((int)clickedButton.CommandParameter);
-            VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version, _versionControlManager);
-            versionDetailsWindow.ShowDialog();
-        }
-
-        private void OnButtonDoubleClicked(object sender, RoutedEventArgs e)
-        {
-            if (_selectedButton != null)
-            {
-                Button clickedButton = sender as Button;
-                Database.Models.Document document = _documentManager.GetDocumentsByName(clickedButton.Content.ToString()).First();
-
-                DocumentViewerWindow documentViewerWindow = new DocumentViewerWindow(_documentManager, _versionControlManager, document);
-                documentViewerWindow.ShowDialog();
-            }
-        }
-
-        private void AddDocumentClicked(object sender, RoutedEventArgs e)
-        {
-            // Створення діалогового вікна для вибору файлу
-            var openFileDialog = new Microsoft.Win32.OpenFileDialog
-            {
-                Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
-                Title = "Select a text file to add",
-                Multiselect = false // Забороняє вибір кількох файлів
-            };
-
-            // Відкриття діалогового вікна та перевірка, чи файл було обрано
-            bool? result = openFileDialog.ShowDialog();
-            if (result == true)
-            {
-                string filePath = openFileDialog.FileName; // Отримуємо шлях до файлу
-
-                // Обробка файлу (наприклад, зчитування вмісту)
-                try
-                {
-                    // Наприклад, відобразимо вміст у TextBox (замініть TextBoxName на ваш контроль)
-                    _documentManager.AddDocument(filePath);
-
-                    // Перерахунок сітки
-                    ++totalButtons;
-                    AdjustGridLayout(totalButtons);
-                    // update window
-
-                    MessageBox.Show("File added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error reading file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-        }
-
-        private void CreateContextMenuForButton(Button button)
-        {
-            ContextMenu contextMenu = new ContextMenu();
-
-            MenuItem item1 = new MenuItem { Header = "Open" };
-            item1.Click += Open_Click;
-
-            MenuItem item2 = new MenuItem { Header = "Rename" };
-            item2.Click += Rename_Click;
-
-            MenuItem item3 = new MenuItem { Header = "Remove" };
-            item3.Click += Remove_Click;
-
-            contextMenu.Items.Add(item1);
-            contextMenu.Items.Add(item2);
-            contextMenu.Items.Add(item3);
-
-            button.ContextMenu = contextMenu;
-        }
-
-        private void Open_Click(object sender, RoutedEventArgs e)
-        {
-            if (_selectedButton != null)
-            {
-                // Отримати кнопку, до якої прив'язане контекстне меню
-                if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
-                {
-                    Button parentButton = contextMenu.PlacementTarget as Button;
-
-                    if (parentButton != null)
-                    {
-                        Database.Models.Document document = _documentManager
-                            .GetDocumentsByName(parentButton.Content.ToString())
-                            .First();
-
-                        DocumentViewerWindow documentViewerWindow = new DocumentViewerWindow(
-                            _documentManager,
-                            _versionControlManager,
-                            document
-                        );
-
-                        documentViewerWindow.ShowDialog();
-                    }
-                }
-            }
-        }
-
-        private void Rename_Click(object sender, RoutedEventArgs e)
-        {
-            var document = _documentManager.GetDocumentsByName(_selectedButton.Content.ToString()).First();
-            InputPopup popup = new InputPopup();
-            popup.TitleText.Text = "Rename document";
-            popup.ShowDialog();
-
-            string newName = popup.MessageText.Text;
-            _documentManager.RenameDocument(document, newName);
-            AdjustGridLayout(totalButtons);
-            MessageBox.Show("Rename...", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private void Remove_Click(object sender, RoutedEventArgs e)
-        {
-            var document = _documentManager.GetDocumentsByName(_selectedButton.Content.ToString()).First();
-            _documentManager.DeleteDocument(document);
-            AdjustGridLayout(totalButtons);
-            MessageBox.Show("Document have been removed...", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void CreateContextMenuForVersionButton(Button button)
@@ -359,8 +151,8 @@ namespace DocumentVersionControlSystem.UI
 
                     Database.Models.Version version = _versionControlManager.GetVersionById(versionId);
 
-                    VersionDetailsWindow versionDetailsWindow = new VersionDetailsWindow(version, _versionControlManager);
-                    versionDetailsWindow.ShowDialog();
+                    VersionDetailsPage versionDetailsWindow = new VersionDetailsPage(this, version, _versionControlManager);
+                    MainFrame.Navigate(versionDetailsWindow);
                 }
             }
         }
@@ -393,10 +185,85 @@ namespace DocumentVersionControlSystem.UI
 
                 if (parentButton != null)
                 {
-                    var version = _versionControlManager.GetVersionById((int)parentButton.CommandParameter);
-                    _versionControlManager.DeleteVersion(version);
+                    _versionControlManager.DeleteVersion((int)parentButton.CommandParameter);
                     AddVersionButtons();
                 }
+            }
+        }
+
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainFrame.Content is HomePage)
+                return;
+
+            if (_homePage == null)
+                _homePage = new HomePage(this, _documentManager, _versionControlManager);
+
+            MainFrame.Navigate(_homePage);
+            ClearVersionButtons();
+        }
+
+        private void PreviousButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainFrame.CanGoBack)
+            {
+                MainFrame.GoBack();
+
+                Dispatcher.Invoke(() =>
+                {
+                    var currentPage = MainFrame.Content as Page;
+                    if (currentPage is HomePage homePage)
+                    {
+                        homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                        ClearVersionButtons();
+                    }
+                    else if (currentPage is VersionDetailsPage versionDetailsPage)
+                    {
+                        if (!versionDetailsPage.RefreshWindow())
+                        {
+                            MainFrame.Navigate(_homePage);
+                            _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                            ClearVersionButtons();
+                            MessageBox.Show("Failed to load version. Returning to the home page.");
+                        }
+                    }
+                    else if (currentPage is DocumentViewerPage documentViewerPage)
+                    {
+                        documentViewerPage.ReadDocument();
+                    }
+                }, DispatcherPriority.Background);
+            }
+        }
+
+        private void NextButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainFrame.CanGoForward)
+            {
+                MainFrame.GoForward();
+
+                Dispatcher.Invoke(() =>
+                {
+                    var currentPage = MainFrame.Content as Page;
+                    if (currentPage is HomePage homePage)
+                    {
+                        homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                        ClearVersionButtons();
+                    }
+                    else if (currentPage is VersionDetailsPage versionDetailsPage)
+                    {
+                        if (!versionDetailsPage.RefreshWindow())
+                        {
+                            MainFrame.Navigate(_homePage);
+                            _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                            ClearVersionButtons();
+                            MessageBox.Show("Failed to load version. Returning to the home page.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    else if (currentPage is DocumentViewerPage documentViewerPage)
+                    {
+                        documentViewerPage.ReadDocument();
+                    }
+                }, DispatcherPriority.Background);
             }
         }
     }

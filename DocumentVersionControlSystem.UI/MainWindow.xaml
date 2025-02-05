@@ -6,38 +6,40 @@
         xmlns:local="clr-namespace:DocumentVersionControlSystem.UI"
         mc:Ignorable="d"
         Title="MainWindow" Height="515" Width="850" Background="#D9D9D9"
-        ResizeMode="CanResize" Loaded="Window_Loaded">
+        ResizeMode="CanResize" Loaded="MainWindow_Loaded">
+
     <Border BorderBrush="Black" BorderThickness="1">
-        <ScrollViewer>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="203" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="203" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="32" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                <TextBlock Text="Document Versions" Grid.Column="0" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Height="29" Width="203"/>
+            <TextBlock Text="Document Versions" Grid.Column="0" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Height="29" Width="203" Padding="0" Margin="0"/>
+            <TextBlock Text="DocVersionControl" Grid.Column="1" Grid.Row="0" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Height="29" Width="545" Padding="0" Margin="0"/>
 
-                <TextBlock Text="Document Version Control System" Grid.Column="1" Grid.Row="0" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Height="29" Width="545"/>
+            <!-- Кнопки навігації -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5,2,0,0">
+                <Button Click="HomeButton_Click" Style="{StaticResource HomeButtonStyle}" Height="25" Width="25" FontSize="12" Margin="5,0,0,0"/>
+                <Button Click="PreviousButton_Click" Style="{StaticResource LeftButtonStyle}" Height="25" Width="25" FontSize="12" Margin="5,0,0,0"/>
+                <Button Click="NextButton_Click" Style="{StaticResource RightButtonStyle}" Height="25" Width="25" FontSize="12" Margin="5,0,0,0" />
+            </StackPanel>
 
-                <GridSplitter Grid.Column="0" Grid.RowSpan="2" Width="3" Background="Black"
-                  HorizontalAlignment="Stretch" Margin="200,0,0,0" Cursor="Arrow"/>
+            <GridSplitter Grid.Column="0" Grid.RowSpan="2" Width="3" Background="Black"
+          HorizontalAlignment="Stretch" Margin="200,0,0,0" Cursor="Arrow"/>
 
-                <GridSplitter Grid.Row="0" Grid.ColumnSpan="2" Height="3" Background="Black"
-                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,28,0,0" Cursor="Arrow" />
+            <GridSplitter Grid.Row="0" Grid.ColumnSpan="2" Height="3" Background="Black"
+          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,28,0,0" Cursor="Arrow" />
 
-                <!-- Кнопки у лівій колонці -->
-                <StackPanel x:Name="ButtonStackPanel" Grid.Column="0" Grid.Row="1"/>
+            <!-- Кнопки у лівій колонці -->
+            <StackPanel x:Name="ButtonStackPanel" Grid.Column="0" Grid.Row="1"/>
 
-                <!-- Кнопки у правій колонці -->
-                <StackPanel Grid.Column="1" Grid.Row="1">
-                    <Grid x:Name="ButtonGrid"/>
-                </StackPanel>
-            </Grid>
-        </ScrollViewer>
+            <Frame x:Name="MainFrame" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" NavigationUIVisibility="Hidden" />
+        </Grid>
     </Border>
 </Window>

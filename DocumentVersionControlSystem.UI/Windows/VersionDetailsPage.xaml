@@ -1,0 +1,28 @@
+﻿<Page x:Class="DocumentVersionControlSystem.UI.Windows.VersionDetailsPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DocumentVersionControlSystem.UI.Windows"
+        mc:Ignorable="d"
+      d:DesignHeight="515" d:DesignWidth="850"
+        Title="VersionViewer">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="203" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <Button Grid.Column="1" Content="Apply version" Margin="0,0,10,8" Style="{StaticResource CustomButtonStyle}" Width="100" Height="20" HorizontalAlignment="Right" FontSize="12" VerticalAlignment="Bottom" Click="ApplyVersionButton_Click" />
+        <TextBox x:Name="TextBox" IsReadOnly="True" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,10,10,80" BorderBrush="Black" BorderThickness="1.5" Style="{StaticResource TextBoxStyle}"/>
+
+        <TextBlock x:Name="TextBlock" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,0,0,50" VerticalAlignment="Bottom"/>
+
+    </Grid>
+</Page>
