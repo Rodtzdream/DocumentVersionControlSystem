@@ -10,6 +10,9 @@
     <None Remove="images/document_icon.png" />
     <None Remove="images/plus.png" />
     <None Remove="images/circle-arrow-icon.png" />
+    <None Remove="images/house-icon.png" />
+    <None Remove="images/line-angle-left-icon.png" />
+    <None Remove="images/line-angle-right-icon.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -23,5 +26,8 @@
     <Resource Include="images/document_icon.png" />
     <Resource Include="images/plus.png" />
     <Resource Include="images/circle-arrow-icon.png" />
+    <Resource Include="images/house-icon.png" />
+    <Resource Include="images/line-angle-left-icon.png" />
+    <Resource Include="images/line-angle-right-icon.png" />
   </ItemGroup>
 </Project>
