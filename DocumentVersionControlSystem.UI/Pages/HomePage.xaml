@@ -8,22 +8,22 @@
       d:DesignHeight="515" d:DesignWidth="850"
       Title="HomePage" Loaded="Page_Loaded">
 
-    <ScrollViewer>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="203" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="203" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="32" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-            <!-- Кнопки у правій колонці -->
+        <!-- Кнопки у правій колонці -->
+        <ScrollViewer Grid.Column="1" Grid.Row="1">
             <StackPanel Name="DocumentStackPanel" Grid.Column="1" Grid.Row="1">
                 <Grid x:Name="ButtonGrid"/>
             </StackPanel>
-        </Grid>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </Page>
