@@ -2,8 +2,10 @@
 using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.UI.Windows;
 using DocumentVersionControlSystem.VersionControl;
+using Serilog.Sinks.File;
 using System;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -124,7 +126,8 @@ namespace DocumentVersionControlSystem.UI
                         Style = (Style)FindResource("RectangleButtonStyle"), // Стиль із ресурсів
                         Margin = new Thickness(0, 8, 0, 0), // Відступи
                         CommandParameter = version.Id,
-
+                        ToolTip = $"{version.VersionDescription}.txt" + Environment.NewLine +
+                                  $"Created: {version.CreationDate}",
                         // Адаптивність:
                         Width = stackPanel.ActualWidth * 0.95, // Автоширина (заповнює StackPanel)
                         HorizontalAlignment = HorizontalAlignment.Stretch,

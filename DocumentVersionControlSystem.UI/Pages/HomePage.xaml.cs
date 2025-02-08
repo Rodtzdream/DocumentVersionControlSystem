@@ -1,9 +1,13 @@
-﻿using DocumentVersionControlSystem.DocumentManagement;
+﻿using DocumentVersionControlSystem.Database.Models;
+using DocumentVersionControlSystem.DocumentManagement;
 using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.VersionControl;
+using Serilog.Sinks.File;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -81,7 +85,12 @@ namespace DocumentVersionControlSystem.UI.Windows
             // Очистити старі кнопки
             ButtonGrid.Children.Clear();
 
-            Button button = CreateButton($"Add document", "AddButtonStyle");
+            Button button = new Button
+            {
+                Content = "Add document",
+                Style = (Style)FindResource("AddButtonStyle"),
+                Margin = new Thickness(5),
+            };
             button.Click += AddDocumentClicked;
 
             // Додавання кнопки до сітки
@@ -93,7 +102,7 @@ namespace DocumentVersionControlSystem.UI.Windows
             foreach (var document in documents)
             {
                 // Створення кнопки
-                button = CreateButton(document.Name, "SquareButtonStyle");
+                button = CreateButton(document.Name, "SquareButtonStyle", document);
                 button.Tag = document.Name + ".txt";
                 button.Click += OnButtonClicked;
                 button.MouseDoubleClick += OnButtonDoubleClicked;
@@ -112,13 +121,20 @@ namespace DocumentVersionControlSystem.UI.Windows
             }
         }
 
-        private Button CreateButton(string content, string styleKey)
+        private Button CreateButton(string content, string styleKey, Database.Models.Document document)
         {
+            long fileSize = new FileInfo(document.FilePath).Length / 1024;
+            string lastModified = File.GetLastWriteTime(document.FilePath).ToString("dd/MM/yyyy HH:mm:ss");
+
             return new Button
             {
                 Content = content,
                 Style = (Style)FindResource(styleKey),
-                Margin = new Thickness(5)
+                Margin = new Thickness(5),
+                ToolTip = $"{content}.txt" + Environment.NewLine +
+                          $"Size: {fileSize} KB" + Environment.NewLine +
+                          $"Modified: {lastModified}" + Environment.NewLine +
+                          $"Version count: {document.VersionCount}"
             };
         }
 
