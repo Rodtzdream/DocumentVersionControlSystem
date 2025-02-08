@@ -43,16 +43,17 @@ namespace DocumentVersionControlSystem.UI.Windows
         public void AdjustGridLayout(int totalButtons)
         {
             // Отримуємо ширину і висоту контейнера
-            double windowWidth = this.ActualWidth - 350;
+            double windowWidth = this.ActualWidth - 200;
             double windowHeight = this.ActualHeight - 32;
 
-            // Визначаємо кількість стовпців і рядків на основі розміру вікна
-            int columns = (int)(windowWidth / 100);
-            int rows = totalButtons - columns + 1;
+            // Визначаємо приблизну ширину кнопки (з урахуванням відступів)
+            double buttonWidth = 120; // Мінімальна ширина кнопки
+            int columns = (int)(windowWidth / buttonWidth);
+            columns = Math.Max(columns, 1); // Мінімум 1 колонка
 
-            // Якщо кількість стовпців або рядків менша ніж 1, робимо їх мінімум 1
-            columns = Math.Max(columns, 1);
-            rows = Math.Max(rows, 1);
+            // Обчислюємо кількість рядків
+            int rows = (int)Math.Ceiling((double)totalButtons / columns);
+            rows = Math.Max(rows, 1); // Мінімум 1 рядок
 
             // Очищаємо існуючі стовпці і рядки
             ButtonGrid.ColumnDefinitions.Clear();

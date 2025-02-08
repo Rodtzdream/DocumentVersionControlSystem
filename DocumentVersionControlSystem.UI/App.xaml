@@ -163,7 +163,7 @@
         <!-- Стиль для кнопок -->
         <Style x:Key="CustomButtonStyle" TargetType="Button">
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Background" Value="White" />
             <Setter Property="Foreground" Value="Black" />
             <Setter Property="FontSize" Value="10" />
@@ -187,7 +187,7 @@
         <!-- Стиль для кнопки refresh -->
         <Style x:Key="RefreshButtonStyle" TargetType="Button">
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Background" Value="White" />
             <Setter Property="Foreground" Value="Black" />
             <Setter Property="FontSize" Value="10" />
@@ -204,8 +204,7 @@
                                 <Image Source="images/circle-arrow-icon.png" 
                                        HorizontalAlignment="Center" 
                                        VerticalAlignment="Center" 
-                                       Width="12" 
-                                       Height="12"/>
+                                       Stretch="Uniform" Margin="5,5,5,5"/>
                                 <ContentPresenter HorizontalAlignment="Center" 
                                                   VerticalAlignment="Center"/>
                             </Grid>
@@ -218,7 +217,7 @@
         <!-- Стиль для кнопки home -->
         <Style x:Key="HomeButtonStyle" TargetType="Button">
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Background" Value="White" />
             <Setter Property="Foreground" Value="Black" />
             <Setter Property="FontSize" Value="10" />
@@ -235,8 +234,7 @@
                                 <Image Source="images/house-icon.png" 
                                        HorizontalAlignment="Center" 
                                        VerticalAlignment="Center" 
-                                       Width="18" 
-                                       Height="18"/>
+                                       Stretch="Uniform" Margin="3,3,3,3"/>
                                 <ContentPresenter HorizontalAlignment="Center" 
                                                   VerticalAlignment="Center"/>
                             </Grid>
@@ -249,7 +247,7 @@
         <!-- Стиль для кнопки left -->
         <Style x:Key="LeftButtonStyle" TargetType="Button">
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Background" Value="White" />
             <Setter Property="Foreground" Value="Black" />
             <Setter Property="FontSize" Value="10" />
@@ -266,8 +264,7 @@
                                 <Image Source="images/line-angle-left-icon.png" 
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
-                               Width="15" 
-                               Height="15"/>
+                               Stretch="Uniform" Margin="5,5,5,5"/>
                                 <ContentPresenter HorizontalAlignment="Center" 
                                           VerticalAlignment="Center"/>
                             </Grid>
@@ -280,7 +277,7 @@
         <!-- Стиль для кнопки right -->
         <Style x:Key="RightButtonStyle" TargetType="Button">
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Background" Value="White" />
             <Setter Property="Foreground" Value="Black" />
             <Setter Property="FontSize" Value="10" />
@@ -297,8 +294,7 @@
                                 <Image Source="images/line-angle-right-icon.png" 
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
-                               Width="15" 
-                               Height="15"/>
+                               Stretch="Uniform" Margin="5,5,5,5"/>
                                 <ContentPresenter HorizontalAlignment="Center" 
                                           VerticalAlignment="Center"/>
                             </Grid>

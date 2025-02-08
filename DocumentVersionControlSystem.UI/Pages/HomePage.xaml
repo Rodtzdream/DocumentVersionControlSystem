@@ -10,18 +10,18 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="203" />
+            <ColumnDefinition MinWidth="200" Width="0.2*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="32" />
+            <RowDefinition MinHeight="32" Height="0.05*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!-- Кнопки у правій колонці -->
         <ScrollViewer Grid.Column="1" Grid.Row="1">
-            <StackPanel Name="DocumentStackPanel" Grid.Column="1" Grid.Row="1">
+            <StackPanel Name="DocumentStackPanel" Grid.Column="1" Grid.Row="1" Margin="0,5,0,0">
                 <Grid x:Name="ButtonGrid"/>
             </StackPanel>
         </ScrollViewer>

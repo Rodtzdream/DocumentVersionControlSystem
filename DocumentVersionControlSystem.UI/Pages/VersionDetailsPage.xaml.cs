@@ -24,7 +24,22 @@ namespace DocumentVersionControlSystem.UI.Windows
 
             InitializeComponent();
             ReadDocument();
-            ReadDescription();
+            ReadDescription(); 
+            
+            _mainWindow.SizeChanged += OnWindowSizeChanged;
+
+            UpdateButtonSizes(_mainWindow.ActualWidth, _mainWindow.ActualHeight);
+        }
+
+        private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateButtonSizes(e.NewSize.Width, e.NewSize.Height);
+        }
+
+        private void UpdateButtonSizes(double width, double height)
+        {
+            ApplyVersionButton.Width = width * 0.06;
+            ApplyVersionButton.Height = height * 0.033;
         }
 
         public bool ReadDocument()
@@ -47,7 +62,9 @@ namespace DocumentVersionControlSystem.UI.Windows
         {
             string descriptionText = _version.VersionDescription;
             TextBlock textBox = (TextBlock)FindName("TextBlock");
-            textBox.Text = descriptionText;
+            textBox.Text = "Description: " + descriptionText;
+            if(descriptionText == "")
+                textBox.Text = "Description: None";
         }
 
         public bool RefreshWindow()

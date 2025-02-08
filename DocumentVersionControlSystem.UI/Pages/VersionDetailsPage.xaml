@@ -10,16 +10,16 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="203" />
+            <ColumnDefinition MinWidth="200" Width="0.2*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="32" />
+            <RowDefinition MinHeight="32" Height="0.05*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
-        <Button Grid.Column="1" Content="Apply version" Margin="0,0,10,8" Style="{StaticResource CustomButtonStyle}" Width="100" Height="20" HorizontalAlignment="Right" FontSize="12" VerticalAlignment="Bottom" Click="ApplyVersionButton_Click" />
+
+        <Button Name="ApplyVersionButton" Grid.Column="1" Content="Apply version" Margin="0,0,10,0" Style="{StaticResource CustomButtonStyle}" MinWidth="100" MinHeight="25" HorizontalAlignment="Right" FontSize="12" Click="ApplyVersionButton_Click" />
         <TextBox x:Name="TextBox" IsReadOnly="True" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,10,10,80" BorderBrush="Black" BorderThickness="1.5" Style="{StaticResource TextBoxStyle}"/>
 
         <TextBlock x:Name="TextBlock" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,0,0,50" VerticalAlignment="Bottom"/>

@@ -10,18 +10,18 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="203" />
+            <ColumnDefinition MinWidth="200" Width="0.2*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="32" />
+            <RowDefinition MinHeight="32" Height="0.05*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <TextBox x:Name="TextBox" IsReadOnly="True" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,10,10,10" BorderBrush="Black" BorderThickness="1.5" Style="{StaticResource TextBoxStyle2}"/>
-        <Button Grid.Column="1" Content="Open document" Margin="100,4,0,0" Style="{StaticResource CustomButtonStyle}" Width="100" Height="20" FontSize="12" VerticalAlignment="Top" Click="OpenInExternalEditor_Click" />
-        <Button Grid.Column="1" Content="Create new version" Margin="0,4,35,0" Style="{StaticResource CustomButtonStyle}" Width="120" Height="20" FontSize="12" HorizontalAlignment="Right" Click="CreateNewVersionButton_Click" />
-        <Button Grid.Column="1" Margin="0,4,10,0" Style="{StaticResource RefreshButtonStyle}" Width="20" Height="20" FontSize="12" Click="RefreshButton_Click" HorizontalAlignment="Right" />
+        <Button Grid.Column="1" Name="OpenDocumentButton" Content="Open document" Margin="100,0,0,0" Style="{StaticResource CustomButtonStyle}" MinWidth="100" MinHeight="25" FontSize="12" Click="OpenInExternalEditor_Click" />
+        <Button Grid.Column="1" Name="CreateNewVersionButton" Content="Create new version" Margin="0,0,45,0" Style="{StaticResource CustomButtonStyle}" MinWidth="120" MinHeight="25" FontSize="12" HorizontalAlignment="Right" Click="CreateNewVersionButton_Click" />
+        <Button Grid.Column="1" Name="RefreshButton" Margin="0,0,10,0" Style="{StaticResource RefreshButtonStyle}" MinWidth="25" MinHeight="25" FontSize="12" Click="RefreshButton_Click" HorizontalAlignment="Right" />
     </Grid>
 </Page>

@@ -26,6 +26,29 @@ namespace DocumentVersionControlSystem.UI.Windows
 
             InitializeComponent();
             ReadDocument();
+
+            _mainWindow.SizeChanged += OnWindowSizeChanged;
+
+            UpdateButtonSizes(_mainWindow.ActualWidth, _mainWindow.ActualHeight);
+        }
+
+        private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateButtonSizes(e.NewSize.Width, e.NewSize.Height);
+        }
+
+        private void UpdateButtonSizes(double width, double height)
+        {
+            OpenDocumentButton.Width = width * 0.06;
+            OpenDocumentButton.Height = height * 0.033;
+            OpenDocumentButton.Margin = new Thickness(width * 0.024 + 25 * 3 + 5, 0, 0, 0);
+
+            CreateNewVersionButton.Width = width * 0.05;
+            CreateNewVersionButton.Height = height * 0.033;
+            CreateNewVersionButton.Margin = new Thickness(0, 0, width * 0.006 + 25 + 10, 0);
+
+            RefreshButton.Width = width * 0.016;
+            RefreshButton.Height = height * 0.03;
         }
 
         public void ReadDocument()

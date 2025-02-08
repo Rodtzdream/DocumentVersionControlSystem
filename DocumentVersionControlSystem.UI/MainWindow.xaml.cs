@@ -2,6 +2,7 @@
 using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.UI.Windows;
 using DocumentVersionControlSystem.VersionControl;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,6 +45,29 @@ namespace DocumentVersionControlSystem.UI
         {
             // Перерахунок сітки при зміні розміру
             _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+
+            _selectedButton = _homePage.GetSelectedButton();
+            if (_selectedButton != null)
+            {
+                _selectedButton.BorderBrush = Brushes.Gray;
+                _selectedButton.BorderThickness = new Thickness(3);
+                AddVersionButtons();
+            }
+
+            double newSize = Math.Max(16, this.ActualWidth * 0.01); // Мінімальний розмір 12
+            DocumentVersionsTextBlock.FontSize = newSize;
+            DocVersionControlTextBlock.FontSize = newSize;
+
+            StackPanel stackPanel = (StackPanel)FindName("NavigationButtons");
+
+            if (stackPanel != null)
+            {
+                foreach (Button button in stackPanel.Children)
+                {
+                    button.Width = stackPanel.ActualWidth * 0.021;
+                    button.Height = stackPanel.ActualHeight * 0.7;
+                }
+            }
         }
 
         private void InitializeDynamicGrid()
@@ -99,7 +123,13 @@ namespace DocumentVersionControlSystem.UI
                         Tag = version.VersionDescription,
                         Style = (Style)FindResource("RectangleButtonStyle"), // Стиль із ресурсів
                         Margin = new Thickness(0, 8, 0, 0), // Відступи
-                        CommandParameter = version.Id
+                        CommandParameter = version.Id,
+
+                        // Адаптивність:
+                        Width = stackPanel.ActualWidth * 0.95, // Автоширина (заповнює StackPanel)
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        MinWidth = 140, // Мінімальна ширина
+                        MinHeight = 40   // Мінімальна висота
                     };
 
                     button.Click += OnButtonVersionClicked;
