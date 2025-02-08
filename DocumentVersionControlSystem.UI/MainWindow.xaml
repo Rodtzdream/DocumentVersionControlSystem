@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DocumentVersionControlSystem.UI"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="515" Width="850" Background="#D9D9D9"
+        mc:Ignorable="d" WindowStartupLocation="CenterScreen"
+        Title="MainWindow" MinHeight="515" Height="515" MinWidth="850" Width="850" Background="#D9D9D9"
         ResizeMode="CanResize" Loaded="MainWindow_Loaded">
 
     <Border BorderBrush="Black" BorderThickness="1">
