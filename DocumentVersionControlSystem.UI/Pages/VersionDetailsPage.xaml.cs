@@ -1,5 +1,6 @@
 ﻿using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.VersionControl;
+using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,10 +25,14 @@ namespace DocumentVersionControlSystem.UI.Windows
 
             InitializeComponent();
             ReadDocument();
-            ReadDescription(); 
-            
-            _mainWindow.SizeChanged += OnWindowSizeChanged;
+            ReadDescription();
 
+            Loaded += DocumentViewerPage_Loaded;
+            _mainWindow.SizeChanged += OnWindowSizeChanged;
+        }
+
+        private void DocumentViewerPage_Loaded(object sender, RoutedEventArgs e)
+        {
             UpdateButtonSizes(_mainWindow.ActualWidth, _mainWindow.ActualHeight);
         }
 
@@ -40,6 +45,7 @@ namespace DocumentVersionControlSystem.UI.Windows
         {
             ApplyVersionButton.Width = width * 0.06;
             ApplyVersionButton.Height = height * 0.033;
+            ApplyVersionButton.FontSize = Math.Max(12, this.ActualWidth * 0.007);
         }
 
         public bool ReadDocument()

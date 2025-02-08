@@ -54,7 +54,7 @@ namespace DocumentVersionControlSystem.UI
                 AddVersionButtons();
             }
 
-            double newSize = Math.Max(16, this.ActualWidth * 0.01); // Мінімальний розмір 12
+            double newSize = Math.Max(16, this.ActualWidth * 0.01);
             DocumentVersionsTextBlock.FontSize = newSize;
             DocVersionControlTextBlock.FontSize = newSize;
 

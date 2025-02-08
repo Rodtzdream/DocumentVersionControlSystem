@@ -27,8 +27,12 @@ namespace DocumentVersionControlSystem.UI.Windows
             InitializeComponent();
             ReadDocument();
 
+            Loaded += DocumentViewerPage_Loaded;
             _mainWindow.SizeChanged += OnWindowSizeChanged;
+        }
 
+        private void DocumentViewerPage_Loaded(object sender, RoutedEventArgs e)
+        {
             UpdateButtonSizes(_mainWindow.ActualWidth, _mainWindow.ActualHeight);
         }
 
@@ -39,13 +43,17 @@ namespace DocumentVersionControlSystem.UI.Windows
 
         private void UpdateButtonSizes(double width, double height)
         {
+            double newSize = Math.Max(12, this.ActualWidth * 0.007);
+
             OpenDocumentButton.Width = width * 0.06;
             OpenDocumentButton.Height = height * 0.033;
-            OpenDocumentButton.Margin = new Thickness(width * 0.024 + 25 * 3 + 5, 0, 0, 0);
+            OpenDocumentButton.Margin = new Thickness(width * 0.025 + 80, 0, 0, 0); // 25 * 3 + 5
+            OpenDocumentButton.FontSize = newSize;
 
-            CreateNewVersionButton.Width = width * 0.05;
+            CreateNewVersionButton.Width = width * 0.07;
             CreateNewVersionButton.Height = height * 0.033;
-            CreateNewVersionButton.Margin = new Thickness(0, 0, width * 0.006 + 25 + 10, 0);
+            CreateNewVersionButton.Margin = new Thickness(0, 0, width * 0.006 + 35, 0); // 25 + 10
+            CreateNewVersionButton.FontSize = newSize;
 
             RefreshButton.Width = width * 0.016;
             RefreshButton.Height = height * 0.03;
