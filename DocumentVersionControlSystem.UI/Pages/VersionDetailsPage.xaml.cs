@@ -27,11 +27,11 @@ namespace DocumentVersionControlSystem.UI.Windows
             ReadDocument();
             ReadDescription();
 
-            Loaded += DocumentViewerPage_Loaded;
+            Loaded += VersionDetailsPage_Loaded;
             _mainWindow.SizeChanged += OnWindowSizeChanged;
         }
 
-        private void DocumentViewerPage_Loaded(object sender, RoutedEventArgs e)
+        private void VersionDetailsPage_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateButtonSizes(_mainWindow.ActualWidth, _mainWindow.ActualHeight);
         }
@@ -46,6 +46,11 @@ namespace DocumentVersionControlSystem.UI.Windows
             ApplyVersionButton.Width = width * 0.06;
             ApplyVersionButton.Height = height * 0.033;
             ApplyVersionButton.FontSize = Math.Max(12, this.ActualWidth * 0.007);
+        }
+
+        public int GetVersionId()
+        {
+            return _version.Id;
         }
 
         public bool ReadDocument()

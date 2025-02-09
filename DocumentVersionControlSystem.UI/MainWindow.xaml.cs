@@ -82,19 +82,21 @@ namespace DocumentVersionControlSystem.UI
 
         private void OnButtonVersionClicked(object sender, RoutedEventArgs e)
         {
-            if (_selectedVersionButton != null)
-            {
-                _selectedVersionButton.ClearValue(Button.BorderBrushProperty);
-                _selectedVersionButton.ClearValue(Button.BorderThicknessProperty);
-            }
+            if (sender is not Button clickedButton || clickedButton == _selectedVersionButton)
+                return;
 
-            Button clickedButton = sender as Button;
+            _selectedVersionButton?.ClearValue(Button.BorderBrushProperty);
+            _selectedVersionButton?.ClearValue(Button.BorderThicknessProperty);
+
             _selectedVersionButton = clickedButton;
             clickedButton.BorderBrush = Brushes.Gray;
             clickedButton.BorderThickness = new Thickness(3);
 
-            var version = _versionControlManager.GetVersionById((int)clickedButton.CommandParameter);
-            OpenVersionViewer(version);
+            if (clickedButton.CommandParameter is int versionId)
+            {
+                var version = _versionControlManager.GetVersionById(versionId);
+                OpenVersionViewer(version);
+            }
         }
 
         private void OpenVersionViewer(Database.Models.Version version)
@@ -103,7 +105,7 @@ namespace DocumentVersionControlSystem.UI
             MainFrame.Navigate(versionDetailsWindow);
         }
 
-        public void AddVersionButtons()
+        public void AddVersionButtons(int selectedVersionId = -1)
         {
             // Отримати StackPanel за ім'ям
             StackPanel stackPanel = (StackPanel)FindName("ButtonStackPanel");
@@ -134,6 +136,12 @@ namespace DocumentVersionControlSystem.UI
                         MinWidth = 140, // Мінімальна ширина
                         MinHeight = 40   // Мінімальна висота
                     };
+
+                    if (selectedVersionId == version.Id)
+                    {
+                        button.BorderBrush = Brushes.Gray;
+                        button.BorderThickness = new Thickness(3);
+                    }
 
                     button.Click += OnButtonVersionClicked;
 
@@ -259,10 +267,12 @@ namespace DocumentVersionControlSystem.UI
                             ClearVersionButtons();
                             MessageBox.Show("Failed to load version. Returning to the home page.");
                         }
+                        AddVersionButtons(versionDetailsPage.GetVersionId());
                     }
                     else if (currentPage is DocumentViewerPage documentViewerPage)
                     {
                         documentViewerPage.ReadDocument();
+                        AddVersionButtons();
                     }
                 }, DispatcherPriority.Background);
             }
@@ -291,10 +301,12 @@ namespace DocumentVersionControlSystem.UI
                             ClearVersionButtons();
                             MessageBox.Show("Failed to load version. Returning to the home page.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
+                        AddVersionButtons(versionDetailsPage.GetVersionId());
                     }
                     else if (currentPage is DocumentViewerPage documentViewerPage)
                     {
                         documentViewerPage.ReadDocument();
+                        AddVersionButtons();
                     }
                 }, DispatcherPriority.Background);
             }
