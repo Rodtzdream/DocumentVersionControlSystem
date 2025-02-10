@@ -21,7 +21,7 @@
 
         <!-- Кнопки у правій колонці -->
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Name="DocumentStackPanel" Grid.Column="1" Grid.Row="1" Margin="0,5,0,0">
+            <StackPanel Name="DocumentStackPanel" Grid.Column="1" Grid.Row="1" Margin="0,5,0,0" Background="Transparent" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
                 <Grid x:Name="ButtonGrid"/>
             </StackPanel>
         </ScrollViewer>

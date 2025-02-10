@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -18,7 +19,7 @@ namespace DocumentVersionControlSystem.UI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Button _selectedButton;
+        private Button _selectedDocumentButton;
         private Button _selectedVersionButton;
         private DocumentManager _documentManager;
         private VersionControlManager _versionControlManager;
@@ -48,11 +49,11 @@ namespace DocumentVersionControlSystem.UI
             // Перерахунок сітки при зміні розміру
             _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
 
-            _selectedButton = _homePage.GetSelectedButton();
-            if (_selectedButton != null)
+            _selectedDocumentButton = _homePage.GetSelectedButton();
+            if (_selectedDocumentButton != null)
             {
-                _selectedButton.BorderBrush = Brushes.Gray;
-                _selectedButton.BorderThickness = new Thickness(3);
+                _selectedDocumentButton.BorderBrush = Brushes.Gray;
+                _selectedDocumentButton.BorderThickness = new Thickness(3);
                 AddVersionButtons();
             }
 
@@ -102,6 +103,16 @@ namespace DocumentVersionControlSystem.UI
             }
         }
 
+        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_selectedVersionButton != null)
+            {
+                _selectedVersionButton.ClearValue(Button.BorderBrushProperty);
+                _selectedVersionButton.ClearValue(Button.BorderThicknessProperty);
+                _selectedVersionButton = null;
+            }
+        }
+
         private void OpenVersionViewer(Database.Models.Version version)
         {
             VersionDetailsPage versionDetailsWindow = new VersionDetailsPage(this, version, _versionControlManager);
@@ -117,8 +128,8 @@ namespace DocumentVersionControlSystem.UI
             {
                 stackPanel.Children.Clear();
 
-                _selectedButton = _homePage.GetSelectedButton();
-                var documentId = _documentManager.GetDocumentsByName(_selectedButton.Content.ToString()).First().Id;
+                _selectedDocumentButton = _homePage.GetSelectedButton();
+                var documentId = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First().Id;
                 var versions = _versionControlManager.GetVersionsByDocumentId(documentId);
 
                 // Додати кнопки
@@ -142,8 +153,9 @@ namespace DocumentVersionControlSystem.UI
 
                     if (selectedVersionId == version.Id)
                     {
-                        button.BorderBrush = Brushes.Gray;
-                        button.BorderThickness = new Thickness(3);
+                        _selectedVersionButton = button;
+                        _selectedVersionButton.BorderBrush = Brushes.Gray;
+                        _selectedVersionButton.BorderThickness = new Thickness(3);
                     }
 
                     button.Click += OnButtonVersionClicked;
@@ -232,6 +244,7 @@ namespace DocumentVersionControlSystem.UI
                 {
                     _versionControlManager.DeleteVersion((int)parentButton.CommandParameter);
                     AddVersionButtons();
+                    _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                 }
             }
         }

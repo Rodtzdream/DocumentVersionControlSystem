@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace DocumentVersionControlSystem.UI.Windows
@@ -19,7 +20,7 @@ namespace DocumentVersionControlSystem.UI.Windows
     /// </summary>
     public partial class HomePage : Page
     {
-        private Button _selectedButton;
+        private Button _selectedDocumentButton;
         private DocumentManager _documentManager;
         private VersionControlManager _versionControlManager;
 
@@ -37,6 +38,8 @@ namespace DocumentVersionControlSystem.UI.Windows
             _mainWindow = mainWindow;
 
             totalButtons = _documentManager.GetAllDocuments().Count + 1;
+
+            Loaded += Page_Loaded;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -140,19 +143,19 @@ namespace DocumentVersionControlSystem.UI.Windows
 
         public Button GetSelectedButton()
         {
-            return _selectedButton;
+            return _selectedDocumentButton;
         }
 
         private void OnButtonClicked(object sender, RoutedEventArgs e)
         {
-            if (_selectedButton != null)
+            if (_selectedDocumentButton != null)
             {
-                _selectedButton.ClearValue(Button.BorderBrushProperty);
-                _selectedButton.ClearValue(Button.BorderThicknessProperty);
+                _selectedDocumentButton.ClearValue(Button.BorderBrushProperty);
+                _selectedDocumentButton.ClearValue(Button.BorderThicknessProperty);
             }
 
             Button clickedButton = sender as Button;
-            _selectedButton = clickedButton;
+            _selectedDocumentButton = clickedButton;
             clickedButton.BorderBrush = Brushes.Gray;
             clickedButton.BorderThickness = new Thickness(3);
 
@@ -161,7 +164,7 @@ namespace DocumentVersionControlSystem.UI.Windows
 
         private void OnButtonDoubleClicked(object sender, RoutedEventArgs e)
         {
-            if (_selectedButton != null)
+            if (_selectedDocumentButton != null)
             {
                 Button clickedButton = sender as Button;
                 Database.Models.Document document = _documentManager.GetDocumentsByName(clickedButton.Content.ToString()).First();
@@ -169,6 +172,17 @@ namespace DocumentVersionControlSystem.UI.Windows
                 _documentViewerWindow = new DocumentViewerPage(_mainWindow, _versionControlManager, document);
                 _mainWindow.MainFrame.Navigate(_documentViewerWindow);
                 _mainWindow.AddVersionButtons();
+            }
+        }
+
+        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_selectedDocumentButton != null)
+            {
+                _selectedDocumentButton.ClearValue(Button.BorderBrushProperty);
+                _selectedDocumentButton.ClearValue(Button.BorderThicknessProperty);
+                _selectedDocumentButton = null;
+                _mainWindow.ClearVersionButtons();
             }
         }
 
@@ -230,7 +244,7 @@ namespace DocumentVersionControlSystem.UI.Windows
 
         private void Open_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedButton != null)
+            if (_selectedDocumentButton != null)
             {
                 // Отримати кнопку, до якої прив'язане контекстне меню
                 if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
@@ -253,7 +267,7 @@ namespace DocumentVersionControlSystem.UI.Windows
 
         private void Rename_Click(object sender, RoutedEventArgs e)
         {
-            var document = _documentManager.GetDocumentsByName(_selectedButton.Content.ToString()).First();
+            var document = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First();
             InputPopup popup = new InputPopup();
             popup.TitleText.Text = "Rename document";
             popup.ShowDialog();
@@ -266,9 +280,10 @@ namespace DocumentVersionControlSystem.UI.Windows
 
         private void Remove_Click(object sender, RoutedEventArgs e)
         {
-            var document = _documentManager.GetDocumentsByName(_selectedButton.Content.ToString()).First();
+            var document = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First();
             _documentManager.DeleteDocument(document);
             AdjustGridLayout(totalButtons);
+            _mainWindow.AddVersionButtons();
             MessageBox.Show("Document have been removed...", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }

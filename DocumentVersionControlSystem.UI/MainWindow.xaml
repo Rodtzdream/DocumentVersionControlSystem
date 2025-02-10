@@ -38,7 +38,7 @@
 
             <!-- Кнопки у лівій колонці -->
             <ScrollViewer Grid.Column="0" Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-                <StackPanel x:Name="ButtonStackPanel"/>
+                <StackPanel x:Name="ButtonStackPanel" Background="Transparent" MouseLeftButtonDown="Grid_MouseLeftButtonDown"/>
             </ScrollViewer>
 
             <Frame x:Name="MainFrame" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" NavigationUIVisibility="Hidden" />
