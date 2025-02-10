@@ -91,8 +91,11 @@ namespace DocumentVersionControlSystem.UI
             _selectedVersionButton = clickedButton;
             clickedButton.BorderBrush = Brushes.Gray;
             clickedButton.BorderThickness = new Thickness(3);
+        }
 
-            if (clickedButton.CommandParameter is int versionId)
+        private void OnButtonVersionDoubleClicked(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button clickedButton && clickedButton.CommandParameter is int versionId)
             {
                 var version = _versionControlManager.GetVersionById(versionId);
                 OpenVersionViewer(version);
@@ -144,6 +147,7 @@ namespace DocumentVersionControlSystem.UI
                     }
 
                     button.Click += OnButtonVersionClicked;
+                    button.MouseDoubleClick += OnButtonVersionDoubleClicked;
 
                     CreateContextMenuForVersionButton(button);
                     stackPanel.Children.Add(button);
