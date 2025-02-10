@@ -22,7 +22,8 @@
         <Button Name="ApplyVersionButton" Grid.Column="1" Content="Apply version" Margin="0,0,10,0" Style="{StaticResource CustomButtonStyle}" MinWidth="100" MinHeight="25" HorizontalAlignment="Right" FontSize="12" Click="ApplyVersionButton_Click" />
         <TextBox x:Name="TextBox" IsReadOnly="True" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,10,10,80" BorderBrush="Black" BorderThickness="1.5" Style="{StaticResource TextBoxStyle}"/>
 
-        <TextBlock x:Name="TextBlock" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,0,0,50" VerticalAlignment="Bottom"/>
+        <TextBlock x:Name="VersionDescription" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,0,0,50" VerticalAlignment="Bottom"/>
+        <TextBlock x:Name="VersionDateTime" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" Margin="10,0,0,30" VerticalAlignment="Bottom"/>
 
     </Grid>
 </Page>

@@ -26,6 +26,7 @@ namespace DocumentVersionControlSystem.UI.Windows
             InitializeComponent();
             ReadDocument();
             ReadDescription();
+            ReadDateTime();
 
             Loaded += VersionDetailsPage_Loaded;
             _mainWindow.SizeChanged += OnWindowSizeChanged;
@@ -53,7 +54,7 @@ namespace DocumentVersionControlSystem.UI.Windows
             return _version.Id;
         }
 
-        public bool ReadDocument()
+        private bool ReadDocument()
         {
             try
             {
@@ -69,13 +70,20 @@ namespace DocumentVersionControlSystem.UI.Windows
             return true;
         }
 
-        public void ReadDescription()
+        private void ReadDescription()
         {
             string descriptionText = _version.VersionDescription;
-            TextBlock textBox = (TextBlock)FindName("TextBlock");
-            textBox.Text = "Description: " + descriptionText;
+            TextBlock textBox = (TextBlock)FindName("VersionDescription");
+            textBox.Text = "Version description: " + descriptionText;
             if(descriptionText == "")
-                textBox.Text = "Description: None";
+                textBox.Text = "Version description: None";
+        }
+
+        private void ReadDateTime()
+        {
+            string dateTimeText = _version.CreationDate.ToString();
+            TextBlock textBox = (TextBlock)FindName("VersionDateTime");
+            textBox.Text = "Creation date & time: " + dateTimeText;
         }
 
         public bool RefreshWindow()
@@ -84,6 +92,7 @@ namespace DocumentVersionControlSystem.UI.Windows
                 return false;
 
             ReadDescription();
+            ReadDateTime();
             _mainWindow.AddVersionButtons();
             return true;
         }
