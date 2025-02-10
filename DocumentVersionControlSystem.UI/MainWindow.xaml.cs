@@ -132,8 +132,23 @@ namespace DocumentVersionControlSystem.UI
                 var documentId = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First().Id;
                 var versions = _versionControlManager.GetVersionsByDocumentId(documentId);
 
-                // Додати кнопки
-                foreach (var version in versions) // Змінити кількість кнопок за потребою
+                if (versions.Count == 0)
+                {
+                    TextBlock textBlock = new TextBlock
+                    {
+                        Text = "No versions available",
+                        FontSize = 16,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Foreground = Brushes.Black,
+                        Margin = new Thickness(0, stackPanel.ActualHeight - ActualHeight / 2, 0, 0),
+                        IsHitTestVisible = false
+                    };
+                    stackPanel.Children.Add(textBlock);
+                    return;
+                }
+
+                foreach (var version in versions)
                 {
                     Button button = new Button
                     {
