@@ -206,13 +206,14 @@ namespace DocumentVersionControlSystem.UI.Windows
                 // Обробка файлу (наприклад, зчитування вмісту)
                 try
                 {
-                    // Наприклад, відобразимо вміст у TextBox (замініть TextBoxName на ваш контроль)
-                    _documentManager.AddDocument(filePath);
+                    if (!_documentManager.AddDocument(filePath))
+                    {
+                        MessageBox.Show("Document with this name already exists...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
 
-                    // Перерахунок сітки
                     ++totalButtons;
                     AdjustGridLayout(totalButtons);
-                    // update window
 
                     MessageBox.Show("File added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }

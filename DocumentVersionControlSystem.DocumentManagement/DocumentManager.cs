@@ -79,12 +79,12 @@ public class DocumentManager
         _fileWatchers.Clear();
     }
 
-    public void AddDocument(string filePath)
+    public bool AddDocument(string filePath)
     {
-        if (GetDocumentsByName(Path.GetFileName(filePath)).Count > 0)
+        if (GetDocumentsByName(Path.GetFileNameWithoutExtension(filePath)).Any())
         {
             _logger.LogError($"Document {filePath} already exists");
-            return;
+            return false;
         }
 
         var fileInfo = new FileInfo(filePath);
@@ -105,24 +105,12 @@ public class DocumentManager
 
         _documentRepository.AddDocument(document);
         _logger.LogInformation($"Document {document.Id} added");
+        return true;
     }
 
     public void RenameDocument(Document document, string newName)
     {
         _isInternalRename = true;
-
-        if (document == null || string.IsNullOrWhiteSpace(newName))
-        {
-            _logger.LogWarning("RenameDocument: Invalid document or new name.");
-            return;
-        }
-
-        // Перевірка на недопустимі символи у новому імені файлу
-        if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-        {
-            _logger.LogError($"RenameDocument: Invalid characters in new name {newName}.");
-            return;
-        }
 
         try
         {
