@@ -27,6 +27,9 @@ namespace DocumentVersionControlSystem.UI
 
         private HomePage _homePage;
 
+        private TextBlock _selectDocumentTextBlock, _noVersionsAvailableTextBlock;
+        private StackPanel _buttonStackPanel, _navigationButtonsStackPanel;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,12 +39,40 @@ namespace DocumentVersionControlSystem.UI
             _versionControlManager = new VersionControlManager(_logger);
             _homePage = new HomePage(this, _documentManager, _versionControlManager);
 
+            _navigationButtonsStackPanel = (StackPanel)FindName("NavigationButtons");
+
             InitializeDynamicGrid();
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(_homePage);
+
+            _buttonStackPanel = (StackPanel)FindName("ButtonStackPanel");
+
+            _selectDocumentTextBlock = new TextBlock
+            {
+                Text = "Select the document",
+                FontSize = 16,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = Brushes.Black,
+                Margin = new Thickness(0, _buttonStackPanel.ActualHeight - ActualHeight / 2, 0, 0),
+                IsHitTestVisible = false
+            };
+
+            _noVersionsAvailableTextBlock = new TextBlock
+            {
+                Text = "No versions available",
+                FontSize = 16,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = Brushes.Black,
+                Margin = new Thickness(0, _buttonStackPanel.ActualHeight - ActualHeight / 2, 0, 0),
+                IsHitTestVisible = false
+            };
+
+            ClearVersionButtons();
         }
 
         private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
@@ -61,14 +92,12 @@ namespace DocumentVersionControlSystem.UI
             DocumentVersionsTextBlock.FontSize = newSize;
             DocVersionControlTextBlock.FontSize = newSize;
 
-            StackPanel stackPanel = (StackPanel)FindName("NavigationButtons");
-
-            if (stackPanel != null)
+            if (_navigationButtonsStackPanel != null)
             {
-                foreach (Button button in stackPanel.Children)
+                foreach (Button button in _navigationButtonsStackPanel.Children)
                 {
-                    button.Width = stackPanel.ActualWidth * 0.021;
-                    button.Height = stackPanel.ActualHeight * 0.7;
+                    button.Width = _navigationButtonsStackPanel.ActualWidth * 0.021;
+                    button.Height = _navigationButtonsStackPanel.ActualHeight * 0.7;
                 }
             }
         }
@@ -122,11 +151,10 @@ namespace DocumentVersionControlSystem.UI
         public void AddVersionButtons(int selectedVersionId = -1)
         {
             // Отримати StackPanel за ім'ям
-            StackPanel stackPanel = (StackPanel)FindName("ButtonStackPanel");
 
-            if (stackPanel != null)
+            if (_buttonStackPanel != null)
             {
-                stackPanel.Children.Clear();
+                _buttonStackPanel.Children.Clear();
 
                 _selectedDocumentButton = _homePage.GetSelectedButton();
                 var documentId = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First().Id;
@@ -134,17 +162,7 @@ namespace DocumentVersionControlSystem.UI
 
                 if (versions.Count == 0)
                 {
-                    TextBlock textBlock = new TextBlock
-                    {
-                        Text = "No versions available",
-                        FontSize = 16,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Foreground = Brushes.Black,
-                        Margin = new Thickness(0, stackPanel.ActualHeight - ActualHeight / 2, 0, 0),
-                        IsHitTestVisible = false
-                    };
-                    stackPanel.Children.Add(textBlock);
+                    _buttonStackPanel.Children.Add(_noVersionsAvailableTextBlock);
                     return;
                 }
 
@@ -160,7 +178,7 @@ namespace DocumentVersionControlSystem.UI
                         ToolTip = $"{version.VersionDescription}.txt" + Environment.NewLine +
                                   $"Created: {version.CreationDate}",
                         // Адаптивність:
-                        Width = stackPanel.ActualWidth * 0.95, // Автоширина (заповнює StackPanel)
+                        Width = _buttonStackPanel.ActualWidth * 0.95, // Автоширина (заповнює StackPanel)
                         HorizontalAlignment = HorizontalAlignment.Stretch,
                         MinWidth = 140, // Мінімальна ширина
                         MinHeight = 40   // Мінімальна висота
@@ -178,17 +196,18 @@ namespace DocumentVersionControlSystem.UI
                     button.MouseDoubleClick += OnButtonVersionDoubleClicked;
 
                     CreateContextMenuForVersionButton(button);
-                    stackPanel.Children.Add(button);
+                    _buttonStackPanel.Children.Add(button);
                 }
             }
         }
 
         public void ClearVersionButtons()
         {
-            StackPanel stackPanel = (StackPanel)FindName("ButtonStackPanel");
-            if (stackPanel != null)
+            if (_buttonStackPanel != null)
             {
-                stackPanel.Children.Clear();
+                _buttonStackPanel.Children.Clear();
+                
+                _buttonStackPanel.Children.Add(_selectDocumentTextBlock);
             }
         }
 
