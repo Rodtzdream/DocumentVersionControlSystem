@@ -45,7 +45,7 @@ public class VersionControlManager
 
         var documentDirectory = Path.Combine("Documents", document.Name);
         string oldFilePath = document.FilePath;
-        string newFilePath = Path.Combine(documentDirectory, $"{document.Name}_v{document.VersionCount + 1}.txt");
+        string newFilePath = Path.Combine(documentDirectory, $"{document.Name}_{DateTime.Now:yyyyMMddHHmmss}.txt");
 
         Version version = new()
         {
@@ -121,7 +121,7 @@ public class VersionControlManager
         }
 
         var documentDirectory = Path.Combine("Documents", document.Name);
-        string newFilePath = Path.Combine(documentDirectory, $"{document.Name}_v{document.VersionCount + 1}.txt");
+        string newFilePath = Path.Combine(documentDirectory, $"{document.Name}_{DateTime.Now:yyyyMMddHHmmss}.txt");
 
         var documentFilePath = document.FilePath;
         var versionFilePath = version.FilePath;
