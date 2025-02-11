@@ -5,6 +5,7 @@ using DocumentVersionControlSystem.VersionControl;
 using Serilog.Sinks.File;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -267,15 +268,66 @@ namespace DocumentVersionControlSystem.UI.Windows
 
         private void Rename_Click(object sender, RoutedEventArgs e)
         {
-            var document = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First();
-            InputPopup popup = new InputPopup();
-            popup.TitleText.Text = "Rename document";
+            var document = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).FirstOrDefault();
+            if (document == null)
+            {
+                MessageBox.Show("Document not found...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            InputPopup popup = new InputPopup
+            {
+                TitleText = { Text = "Rename document" }
+            };
             popup.ShowDialog();
 
-            string newName = popup.MessageText.Text;
+            string newName = popup.MessageText.Text?.Trim();
+
+            if (string.IsNullOrEmpty(newName) || string.IsNullOrWhiteSpace(newName))
+            {
+                MessageBox.Show("Name cannot be empty...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (document == null)
+            {
+                MessageBox.Show("Invalid document...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (newName.Equals(document.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("Name cannot be the same as the current one...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (newName.Length < 3 || newName.Length > 50)
+            {
+                MessageBox.Show("Name must be between 3 and 50 characters...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (newName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("Name cannot end with '.txt'...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (_documentManager.GetDocumentsByName(newName).Any())
+            {
+                MessageBox.Show("A document with this name already exists...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            {
+                MessageBox.Show("Name contains invalid characters...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             _documentManager.RenameDocument(document, newName);
             AdjustGridLayout(totalButtons);
-            MessageBox.Show("Rename...", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Rename successful", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void Remove_Click(object sender, RoutedEventArgs e)
@@ -283,8 +335,8 @@ namespace DocumentVersionControlSystem.UI.Windows
             var document = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First();
             _documentManager.DeleteDocument(document);
             AdjustGridLayout(totalButtons);
-            _mainWindow.AddVersionButtons();
-            MessageBox.Show("Document have been removed...", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            _mainWindow.ClearVersionButtons();
+            MessageBox.Show("Document have been removed successfully", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }
