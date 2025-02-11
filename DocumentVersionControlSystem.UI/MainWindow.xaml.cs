@@ -21,6 +21,7 @@ namespace DocumentVersionControlSystem.UI
     {
         private Button _selectedDocumentButton;
         private Button _selectedVersionButton;
+        private Button _currentVersionButton;
         private DocumentManager _documentManager;
         private VersionControlManager _versionControlManager;
         private Logging.Logger _logger;
@@ -112,7 +113,7 @@ namespace DocumentVersionControlSystem.UI
 
         private void OnButtonVersionClicked(object sender, RoutedEventArgs e)
         {
-            if (sender is not Button clickedButton || clickedButton == _selectedVersionButton)
+            if (sender is not Button clickedButton || clickedButton == _selectedVersionButton || clickedButton == _currentVersionButton)
                 return;
 
             _selectedVersionButton?.ClearValue(Button.BorderBrushProperty);
@@ -129,6 +130,7 @@ namespace DocumentVersionControlSystem.UI
             {
                 var version = _versionControlManager.GetVersionById(versionId);
                 OpenVersionViewer(version);
+                AddVersionButtons(versionId);
             }
         }
 
@@ -148,7 +150,7 @@ namespace DocumentVersionControlSystem.UI
             MainFrame.Navigate(versionDetailsWindow);
         }
 
-        public void AddVersionButtons(int selectedVersionId = -1)
+        public void AddVersionButtons(int currentVersionId = -1)
         {
             // Отримати StackPanel за ім'ям
 
@@ -157,6 +159,7 @@ namespace DocumentVersionControlSystem.UI
                 _buttonStackPanel.Children.Clear();
 
                 _selectedDocumentButton = _homePage.GetSelectedButton();
+
                 var documentId = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First().Id;
                 var versions = _versionControlManager.GetVersionsByDocumentId(documentId);
 
@@ -184,11 +187,11 @@ namespace DocumentVersionControlSystem.UI
                         MinHeight = 40   // Мінімальна висота
                     };
 
-                    if (selectedVersionId == version.Id)
+                    if (currentVersionId == version.Id)
                     {
-                        _selectedVersionButton = button;
-                        _selectedVersionButton.BorderBrush = Brushes.Gray;
-                        _selectedVersionButton.BorderThickness = new Thickness(3);
+                        _currentVersionButton = button;
+                        _currentVersionButton.BorderBrush = Brushes.Black;
+                        _currentVersionButton.BorderThickness = new Thickness(2.5);
                     }
 
                     button.Click += OnButtonVersionClicked;

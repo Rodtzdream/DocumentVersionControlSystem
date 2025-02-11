@@ -27,6 +27,7 @@ namespace DocumentVersionControlSystem.UI.Windows
             ReadDocument();
             ReadDescription();
             ReadDateTime();
+            _mainWindow.AddVersionButtons(_version.Id);
 
             Loaded += VersionDetailsPage_Loaded;
             _mainWindow.SizeChanged += OnWindowSizeChanged;
@@ -93,7 +94,7 @@ namespace DocumentVersionControlSystem.UI.Windows
 
             ReadDescription();
             ReadDateTime();
-            _mainWindow.AddVersionButtons();
+            _mainWindow.AddVersionButtons(_version.Id);
             return true;
         }
 
