@@ -1,4 +1,5 @@
 ﻿using DocumentVersionControlSystem.Database.Contexts;
+using Microsoft.EntityFrameworkCore;
 namespace DocumentVersionControlSystem.Database.Repositories;
 
 public class DocumentRepository
@@ -40,6 +41,11 @@ public class DocumentRepository
     {
         lock (_lock)
         {
+            var existingDocument = _context.Documents.Local.FirstOrDefault(d => d.Id == document.Id);
+            if (existingDocument != null)
+            {
+                _context.Entry(existingDocument).State = EntityState.Detached;
+            }
             _context.Documents.Update(document);
             _context.SaveChanges();
         }
@@ -69,14 +75,6 @@ public class DocumentRepository
         lock (_lock)
         {
             return _context.Documents.FirstOrDefault(d => d.FilePath == path);
-        }
-    }
-
-    public void SaveChanges()
-    {
-        lock (_lock)
-        {
-            _context.SaveChanges();
         }
     }
 }

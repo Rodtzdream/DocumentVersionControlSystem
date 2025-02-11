@@ -174,6 +174,7 @@ namespace DocumentVersionControlSystem.UI
                     }
 
                     button.Click += OnButtonVersionClicked;
+                    button.MouseRightButtonDown += OnButtonVersionClicked;
                     button.MouseDoubleClick += OnButtonVersionDoubleClicked;
 
                     CreateContextMenuForVersionButton(button);
@@ -299,7 +300,8 @@ namespace DocumentVersionControlSystem.UI
                             ClearVersionButtons();
                             MessageBox.Show("Failed to load version. Returning to the home page.");
                         }
-                        AddVersionButtons(versionDetailsPage.GetVersionId());
+                        else
+                            AddVersionButtons(versionDetailsPage.GetVersionId());
                     }
                     else if (currentPage is DocumentViewerPage documentViewerPage)
                     {
@@ -333,7 +335,8 @@ namespace DocumentVersionControlSystem.UI
                             ClearVersionButtons();
                             MessageBox.Show("Failed to load version. Returning to the home page.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
-                        AddVersionButtons(versionDetailsPage.GetVersionId());
+                        else
+                            AddVersionButtons(versionDetailsPage.GetVersionId());
                     }
                     else if (currentPage is DocumentViewerPage documentViewerPage)
                     {

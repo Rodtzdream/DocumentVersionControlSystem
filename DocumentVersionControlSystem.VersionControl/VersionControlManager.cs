@@ -38,7 +38,7 @@ public class VersionControlManager
 
     public bool CreateNewVersion(Document document, string versionDescription)
     {
-        if (document.VersionCount > 0 && !_diffManager.IsFileChanged(document.FilePath, _versionRepository.GetVersionsByDocumentId(document.Id).Last().FilePath))
+        if (document.VersionCount > 0 && !_diffManager.IsFileChanged(document.FilePath, _versionRepository.GetLatestVersionByDocumentId(document.Id).FilePath))
         {
             return false;
         }
@@ -114,10 +114,10 @@ public class VersionControlManager
         Version version = GetVersionById(versionId);
         Document? document = _documentRepository.GetDocumentById(documentId);
 
-        if (document == null)
+        if (!_diffManager.IsFileChanged(_versionRepository.GetLatestVersionByDocumentId(document.Id).FilePath, version.FilePath))
         {
-            _logger.LogError($"Document with ID {documentId} not found.");
-            throw new InvalidOperationException($"Document with ID {documentId} not found.");
+            _logger.LogError($"Version {versionId} is the same as the latest version.");
+            return version;
         }
 
         var documentDirectory = Path.Combine("Documents", document.Name);
@@ -141,7 +141,6 @@ public class VersionControlManager
 
         document.LastModifiedDate = DateTime.Now;
         FileStorage.FileStorageManager.CopyFile(documentFilePath, newFilePath);
-        document.VersionCount++;
         _documentRepository.UpdateDocument(document);
 
         _logger.LogInformation($"Switched to version {version.Id} and saved as latest for document {document.Id}");
@@ -167,6 +166,14 @@ public class VersionControlManager
     public void DeleteVersion(int versionId)
     {
         Version version = GetVersionById(versionId);
+        var document = _documentRepository.GetDocumentById(version.DocumentId);
+
         DeleteVersion(version);
+
+        if (document != null)
+        {
+            document.VersionCount--;
+            _documentRepository.UpdateDocument(document);
+        }
     }
 }

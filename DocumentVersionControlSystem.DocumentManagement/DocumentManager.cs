@@ -56,7 +56,6 @@ public class DocumentManager
 
             // Оновлення документа в базі даних
             _documentRepository.UpdateDocument(document);
-            _documentRepository.SaveChanges();
             _logger.LogInformation($"Document {document.Id} renamed or moved");
         }
 
@@ -69,7 +68,6 @@ public class DocumentManager
         if (document != null)
         {
             _documentRepository.DeleteDocument(document);
-            _documentRepository.SaveChanges();
             _logger.LogInformation($"Document {document.Id} deleted");
         }
     }
@@ -162,7 +160,6 @@ public class DocumentManager
 
             // Оновлення документа в базі даних
             _documentRepository.UpdateDocument(document);
-            _documentRepository.SaveChanges();
 
             _logger.LogInformation($"Document {document.Id} renamed successfully to {newName}.");
         }
@@ -193,7 +190,6 @@ public class DocumentManager
     public void UpdateDocument(Database.Models.Document document)
     {
         _documentRepository.UpdateDocument(document);
-        _documentRepository.SaveChanges();
         _logger.LogInformation($"Document {document.Id} updated");
     }
 
@@ -205,7 +201,6 @@ public class DocumentManager
             document.Name = name;
             document.LastModifiedDate = DateTime.Now;
             _documentRepository.UpdateDocument(document);
-            _documentRepository.SaveChanges();
             _logger.LogInformation($"Document {document.Id} updated");
         }
     }
@@ -217,7 +212,6 @@ public class DocumentManager
         {
             document.LastModifiedDate = DateTime.Now;
             _documentRepository.UpdateDocument(document);
-            _documentRepository.SaveChanges();
             _logger.LogInformation($"Document {document.Id} updated");
         }
     }
@@ -225,7 +219,6 @@ public class DocumentManager
     public void DeleteDocument(Database.Models.Document document)
     {
         _documentRepository.DeleteDocument(document);
-        _documentRepository.SaveChanges();
 
         var documentDirectory = Path.Combine("Documents", document.Name);
         if (Directory.Exists(documentDirectory))
@@ -249,7 +242,6 @@ public class DocumentManager
             }
 
             _documentRepository.DeleteDocument(document);
-            _documentRepository.SaveChanges();
             _logger.LogInformation($"Document {document.Id} deleted");
         }
     }
