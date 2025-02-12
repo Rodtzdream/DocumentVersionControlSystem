@@ -1,4 +1,6 @@
-﻿using DocumentVersionControlSystem.DocumentManagement;
+﻿using DocumentVersionControlSystem.DiffManager;
+using DocumentVersionControlSystem.DocumentManagement;
+using DocumentVersionControlSystem.FileStorage;
 using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.UI.Windows;
 using DocumentVersionControlSystem.VersionControl;
@@ -24,6 +26,8 @@ namespace DocumentVersionControlSystem.UI
         private Button _currentVersionButton;
         private DocumentManager _documentManager;
         private VersionControlManager _versionControlManager;
+        private IDiffManager _diffManager;
+        private IFileStorageManager _fileStorageManager;
         private Logging.Logger _logger;
 
         private HomePage _homePage;
@@ -37,7 +41,9 @@ namespace DocumentVersionControlSystem.UI
 
             _logger = new Logging.Logger();
             _documentManager = new DocumentManager(_logger);
-            _versionControlManager = new VersionControlManager(_logger);
+            _diffManager = new DiffManager.DiffManager();
+            _fileStorageManager = new FileStorageManager();
+            _versionControlManager = new VersionControlManager(_logger, _fileStorageManager, _diffManager);
             _homePage = new HomePage(this, _documentManager, _versionControlManager);
 
             _navigationButtonsStackPanel = (StackPanel)FindName("NavigationButtons");

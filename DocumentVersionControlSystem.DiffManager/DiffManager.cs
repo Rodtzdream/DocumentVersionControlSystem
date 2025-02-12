@@ -1,6 +1,6 @@
 ﻿namespace DocumentVersionControlSystem.DiffManager;
 
-public class DiffManager
+public class DiffManager : IDiffManager
 {
     public string GetDiff(string firstFilePath, string secondFilePath)
     {
