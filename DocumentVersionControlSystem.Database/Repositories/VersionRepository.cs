@@ -13,11 +13,12 @@ public class VersionRepository
     public void AddVersion(Models.Document document, Models.Version version)
     {
         document.VersionCount++;
+        _context.Documents.Update(document);
         _context.Versions.Add(version);
         _context.SaveChanges();
     }
 
-    public Models.Version GetVersionById(int id)
+    public Models.Version? GetVersionById(int id)
     {
         return _context.Versions.Find(id);
     }
@@ -35,7 +36,19 @@ public class VersionRepository
 
     public List<Models.Version> GetVersionsByDocumentId(int documentId)
     {
-        return _context.Versions.Where(v => v.DocumentId == documentId).ToList();
+        var versions = _context.Versions.Where(v => v.DocumentId == documentId).ToList();
+        return versions.OrderByDescending(v => v.CreationDate).ToList();
+    }
+
+    public Models.Version GetLatestVersionByDocumentId(int documentId)
+    {
+        return _context.Versions.Where(v => v.DocumentId == documentId).ToList().Last();
+    }
+
+    public void UpdateVersion(Models.Version version)
+    {
+        _context.Versions.Update(version);
+        _context.SaveChanges();
     }
 
     public void SaveChanges()

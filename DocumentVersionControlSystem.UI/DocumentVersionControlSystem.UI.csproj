@@ -7,10 +7,27 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="images/document_icon.png" />
+    <None Remove="images/plus.png" />
+    <None Remove="images/circle-arrow-icon.png" />
+    <None Remove="images/house-icon.png" />
+    <None Remove="images/line-angle-left-icon.png" />
+    <None Remove="images/line-angle-right-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DocumentVersionControlSystem.DocumentManagement\DocumentVersionControlSystem.DocumentManagement.csproj" />
+    <ProjectReference Include="..\DocumentVersionControlSystem.VersionControl\DocumentVersionControlSystem.VersionControl.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images/document_icon.png" />
+    <Resource Include="images/plus.png" />
+    <Resource Include="images/circle-arrow-icon.png" />
+    <Resource Include="images/house-icon.png" />
+    <Resource Include="images/line-angle-left-icon.png" />
+    <Resource Include="images/line-angle-right-icon.png" />
   </ItemGroup>
 </Project>

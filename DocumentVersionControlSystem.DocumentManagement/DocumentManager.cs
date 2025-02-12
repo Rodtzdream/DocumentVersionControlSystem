@@ -1,18 +1,21 @@
-﻿namespace DocumentVersionControlSystem.DocumentManagement;
+﻿using DocumentVersionControlSystem.Database.Contexts;
+using DocumentVersionControlSystem.Database.Models;
+using Microsoft.EntityFrameworkCore;
+namespace DocumentVersionControlSystem.DocumentManagement;
 
 public class DocumentManager
 {
     private readonly Database.Repositories.DocumentRepository _documentRepository;
-    private readonly Database.Repositories.VersionRepository _versionRepository;
-    private readonly DiffManager.DiffManager _diffManager;
     private readonly Logging.Logger _logger;
     private readonly List<FileChangeWatcher> _fileWatchers = new();
 
-    public DocumentManager(Database.Repositories.DocumentRepository documentRepository, Database.Repositories.VersionRepository versionRepository, DiffManager.DiffManager diffManager, Logging.Logger logger)
+    private bool _isInternalRename = false;
+
+    public DocumentManager(Logging.Logger logger)
     {
-        _documentRepository = documentRepository;
-        _versionRepository = versionRepository;
-        _diffManager = diffManager;
+        var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
+        optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DocVerControlDB;Integrated Security=True"); // Replace with your actual connection string
+        _documentRepository = new Database.Repositories.DocumentRepository(new DatabaseContext(optionsBuilder.Options));
         _logger = logger;
     }
 
@@ -33,15 +36,30 @@ public class DocumentManager
 
     private void HandleFileRenamedOrMoved(string oldPath, string newPath)
     {
+        if (_isInternalRename)
+            return;
+
+        _isInternalRename = true;
+
         var document = _documentRepository.GetDocumentByPath(oldPath);
         if (document != null)
         {
-            document.FilePath = newPath;
-            document.Name = Path.GetFileName(newPath);
+            string newName = Path.GetFileNameWithoutExtension(newPath);
 
+            // Переміщення папки документа
+            Directory.Move(Path.Combine("Documents", document.Name), Path.Combine("Documents", newName));
+
+            // Оновлення шляху в документі
+            document.FilePath = newPath;
+            document.Name = newName;
+            document.LastModifiedDate = DateTime.Now;
+
+            // Оновлення документа в базі даних
             _documentRepository.UpdateDocument(document);
-            _documentRepository.SaveChanges();
+            _logger.LogInformation($"Document {document.Id} renamed or moved");
         }
+
+        _isInternalRename = false;
     }
 
     private void HandleFileDeleted(string path)
@@ -50,7 +68,7 @@ public class DocumentManager
         if (document != null)
         {
             _documentRepository.DeleteDocument(document);
-            _documentRepository.SaveChanges();
+            _logger.LogInformation($"Document {document.Id} deleted");
         }
     }
 
@@ -61,13 +79,19 @@ public class DocumentManager
         _fileWatchers.Clear();
     }
 
-    public void AddDocument(string filePath)
+    public bool AddDocument(string filePath)
     {
+        if (GetDocumentsByName(Path.GetFileNameWithoutExtension(filePath)).Any())
+        {
+            _logger.LogError($"Document {filePath} already exists");
+            return false;
+        }
+
         var fileInfo = new FileInfo(filePath);
 
         var document = new Database.Models.Document
         {
-            Name = fileInfo.Name,
+            Name = Path.GetFileNameWithoutExtension(fileInfo.Name),
             FilePath = filePath,
             CreationDate = fileInfo.CreationTime,
             LastModifiedDate = fileInfo.LastWriteTime
@@ -81,23 +105,62 @@ public class DocumentManager
 
         _documentRepository.AddDocument(document);
         _logger.LogInformation($"Document {document.Id} added");
+        return true;
     }
 
-    public void UpdateDocument(Database.Models.Document document)
+    public void RenameDocument(Document document, string newName)
     {
-        _documentRepository.UpdateDocument(document);
-        _documentRepository.SaveChanges();
-        _logger.LogInformation($"Document {document.Id} updated");
+        _isInternalRename = true;
+
+        try
+        {
+            var oldFilePath = document.FilePath;
+            var fileDirectory = Path.GetDirectoryName(oldFilePath) ?? string.Empty; // Отримуємо директорію файлу
+            var newFilePath = Path.Combine(fileDirectory, newName) + ".txt";
+
+            var currentDocumentPath = Path.Combine("Documents", document.Name);
+            var newDocumentPath = Path.Combine("Documents", newName);
+
+            // Перевірка, чи існує старий файл
+            if (!File.Exists(oldFilePath))
+            {
+                _logger.LogError($"RenameDocument: File {oldFilePath} does not exist.");
+                return;
+            }
+
+            // Перевірка, чи не існує файл із новим ім'ям
+            if (File.Exists(newFilePath))
+            {
+                _logger.LogError($"RenameDocument: File {newFilePath} already exists.");
+                return;
+            }
+
+            // Перейменування файлу
+            File.Move(oldFilePath, newFilePath);
+
+            // Переміщення папки документа
+            Directory.Move(currentDocumentPath, newDocumentPath);
+
+            // Оновлення шляху в документі
+            document.FilePath = newFilePath;
+            document.Name = newName;
+            document.LastModifiedDate = DateTime.Now;
+
+            // Оновлення документа в базі даних
+            _documentRepository.UpdateDocument(document);
+
+            _logger.LogInformation($"Document {document.Id} renamed successfully to {newName}.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"RenameDocument: Failed to rename document {document.Id}. Error: {ex.Message}");
+        }
+
+        _isInternalRename = false;
     }
 
-    public void DeleteDocument(Database.Models.Document document)
-    {
-        _documentRepository.DeleteDocument(document);
-        _documentRepository.SaveChanges();
-        _logger.LogInformation($"Document {document.Id} deleted");
-    }
 
-    public Database.Models.Document GetDocumentById(int id)
+    public Database.Models.Document? GetDocumentById(int id)
     {
         return _documentRepository.GetDocumentById(id);
     }
@@ -112,37 +175,62 @@ public class DocumentManager
         return _documentRepository.GetDocumentsByName(name);
     }
 
+    public void UpdateDocument(Database.Models.Document document)
+    {
+        _documentRepository.UpdateDocument(document);
+        _logger.LogInformation($"Document {document.Id} updated");
+    }
+
     public void UpdateDocument(int documentId, string name)
     {
         var document = _documentRepository.GetDocumentById(documentId);
-        document.Name = name;
-        document.LastModifiedDate = DateTime.Now;
-        _documentRepository.UpdateDocument(document);
-        _documentRepository.SaveChanges();
-        _logger.LogInformation($"Document {document.Id} updated");
+        if (document != null)
+        {
+            document.Name = name;
+            document.LastModifiedDate = DateTime.Now;
+            _documentRepository.UpdateDocument(document);
+            _logger.LogInformation($"Document {document.Id} updated");
+        }
     }
 
     public void UpdateDocument(int documentId)
     {
         var document = _documentRepository.GetDocumentById(documentId);
-        document.LastModifiedDate = DateTime.Now;
-        _documentRepository.UpdateDocument(document);
-        _documentRepository.SaveChanges();
-        _logger.LogInformation($"Document {document.Id} updated");
+        if (document != null)
+        {
+            document.LastModifiedDate = DateTime.Now;
+            _documentRepository.UpdateDocument(document);
+            _logger.LogInformation($"Document {document.Id} updated");
+        }
     }
 
-    public void DeleteDocument(int documentId)
+    public void DeleteDocument(Database.Models.Document document)
     {
-        var document = _documentRepository.GetDocumentById(documentId);
-        var documentDirectory = Path.Combine("Documents", document.Name);
+        _documentRepository.DeleteDocument(document);
 
+        var documentDirectory = Path.Combine("Documents", document.Name);
         if (Directory.Exists(documentDirectory))
         {
             Directory.Delete(documentDirectory, true);
         }
 
-        _documentRepository.DeleteDocument(document);
-        _documentRepository.SaveChanges();
         _logger.LogInformation($"Document {document.Id} deleted");
+    }
+
+    public void DeleteDocument(int documentId)
+    {
+        var document = _documentRepository.GetDocumentById(documentId);
+        if (document != null)
+        {
+            var documentDirectory = Path.Combine("Documents", document.Name);
+
+            if (Directory.Exists(documentDirectory))
+            {
+                Directory.Delete(documentDirectory, true);
+            }
+
+            _documentRepository.DeleteDocument(document);
+            _logger.LogInformation($"Document {document.Id} deleted");
+        }
     }
 }
