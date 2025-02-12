@@ -111,7 +111,11 @@ namespace DocumentVersionControlSystem.UI.Windows
                 }
                 else if (popup.switchOption == SelectSwitchOptionPopup.SwitchOption.SaveAsTheLatest)
                 {
-                    _version = _versionControlManager.SwitchToVersionAndSaveAsLatest(_version.DocumentId, _version.Id, popup.Description);
+                    Database.Models.Version newVersion = _versionControlManager.SwitchToVersionAndSaveAsLatest(_version.DocumentId, _version.Id, popup.Description);
+                    if (newVersion.Id == _version.Id)
+                        MessageBox.Show("This version does not differ from your document!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    else
+                        _version = newVersion;
                 }
                 RefreshWindow();
             }
