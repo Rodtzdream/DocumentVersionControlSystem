@@ -189,6 +189,8 @@ public class VersionRepositoryTests
                 FilePath = "C:\\Documents\\TestDocument.txt"
             };
 
+            documentRepository.AddDocument(document);
+
             var version1 = new Database.Models.Version
             {
                 DocumentId = document.Id,
