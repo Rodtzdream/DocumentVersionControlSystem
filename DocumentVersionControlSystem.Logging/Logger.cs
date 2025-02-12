@@ -1,27 +1,34 @@
 ﻿namespace DocumentVersionControlSystem.Logging;
 using Serilog;
 
-public class Logger
+public class Logger : IDisposable
 {
-    public Logger()
+    private static readonly ILogger _logger;
+
+    static Logger()
     {
-        Log.Logger = new LoggerConfiguration()
+        _logger = new LoggerConfiguration()
             .WriteTo.File("log.txt")
             .CreateLogger();
     }
 
     public void LogInformation(string message)
     {
-        Log.Information(message);
+        _logger.Information(message);
     }
 
     public void LogWarning(string message)
     {
-        Log.Warning(message);
+        _logger.Warning(message);
     }
 
     public void LogError(string message)
     {
-        Log.Error(message);
+        _logger.Error(message);
+    }
+
+    public void Dispose()
+    {
+        Log.CloseAndFlush();
     }
 }

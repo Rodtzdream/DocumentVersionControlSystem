@@ -2,24 +2,24 @@
 
 public class FileStorageManager : IFileStorageManager
 {
-    public void SaveFile(string FilePath, string content)
+    public void SaveFile(string filePath, string content)
     {
-        System.IO.File.WriteAllText(FilePath, content);
+        System.IO.File.WriteAllText(filePath, content);
     }
 
-    public string ReadFile(string FilePath)
+    public string ReadFile(string filePath)
     {
-        return System.IO.File.ReadAllText(FilePath);
+        return System.IO.File.ReadAllText(filePath);
     }
 
-    public void DeleteFile(string FilePath)
+    public void DeleteFile(string filePath)
     {
-        System.IO.File.Delete(FilePath);
+        System.IO.File.Delete(filePath);
     }
 
-    public bool FileExists(string FilePath)
+    public bool FileExists(string filePath)
     {
-        return System.IO.File.Exists(FilePath);
+        return System.IO.File.Exists(filePath);
     }
 
     public void CopyFile(string sourceFilePath, string destinationFilePath)
