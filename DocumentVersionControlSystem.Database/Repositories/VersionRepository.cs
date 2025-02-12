@@ -1,5 +1,6 @@
 ﻿namespace DocumentVersionControlSystem.Database.Repositories;
 using DocumentVersionControlSystem.Database.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 public class VersionRepository
 {
@@ -25,7 +26,7 @@ public class VersionRepository
 
     public List<Models.Version> GetAllVersions()
     {
-        return _context.Versions.ToList();
+        return _context.Versions.AsNoTracking().ToList();
     }
 
     public void DeleteVersion(Models.Version version)
@@ -36,13 +37,19 @@ public class VersionRepository
 
     public List<Models.Version> GetVersionsByDocumentId(int documentId)
     {
-        var versions = _context.Versions.Where(v => v.DocumentId == documentId).ToList();
-        return versions.OrderByDescending(v => v.CreationDate).ToList();
+        return _context.Versions
+            .Where(v => v.DocumentId == documentId)
+            .OrderByDescending(v => v.CreationDate)
+            .AsNoTracking()
+            .ToList();
     }
 
     public Models.Version GetLatestVersionByDocumentId(int documentId)
     {
-        return _context.Versions.Where(v => v.DocumentId == documentId).ToList().Last();
+        return _context.Versions
+            .Where(v => v.DocumentId == documentId)
+            .OrderByDescending(v => v.CreationDate)
+            .FirstOrDefault();
     }
 
     public void UpdateVersion(Models.Version version)
