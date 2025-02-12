@@ -15,18 +15,9 @@ public class VersionControlManager
     private readonly IFileStorageManager _fileStorageManager;
     private readonly Logging.Logger _logger;
 
-    public VersionControlManager(Logging.Logger logger, IFileStorageManager fileStorageManager, IDiffManager diffManager, DatabaseContext databaseContext = null)
+    public VersionControlManager(Logging.Logger logger, IFileStorageManager fileStorageManager, IDiffManager diffManager, DatabaseContext databaseContext)
     {
         _logger = logger;
-
-        if (databaseContext == null)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
-            optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DocVerControlDB;Integrated Security=True");
-
-            databaseContext = new DatabaseContext(optionsBuilder.Options);
-        }
-
         _versionRepository = new VersionRepository(databaseContext);
         _documentRepository = new DocumentRepository(databaseContext);
         _fileStorageManager = fileStorageManager;

@@ -1,4 +1,5 @@
-﻿using DocumentVersionControlSystem.DiffManager;
+﻿using DocumentVersionControlSystem.Database.Contexts;
+using DocumentVersionControlSystem.DiffManager;
 using DocumentVersionControlSystem.DocumentManagement;
 using DocumentVersionControlSystem.FileStorage;
 using DocumentVersionControlSystem.UI.Popups;
@@ -40,10 +41,12 @@ namespace DocumentVersionControlSystem.UI
             InitializeComponent();
 
             _logger = new Logging.Logger();
-            _documentManager = new DocumentManager(_logger);
+
+            var databaseContext = new DatabaseContext(); // Create an instance of DatabaseContext
+            _documentManager = new DocumentManager(_logger, databaseContext); // Pass the databaseContext to the constructor
             _diffManager = new DiffManager.DiffManager();
             _fileStorageManager = new FileStorageManager();
-            _versionControlManager = new VersionControlManager(_logger, _fileStorageManager, _diffManager);
+            _versionControlManager = new VersionControlManager(_logger, _fileStorageManager, _diffManager, databaseContext);
             _homePage = new HomePage(this, _documentManager, _versionControlManager);
 
             _navigationButtonsStackPanel = (StackPanel)FindName("NavigationButtons");

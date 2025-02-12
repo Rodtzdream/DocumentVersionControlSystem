@@ -11,11 +11,9 @@ public class DocumentManager
 
     private bool _isInternalRename = false;
 
-    public DocumentManager(Logging.Logger logger)
+    public DocumentManager(Logging.Logger logger, DatabaseContext databaseContext)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
-        optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DocVerControlDB;Integrated Security=True"); // Replace with your actual connection string
-        _documentRepository = new Database.Repositories.DocumentRepository(new DatabaseContext(optionsBuilder.Options));
+        _documentRepository = new Database.Repositories.DocumentRepository(databaseContext);
         _logger = logger;
     }
 
