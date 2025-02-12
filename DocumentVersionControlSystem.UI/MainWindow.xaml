@@ -23,7 +23,7 @@
             <TextBlock Name="DocumentVersionsTextBlock" Text="Document Versions" Grid.Column="0" Grid.Row="0" FontSize="16" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <TextBlock Name="DocVersionControlTextBlock" Text="DocVersionControl" Grid.Column="1" Grid.Row="0" FontSize="16" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-            <!-- Кнопки навігації -->
+            <!-- Navigation Buttons -->
             <StackPanel Name="NavigationButtons" Grid.Column="1" Orientation="Horizontal" Margin="5,0,0,0">
                 <Button Click="HomeButton_Click" Style="{StaticResource HomeButtonStyle}" FontSize="12" Margin="5,0,0,0" MinWidth="25" MinHeight="25"/>
                 <Button Click="PreviousButton_Click" Style="{StaticResource LeftButtonStyle}" FontSize="12" Margin="5,0,0,0" MinWidth="25" MinHeight="25"/>
@@ -36,7 +36,7 @@
             <GridSplitter Grid.Row="1" Grid.ColumnSpan="2" Height="3" Background="Black"
                           HorizontalAlignment="Stretch" VerticalAlignment="Top" Cursor="Arrow" />
 
-            <!-- Кнопки у лівій колонці -->
+            <!-- Buttons in the left column -->
             <ScrollViewer Grid.Column="0" Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel x:Name="ButtonStackPanel" Background="Transparent" MouseLeftButtonDown="Grid_MouseLeftButtonDown"/>
             </ScrollViewer>

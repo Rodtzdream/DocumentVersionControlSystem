@@ -5,120 +5,118 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace DocumentVersionControlSystem.UI.Windows
+namespace DocumentVersionControlSystem.UI.Windows;
+
+public partial class VersionDetailsPage : Page
 {
-    /// <summary>
-    /// Interaction logic for VersionDetailsPage.xaml
-    /// </summary>
-    public partial class VersionDetailsPage : Page
+    private readonly MainWindow _mainWindow;
+    private readonly VersionControlManager _versionControlManager;
+    private Database.Models.Version _version;
+
+    public VersionDetailsPage(MainWindow mainWindow, Database.Models.Version version, VersionControlManager versionControlManager)
     {
-        MainWindow _mainWindow;
+        _version = version;
+        _versionControlManager = versionControlManager;
+        _mainWindow = mainWindow;
 
-        Database.Models.Version _version;
-        private readonly VersionControlManager _versionControlManager;
+        InitializeComponent();
+        LoadVersionDetails();
+        _mainWindow.AddVersionButtons(_version.Id);
 
-        public VersionDetailsPage(MainWindow mainWindow, Database.Models.Version version, VersionControlManager versionControlManager)
+        Loaded += VersionDetailsPage_Loaded;
+        _mainWindow.SizeChanged += OnWindowSizeChanged;
+    }
+
+    private void VersionDetailsPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        UpdateButtonSizes(_mainWindow.ActualWidth, _mainWindow.ActualHeight);
+    }
+
+    private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        UpdateButtonSizes(e.NewSize.Width, e.NewSize.Height);
+    }
+
+    private void UpdateButtonSizes(double width, double height)
+    {
+        ApplyVersionButton.Width = width * 0.06;
+        ApplyVersionButton.Height = height * 0.033;
+        ApplyVersionButton.FontSize = Math.Max(12, ActualWidth * 0.007);
+    }
+
+    public int GetVersionId()
+    {
+        return _version.Id;
+    }
+
+    private bool ReadDocument()
+    {
+        try
         {
-            _version = version;
-            _versionControlManager = versionControlManager;
-            _mainWindow = mainWindow;
-
-            InitializeComponent();
-            ReadDocument();
-            ReadDescription();
-            ReadDateTime();
-            _mainWindow.AddVersionButtons(_version.Id);
-
-            Loaded += VersionDetailsPage_Loaded;
-            _mainWindow.SizeChanged += OnWindowSizeChanged;
+            DocumentText.Text = File.ReadAllText(_version.FilePath);
         }
-
-        private void VersionDetailsPage_Loaded(object sender, RoutedEventArgs e)
+        catch (Exception)
         {
-            UpdateButtonSizes(_mainWindow.ActualWidth, _mainWindow.ActualHeight);
+            MessageBox.Show("Failed to read document version file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return false;
         }
+        return true;
+    }
 
-        private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            UpdateButtonSizes(e.NewSize.Width, e.NewSize.Height);
-        }
+    private void ReadDescription()
+    {
+        VersionDescription.Text = string.IsNullOrEmpty(_version.VersionDescription)
+            ? "Version description: None"
+            : "Version description: " + _version.VersionDescription;
+    }
 
-        private void UpdateButtonSizes(double width, double height)
-        {
-            ApplyVersionButton.Width = width * 0.06;
-            ApplyVersionButton.Height = height * 0.033;
-            ApplyVersionButton.FontSize = Math.Max(12, this.ActualWidth * 0.007);
-        }
+    private void ReadDateTime()
+    {
+        VersionDateTime.Text = "Creation date & time: " + _version.CreationDate;
+    }
 
-        public int GetVersionId()
-        {
-            return _version.Id;
-        }
+    private void LoadVersionDetails()
+    {
+        ReadDocument();
+        ReadDescription();
+        ReadDateTime();
+    }
 
-        private bool ReadDocument()
+    public bool RefreshWindow()
+    {
+        if (!ReadDocument())
+            return false;
+
+        ReadDescription();
+        ReadDateTime();
+        _mainWindow.AddVersionButtons(_version.Id);
+        return true;
+    }
+
+    private void ApplyVersionButton_Click(object sender, RoutedEventArgs e)
+    {
+        var popup = new SelectSwitchOptionPopup(_version.VersionDescription);
+        popup.ShowDialog();
+
+        if (popup.DialogResult == true)
         {
-            try
+            if (popup.switchOption == SelectSwitchOptionPopup.SwitchOption.DeleteNewer)
             {
-                string documentVersionText = File.ReadAllText(_version.FilePath);
-                TextBox textBox = (TextBox)FindName("TextBox");
-                textBox.Text = documentVersionText;
+                _versionControlManager.SwitchToVersionAndDeleteNewer(_version.DocumentId, _version.Id, popup.Description);
             }
-            catch (System.Exception)
+            else if (popup.switchOption == SelectSwitchOptionPopup.SwitchOption.SaveAsTheLatest)
             {
-                return false;
-                throw new System.Exception("Failed to read document version file.");
-            }
-            return true;
-        }
-
-        private void ReadDescription()
-        {
-            string descriptionText = _version.VersionDescription;
-            TextBlock textBox = (TextBlock)FindName("VersionDescription");
-            textBox.Text = "Version description: " + descriptionText;
-            if(descriptionText == "")
-                textBox.Text = "Version description: None";
-        }
-
-        private void ReadDateTime()
-        {
-            string dateTimeText = _version.CreationDate.ToString();
-            TextBlock textBox = (TextBlock)FindName("VersionDateTime");
-            textBox.Text = "Creation date & time: " + dateTimeText;
-        }
-
-        public bool RefreshWindow()
-        {
-            if (!ReadDocument())
-                return false;
-
-            ReadDescription();
-            ReadDateTime();
-            _mainWindow.AddVersionButtons(_version.Id);
-            return true;
-        }
-
-        private void ApplyVersionButton_Click(object sender, RoutedEventArgs e)
-        {
-            SelectSwitchOptionPopup popup = new SelectSwitchOptionPopup(_version.VersionDescription);
-            popup.ShowDialog();
-
-            if (popup.DialogResult == true)
-            {
-                if (popup.switchOption == SelectSwitchOptionPopup.SwitchOption.DeleteNewer)
+                var newVersion = _versionControlManager.SwitchToVersionAndSaveAsLatest(_version.DocumentId, _version.Id, popup.Description);
+                if (newVersion.Id == _version.Id)
                 {
-                    _versionControlManager.SwitchToVersionAndDeleteNewer(_version.DocumentId, _version.Id, popup.Description);
+                    MessageBox.Show("This version does not differ from your document!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                else if (popup.switchOption == SelectSwitchOptionPopup.SwitchOption.SaveAsTheLatest)
+                else
                 {
-                    Database.Models.Version newVersion = _versionControlManager.SwitchToVersionAndSaveAsLatest(_version.DocumentId, _version.Id, popup.Description);
-                    if (newVersion.Id == _version.Id)
-                        MessageBox.Show("This version does not differ from your document!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    else
-                        _version = newVersion;
+                    _version = newVersion;
                 }
-                RefreshWindow();
             }
+            RefreshWindow();
         }
     }
 }

@@ -4,14 +4,19 @@
              xmlns:local="clr-namespace:DocumentVersionControlSystem.UI"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <!-- Стиль для квадратних кнопок -->
-        <Style x:Key="SquareButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="100" />
-            <Setter Property="Height" Value="100" />
+        <!-- Base Style for Buttons -->
+        <Style x:Key="BaseButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="White" />
             <Setter Property="Foreground" Value="Black" />
             <Setter Property="BorderBrush" Value="Gray" />
             <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+
+        <!-- Style for square buttons -->
+        <Style x:Key="SquareButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="100" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -30,7 +35,6 @@
                                 <TextBlock Text="{TemplateBinding Tag}"
                                    HorizontalAlignment="Center" 
                                    VerticalAlignment="Center"
-                                   FontSize="14"
                                    TextTrimming="CharacterEllipsis"
                                    TextWrapping="NoWrap"
                                    Grid.Row="1" Margin="0,0,0,15" />
@@ -41,14 +45,10 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для прямокутних кнопок -->
-        <Style x:Key="RectangleButtonStyle" TargetType="Button">
+        <!-- Style for rectangular buttons -->
+        <Style x:Key="RectangleButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
             <Setter Property="Width" Value="180" />
             <Setter Property="Height" Value="40" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="Foreground" Value="Black" />
-            <Setter Property="BorderBrush" Value="Gray" />
-            <Setter Property="BorderThickness" Value="1.5" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -64,7 +64,6 @@
                                 <TextBlock Text="{TemplateBinding Content}"
                                    HorizontalAlignment="Center" 
                                    VerticalAlignment="Center"
-                                   FontSize="14"
                                    Grid.Row="0" Margin="0,2,0,0" />
                                 <TextBlock Text="{TemplateBinding Tag}"
                                    HorizontalAlignment="Center"
@@ -81,12 +80,10 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для кнопки додавання документу -->
-        <Style x:Key="AddButtonStyle" TargetType="Button">
+        <!-- Style for add document button -->
+        <Style x:Key="AddButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
             <Setter Property="Width" Value="100" />
             <Setter Property="Height" Value="100" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="Foreground" Value="Black" />
             <Setter Property="BorderBrush" Value="Black" />
             <Setter Property="BorderThickness" Value="2.5" />
             <Setter Property="Template">
@@ -107,7 +104,6 @@
                                 <TextBlock Text="Add document"
                            HorizontalAlignment="Center" 
                            VerticalAlignment="Center"
-                           FontSize="14"
                            Grid.Row="1" Margin="0,0,0,15" />
                             </Grid>
                         </Border>
@@ -116,7 +112,7 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для текстового поля -->
+        <!-- Style for text box -->
         <Style x:Key="TextBoxStyle" TargetType="TextBox">
             <Setter Property="MinWidth" Value="600" />
             <Setter Property="MinHeight" Value="350" />
@@ -141,39 +137,17 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для текстового поля 2 -->
-        <Style x:Key="TextBoxStyle2" TargetType="TextBox">
-            <Setter Property="MinWidth" Value="600" />
+        <!-- Style for text box 2 -->
+        <Style x:Key="TextBoxStyle2" TargetType="TextBox" BasedOn="{StaticResource TextBoxStyle}">
             <Setter Property="MinHeight" Value="420" />
             <Setter Property="Margin" Value="10,10,10,10" />
-            <Setter Property="BorderBrush" Value="Black" />
-            <Setter Property="BorderThickness" Value="1.5" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border 
-            CornerRadius="5" 
-            BorderBrush="{TemplateBinding BorderBrush}" 
-            BorderThickness="{TemplateBinding BorderThickness}" 
-            Background="{TemplateBinding Background}">
-                            <ScrollViewer 
-                Margin="0" 
-                x:Name="PART_ContentHost"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
 
-        <!-- Стиль для кнопок -->
-        <Style x:Key="CustomButtonStyle" TargetType="Button">
+        <!-- Style for custom buttons -->
+        <Style x:Key="CustomButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="Foreground" Value="Black" />
             <Setter Property="FontSize" Value="10" />
-            <Setter Property="BorderBrush" Value="Gray" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -190,13 +164,8 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для кнопки refresh -->
-        <Style x:Key="RefreshButtonStyle" TargetType="Button">
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="Foreground" Value="Black" />
-            <Setter Property="FontSize" Value="10" />
+        <!-- Style for refresh button -->
+        <Style x:Key="RefreshButtonStyle" TargetType="Button" BasedOn="{StaticResource CustomButtonStyle}">
             <Setter Property="BorderBrush" Value="Black" />
             <Setter Property="BorderThickness" Value="1.5" />
             <Setter Property="Template">
@@ -220,13 +189,8 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для кнопки home -->
-        <Style x:Key="HomeButtonStyle" TargetType="Button">
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="Foreground" Value="Black" />
-            <Setter Property="FontSize" Value="10" />
+        <!-- Style for home button -->
+        <Style x:Key="HomeButtonStyle" TargetType="Button" BasedOn="{StaticResource CustomButtonStyle}">
             <Setter Property="BorderBrush" Value="Black" />
             <Setter Property="BorderThickness" Value="1.5" />
             <Setter Property="Template">
@@ -250,13 +214,8 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для кнопки left -->
-        <Style x:Key="LeftButtonStyle" TargetType="Button">
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="Foreground" Value="Black" />
-            <Setter Property="FontSize" Value="10" />
+        <!-- Style for left button -->
+        <Style x:Key="LeftButtonStyle" TargetType="Button" BasedOn="{StaticResource CustomButtonStyle}">
             <Setter Property="BorderBrush" Value="Black" />
             <Setter Property="BorderThickness" Value="1.5" />
             <Setter Property="Template">
@@ -280,13 +239,8 @@
             </Setter>
         </Style>
 
-        <!-- Стиль для кнопки right -->
-        <Style x:Key="RightButtonStyle" TargetType="Button">
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="Foreground" Value="Black" />
-            <Setter Property="FontSize" Value="10" />
+        <!-- Style for right button -->
+        <Style x:Key="RightButtonStyle" TargetType="Button" BasedOn="{StaticResource CustomButtonStyle}">
             <Setter Property="BorderBrush" Value="Black" />
             <Setter Property="BorderThickness" Value="1.5" />
             <Setter Property="Template">
