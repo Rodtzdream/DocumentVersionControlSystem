@@ -263,6 +263,7 @@ public class DocumentRepositoryTests
         using (var context = new DatabaseContext(options))
         {
             var documentRepository = new DocumentRepository(context);
+            var versionRepository = new VersionRepository(context);
 
             var document = new Document
             {
@@ -289,8 +290,8 @@ public class DocumentRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            document.VersionCount++;
-            document.VersionCount++;
+            versionRepository.AddVersion(document, version1);
+            versionRepository.AddVersion(document, version2);
 
             // Act
             var result = documentRepository.GetDocumentById(1);
@@ -360,6 +361,8 @@ public class DocumentRepositoryTests
         using (var context = new DatabaseContext(options))
         {
             var documentRepository = new DocumentRepository(context);
+            var versionRepository = new VersionRepository(context);
+
             var document1 = new Document
             {
                 Name = "Test Document",
@@ -392,8 +395,8 @@ public class DocumentRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            document1.VersionCount++;
-            document2.VersionCount++;
+            versionRepository.AddVersion(document1, version1);
+            versionRepository.AddVersion(document2, version2);
 
             // Act
             var result = documentRepository.GetDocumentsByName("Test Document");
@@ -416,6 +419,8 @@ public class DocumentRepositoryTests
         using (var context = new DatabaseContext(options))
         {
             var documentRepository = new DocumentRepository(context);
+            var versionRepository = new VersionRepository(context);
+
             var document = new Document
             {
                 Name = "Test Document",
@@ -441,8 +446,8 @@ public class DocumentRepositoryTests
                 CreationDate = DateTime.Now
             };
 
-            document.VersionCount++;
-            document.VersionCount++;
+            versionRepository.AddVersion(document, version1);
+            versionRepository.AddVersion(document, version2);
 
             // Act
             var result = documentRepository.GetDocumentByPath("test.txt");

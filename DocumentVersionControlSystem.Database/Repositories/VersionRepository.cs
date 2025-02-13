@@ -14,7 +14,12 @@ public class VersionRepository
     public void AddVersion(Models.Document document, Models.Version version)
     {
         document.VersionCount++;
-        _context.Documents.Update(document);
+        var existingDocument = _context.Documents.Find(document.Id);
+        if (existingDocument != null)
+        {
+            _context.Entry(existingDocument).State = EntityState.Detached;
+        }
+        _context.Entry(document).State = EntityState.Modified;
         _context.Versions.Add(version);
         _context.SaveChanges();
     }
@@ -31,6 +36,11 @@ public class VersionRepository
 
     public void DeleteVersion(Models.Version version)
     {
+        var existingVersion = _context.Versions.Find(version.Id);
+        if (existingVersion != null)
+        {
+            _context.Entry(existingVersion).State = EntityState.Detached;
+        }
         _context.Versions.Remove(version);
         _context.SaveChanges();
     }
@@ -44,7 +54,7 @@ public class VersionRepository
             .ToList();
     }
 
-    public Models.Version GetLatestVersionByDocumentId(int documentId)
+    public Models.Version? GetLatestVersionByDocumentId(int documentId)
     {
         return _context.Versions
             .Where(v => v.DocumentId == documentId)

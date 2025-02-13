@@ -1,41 +1,27 @@
 ﻿namespace DocumentVersionControlSystem.Database.Contexts;
 using DocumentVersionControlSystem.Database.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using System.Configuration;
 
 public class DatabaseContext : DbContext
 {
     public DbSet<Document> Documents { get; set; }
     public DbSet<Version> Versions { get; set; }
 
-    private readonly string _connectionString;
-
     public DatabaseContext()
     {
-        _connectionString = LoadConnectionString();
     }
 
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
     {
-        _connectionString = LoadConnectionString();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer(_connectionString);
+            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
         }
-    }
-
-    private string LoadConnectionString()
-    {
-        var config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .Build();
-
-        return config.GetConnectionString("DefaultConnection")
-            ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DocVerControlDB;Integrated Security=True";
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

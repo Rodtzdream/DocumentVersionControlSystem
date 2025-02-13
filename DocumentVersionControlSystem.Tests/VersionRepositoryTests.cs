@@ -2,7 +2,6 @@
 using DocumentVersionControlSystem.Database.Contexts;
 using DocumentVersionControlSystem.Database.Models;
 using DocumentVersionControlSystem.Database.Repositories;
-using System;
 using DocumentVersionControlSystem.Logging;
 using Moq;
 using DocumentVersionControlSystem.VersionControl;
@@ -63,6 +62,7 @@ public class VersionRepositoryTests
 
         using (var context = new DatabaseContext(options))
         {
+            DocumentRepository documentRepository = new DocumentRepository(context);
             VersionRepository versionRepository = new VersionRepository(context);
 
             var document = new Document
@@ -70,6 +70,8 @@ public class VersionRepositoryTests
                 Name = "Test Document",
                 FilePath = "C:\\Documents\\TestDocument.txt"
             };
+
+            documentRepository.AddDocument(document);
 
             var version = new Database.Models.Version
             {
