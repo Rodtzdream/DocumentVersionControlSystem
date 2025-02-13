@@ -11,12 +11,6 @@ public class DocumentRepository
         _context = context;
     }
 
-    public void AddDocument(Models.Document document)
-    {
-        _context.Documents.Add(document);
-        _context.SaveChanges();
-    }
-
     public Models.Document? GetDocumentById(int id)
     {
         return _context.Documents.AsNoTracking().FirstOrDefault(d => d.Id == id);
@@ -25,6 +19,22 @@ public class DocumentRepository
     public List<Models.Document> GetAllDocuments()
     {
         return _context.Documents.AsNoTracking().ToList();
+    }
+
+    public List<Models.Document> GetDocumentsByName(string name)
+    {
+        return _context.Documents.AsNoTracking().Where(d => d.Name == name).ToList();
+    }
+
+    public Models.Document? GetDocumentByPath(string path)
+    {
+        return _context.Documents.AsNoTracking().FirstOrDefault(d => d.FilePath == path);
+    }
+
+    public void AddDocument(Models.Document document)
+    {
+        _context.Documents.Add(document);
+        _context.SaveChanges();
     }
 
     public void UpdateDocument(Models.Document document)
@@ -38,24 +48,21 @@ public class DocumentRepository
         _context.SaveChanges();
     }
 
+    public void UpdateDocumentLastModifiedDate(Models.Document document, DateTime dateTime)
+    {
+        document.LastModifiedDate = dateTime;
+        _context.Entry(document).Property(d => d.LastModifiedDate).IsModified = true;
+        _context.SaveChanges();
+    }
+
     public void DeleteDocument(Models.Document document)
     {
-        _context.Documents.Remove(document);
         if (document.VersionCount > 0)
         {
             var versionsToRemove = _context.Versions.Where(v => v.DocumentId == document.Id).ToList();
             _context.Versions.RemoveRange(versionsToRemove);
         }
+        _context.Documents.Remove(document);
         _context.SaveChanges();
-    }
-
-    public List<Models.Document> GetDocumentsByName(string name)
-    {
-        return _context.Documents.AsNoTracking().Where(d => d.Name == name).ToList();
-    }
-
-    public Models.Document? GetDocumentByPath(string path)
-    {
-        return _context.Documents.AsNoTracking().FirstOrDefault(d => d.FilePath == path);
     }
 }

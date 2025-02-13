@@ -215,18 +215,18 @@ public partial class MainWindow : Window
     {
         var contextMenu = new ContextMenu();
 
-        var item1 = new MenuItem { Header = "Open" };
-        item1.Click += OpenVersion_Click;
+        var openVersion = new MenuItem { Header = "Open" };
+        openVersion.Click += OpenVersion_Click;
 
-        var item2 = new MenuItem { Header = "Change description" };
-        item2.Click += ChangeDescription_Click;
+        var changeVersionDescription = new MenuItem { Header = "Change description" };
+        changeVersionDescription.Click += ChangeDescription_Click;
 
-        var item3 = new MenuItem { Header = "Delete" };
-        item3.Click += DeleteVersion_Click;
+        var deleteVersion = new MenuItem { Header = "Delete" };
+        deleteVersion.Click += DeleteVersion_Click;
 
-        contextMenu.Items.Add(item1);
-        contextMenu.Items.Add(item2);
-        contextMenu.Items.Add(item3);
+        contextMenu.Items.Add(openVersion);
+        contextMenu.Items.Add(changeVersionDescription);
+        contextMenu.Items.Add(deleteVersion);
 
         button.ContextMenu = contextMenu;
     }

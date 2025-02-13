@@ -1,12 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using DocumentVersionControlSystem.Database.Contexts;
+﻿using DocumentVersionControlSystem.Database.Contexts;
 using DocumentVersionControlSystem.Database.Models;
 using DocumentVersionControlSystem.Database.Repositories;
-using DocumentVersionControlSystem.Logging;
-using Moq;
-using DocumentVersionControlSystem.VersionControl;
-using DocumentVersionControlSystem.FileStorage;
 using DocumentVersionControlSystem.DiffManager;
+using DocumentVersionControlSystem.FileStorage;
+using DocumentVersionControlSystem.Logging;
+using DocumentVersionControlSystem.VersionControl;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 
 namespace DocumentVersionControlSystem.Tests;
 
@@ -87,56 +87,11 @@ public class VersionRepositoryTests
             var result = versionRepository.GetVersionById(version.Id);
 
             // Assert
-            Assert.Equal(version, result);
-        }
-    }
-
-    [Fact]
-    public void GetAllVersions_ShouldReturnAllVersions()
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "GetAllVersions_ShouldReturnAllVersions")
-            .Options;
-
-        using (var context = new DatabaseContext(options))
-        {
-            DocumentRepository documentRepository = new DocumentRepository(context);
-
-            var document = new Document
-            {
-                Name = "Test Document",
-                FilePath = "C:\\Documents\\TestDocument.txt"
-            };
-
-            documentRepository.AddDocument(document);
-
-            var version1 = new Database.Models.Version
-            {
-                DocumentId = document.Id,
-                VersionDescription = "Test Version 1",
-                FilePath = "C:\\Documents\\Test_Document.v1.txt",
-                CreationDate = DateTime.Now
-            };
-
-            var version2 = new Database.Models.Version
-            {
-                DocumentId = document.Id,
-                VersionDescription = "Test Version 2",
-                FilePath = "C:\\Documents\\Test_Document.v2.txt",
-                CreationDate = DateTime.Now
-            };
-
-            var versionRepository = new VersionRepository(context);
-
-            versionRepository.AddVersion(document, version1);
-            versionRepository.AddVersion(document, version2);
-
-            // Act
-            var result = versionRepository.GetAllVersions();
-
-            // Assert
-            Assert.Equal(2, result.Count);
+            Assert.Equal(version.Id, result.Id);
+            Assert.Equal(version.DocumentId, result.DocumentId);
+            Assert.Equal(version.FilePath, result.FilePath);
+            Assert.Equal(version.VersionDescription, result.VersionDescription);
+            Assert.Equal(version.CreationDate.ToUniversalTime(), result.CreationDate.ToUniversalTime());
         }
     }
 
@@ -172,7 +127,7 @@ public class VersionRepositoryTests
             versionRepository.AddVersion(document, version);
 
             // Act
-            versionRepository.DeleteVersion(version);
+            versionRepository.DeleteVersion(document, version);
 
             // Assert
             Assert.Empty(context.Versions);

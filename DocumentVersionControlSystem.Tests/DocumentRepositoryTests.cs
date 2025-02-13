@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using DocumentVersionControlSystem.Database.Contexts;
+﻿using DocumentVersionControlSystem.Database.Contexts;
 using DocumentVersionControlSystem.Database.Models;
 using DocumentVersionControlSystem.Database.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace DocumentVersionControlSystem.Tests;
 

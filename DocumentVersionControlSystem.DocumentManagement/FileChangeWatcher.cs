@@ -17,14 +17,26 @@ public class FileChangeWatcher
             IncludeSubdirectories = true
         };
 
-        _watcher.Renamed += (sender, e) => _onRenamedOrMoved?.Invoke(e.OldFullPath, e.FullPath);
-        _watcher.Deleted += (sender, e) => _onDeleted?.Invoke(e.FullPath);
+        _watcher.Renamed += OnRenamed;
+        _watcher.Deleted += OnDeleted;
         _watcher.EnableRaisingEvents = true;
+    }
+
+    private void OnRenamed(object sender, RenamedEventArgs e)
+    {
+        _onRenamedOrMoved(e.OldFullPath, e.FullPath);
+    }
+
+    private void OnDeleted(object sender, FileSystemEventArgs e)
+    {
+        _onDeleted(e.FullPath);
     }
 
     public void Stop()
     {
         _watcher.EnableRaisingEvents = false;
+        _watcher.Renamed -= OnRenamed;
+        _watcher.Deleted -= OnDeleted;
         _watcher.Dispose();
     }
 }

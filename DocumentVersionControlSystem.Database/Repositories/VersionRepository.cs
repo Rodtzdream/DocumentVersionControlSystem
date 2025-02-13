@@ -11,38 +11,9 @@ public class VersionRepository
         _context = context;
     }
 
-    public void AddVersion(Models.Document document, Models.Version version)
-    {
-        document.VersionCount++;
-        var existingDocument = _context.Documents.Find(document.Id);
-        if (existingDocument != null)
-        {
-            _context.Entry(existingDocument).State = EntityState.Detached;
-        }
-        _context.Entry(document).State = EntityState.Modified;
-        _context.Versions.Add(version);
-        _context.SaveChanges();
-    }
-
     public Models.Version? GetVersionById(int id)
     {
-        return _context.Versions.Find(id);
-    }
-
-    public List<Models.Version> GetAllVersions()
-    {
-        return _context.Versions.AsNoTracking().ToList();
-    }
-
-    public void DeleteVersion(Models.Version version)
-    {
-        var existingVersion = _context.Versions.Find(version.Id);
-        if (existingVersion != null)
-        {
-            _context.Entry(existingVersion).State = EntityState.Detached;
-        }
-        _context.Versions.Remove(version);
-        _context.SaveChanges();
+        return _context.Versions.AsNoTracking().FirstOrDefault(v => v.Id == id);
     }
 
     public List<Models.Version> GetVersionsByDocumentId(int documentId)
@@ -59,17 +30,48 @@ public class VersionRepository
         return _context.Versions
             .Where(v => v.DocumentId == documentId)
             .OrderByDescending(v => v.CreationDate)
+            .AsNoTracking()
             .FirstOrDefault();
     }
 
-    public void UpdateVersion(Models.Version version)
+    public void AddVersion(Models.Document document, Models.Version version)
     {
-        _context.Versions.Update(version);
+        document.VersionCount++;
+        var trackedDocument = _context.Documents.Local.FirstOrDefault(d => d.Id == document.Id);
+        if (trackedDocument != null)
+        {
+            _context.Entry(trackedDocument).State = EntityState.Detached;
+        }
+        _context.Entry(document).State = EntityState.Modified;
+        _context.Versions.Add(version);
         _context.SaveChanges();
     }
 
-    public void SaveChanges()
+    public void UpdateVersionDescription(Models.Version version, string newDescription)
     {
-        _context.SaveChanges();
+        var existingVersion = _context.Versions.Find(version.Id);
+        if (existingVersion != null)
+        {
+            existingVersion.VersionDescription = newDescription;
+            _context.SaveChanges();
+        }
+    }
+
+    public void DeleteVersion(Models.Document document, Models.Version version)
+    {
+        var existingVersion = _context.Versions.Find(version.Id);
+        if (existingVersion != null)
+        {
+            var existingDocument = _context.Documents.Local.FirstOrDefault(d => d.Id == document.Id);
+            if (existingDocument != null)
+            {
+                _context.Entry(existingDocument).State = EntityState.Detached;
+            }
+
+            document.VersionCount--;
+            _context.Entry(document).State = EntityState.Modified;
+            _context.Versions.Remove(existingVersion);
+            _context.SaveChanges();
+        }
     }
 }
