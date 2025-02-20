@@ -48,11 +48,8 @@ public partial class DocumentViewerPage : Page
 
         CreateNewVersionButton.Width = width * 0.07;
         CreateNewVersionButton.Height = height * 0.033;
-        CreateNewVersionButton.Margin = new Thickness(0, 0, width * 0.006 + 35, 0);
+        CreateNewVersionButton.Margin = new Thickness(0, 0, width * 0.006 + 5, 0);
         CreateNewVersionButton.FontSize = newSize;
-
-        RefreshButton.Width = width * 0.016;
-        RefreshButton.Height = height * 0.03;
     }
 
     public bool ReadDocument()
@@ -78,12 +75,6 @@ public partial class DocumentViewerPage : Page
         {
             MessageBox.Show($"Failed to open document in external editor. Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-    }
-
-    private void RefreshButton_Click(object sender, RoutedEventArgs e)
-    {
-        ReadDocument();
-        _mainWindow.AddVersionButtons();
     }
 
     private void CreateNewVersionButton_Click(object sender, RoutedEventArgs e)

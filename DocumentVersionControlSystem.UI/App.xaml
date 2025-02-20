@@ -164,31 +164,6 @@
             </Setter>
         </Style>
 
-        <!-- Style for refresh button -->
-        <Style x:Key="RefreshButtonStyle" TargetType="Button" BasedOn="{StaticResource CustomButtonStyle}">
-            <Setter Property="BorderBrush" Value="Black" />
-            <Setter Property="BorderThickness" Value="1.5" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                BorderThickness="{TemplateBinding BorderThickness}" 
-                                CornerRadius="5">
-                            <Grid>
-                                <Image Source="images/circle-arrow-icon.png" 
-                                       HorizontalAlignment="Center" 
-                                       VerticalAlignment="Center" 
-                                       Stretch="Uniform" Margin="5,5,5,5"/>
-                                <ContentPresenter HorizontalAlignment="Center" 
-                                                  VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
         <!-- Style for home button -->
         <Style x:Key="HomeButtonStyle" TargetType="Button" BasedOn="{StaticResource CustomButtonStyle}">
             <Setter Property="BorderBrush" Value="Black" />
