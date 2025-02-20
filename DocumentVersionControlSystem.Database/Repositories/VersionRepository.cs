@@ -71,6 +71,7 @@ public class VersionRepository
             document.VersionCount--;
             _context.Entry(document).State = EntityState.Modified;
             _context.Versions.Remove(existingVersion);
+            _context.Documents.Update(document);
             _context.SaveChanges();
         }
     }

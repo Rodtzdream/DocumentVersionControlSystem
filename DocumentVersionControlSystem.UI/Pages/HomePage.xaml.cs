@@ -74,18 +74,24 @@ public partial class HomePage : Page
         Grid.SetRow(addButton, 0);
         ButtonGrid.Children.Add(addButton);
 
+        int missedDocuments = 0;
         for (int i = 0; i < documents.Count; i++)
         {
             var document = documents[i];
             var button = CreateButton(document.Name, "SquareButtonStyle", document);
+            if (button == null)
+            {
+                missedDocuments++;
+                continue;
+            }
             button.Tag = document.Name + ".txt";
             button.Click += OnButtonClicked;
             button.MouseDoubleClick += OnButtonDoubleClicked;
             button.PreviewMouseRightButtonDown += OnButtonClicked;
             CreateContextMenuForButton(button);
 
-            int column = (i + 1) % columns;
-            int row = (i + 1) / columns;
+            int column = (i + 1 - missedDocuments) % columns;
+            int row = (i + 1 - missedDocuments) / columns;
 
             Grid.SetColumn(button, column);
             Grid.SetRow(button, row);
@@ -96,6 +102,8 @@ public partial class HomePage : Page
     private Button CreateButton(string content, string styleKey, Database.Models.Document document)
     {
         var fileInfo = new FileInfo(document.FilePath);
+        if (fileInfo.Exists == false)
+            return null;
         long fileSize = fileInfo.Length / 1024;
         string lastModified = fileInfo.LastWriteTime.ToString("dd/MM/yyyy HH:mm:ss");
 

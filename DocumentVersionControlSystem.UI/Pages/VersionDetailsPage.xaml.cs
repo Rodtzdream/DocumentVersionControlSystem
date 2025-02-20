@@ -49,17 +49,12 @@ public partial class VersionDetailsPage : Page
         return _version.Id;
     }
 
-    private bool ReadDocument()
+    public bool ReadDocument()
     {
-        try
-        {
-            DocumentText.Text = File.ReadAllText(_version.FilePath);
-        }
-        catch (Exception)
-        {
-            MessageBox.Show("Failed to read document version file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        if (!File.Exists(_version.FilePath))
             return false;
-        }
+
+        DocumentText.Text = File.ReadAllText(_version.FilePath);
         return true;
     }
 

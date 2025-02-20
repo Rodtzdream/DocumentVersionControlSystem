@@ -43,7 +43,7 @@ public class VersionControlManager
         }
 
         var documentDirectory = Path.Combine("Documents", document.Name);
-        string versionFilePath = Path.Combine(documentDirectory, $"{document.Name}_{DateTime.Now:yyyyMMddHHmmss}.txt");
+        string versionFilePath = Path.Combine(documentDirectory, $"{DateTime.Now:yyyyMMddHHmmss}.txt");
 
         Version version = new()
         {
@@ -97,7 +97,7 @@ public class VersionControlManager
         }
 
         var documentDirectory = Path.Combine("Documents", document.Name);
-        string versionFilePath = Path.Combine(documentDirectory, $"{document.Name}_{DateTime.Now:yyyyMMddHHmmss}.txt");
+        string versionFilePath = Path.Combine(documentDirectory, $"{DateTime.Now:yyyyMMddHHmmss}.txt");
 
         _fileStorageManager.CopyFile(version.FilePath, document.FilePath);
 

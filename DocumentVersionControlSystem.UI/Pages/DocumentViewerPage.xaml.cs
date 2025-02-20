@@ -55,9 +55,13 @@ public partial class DocumentViewerPage : Page
         RefreshButton.Height = height * 0.03;
     }
 
-    public void ReadDocument()
+    public bool ReadDocument()
     {
+        if (!File.Exists(_document.FilePath))
+            return false;
+
         DocumentText.Text = File.ReadAllText(_document.FilePath);
+        return true;
     }
 
     private void OpenInExternalEditor_Click(object sender, RoutedEventArgs e)

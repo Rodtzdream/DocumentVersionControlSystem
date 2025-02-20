@@ -9,13 +9,16 @@ public class DocumentManager
     private readonly Logging.Logger _logger;
     private readonly List<FileChangeWatcher> _fileWatchers;
     private bool _isFileInternallyRenamed;
+    private bool _isFileExternallyDeleted;
 
     public DocumentManager(Logging.Logger logger, DatabaseContext databaseContext)
     {
         _fileWatchers = new List<FileChangeWatcher>();
         _documentRepository = new Database.Repositories.DocumentRepository(databaseContext);
         _logger = logger;
+
         _isFileInternallyRenamed = false;
+        _isFileExternallyDeleted = false;
     }
 
     public void InitializeFileWatchers()
@@ -25,7 +28,7 @@ public class DocumentManager
         {
             var watcher = new FileChangeWatcher(
                 document.FilePath,
-                HandleFileRenamedOrMoved,
+                HandleFileRenamed,
                 HandleFileDeleted
             );
 
@@ -33,39 +36,25 @@ public class DocumentManager
         }
     }
 
-    private void HandleFileRenamedOrMoved(string oldPath, string newPath)
+    private void HandleFileRenamed(string oldPath, string newPath)
     {
         if (_isFileInternallyRenamed)
             return;
 
-        _isFileInternallyRenamed = true;
-
-        var document = _documentRepository.GetDocumentByPath(oldPath);
-        if (document != null)
+        try
         {
-            string newName = Path.GetFileNameWithoutExtension(newPath);
-
-            Directory.Move(Path.Combine("Documents", document.Name), Path.Combine("Documents", newName));
-
-            document.FilePath = newPath;
-            document.Name = newName;
-            document.LastModifiedDate = DateTime.Now;
-
-            _documentRepository.UpdateDocument(document);
-            _logger.LogInformation($"Document {document.Id} renamed or moved");
+            _isFileInternallyRenamed = true;
+            RecoverDocument(oldPath, newPath, true);
         }
-
-        _isFileInternallyRenamed = false;
+        finally
+        {
+            _isFileInternallyRenamed = false;
+        }
     }
 
     private void HandleFileDeleted(string path)
     {
-        var document = _documentRepository.GetDocumentByPath(path);
-        if (document != null)
-        {
-            _documentRepository.DeleteDocument(document);
-            _logger.LogInformation($"Document {document.Id} deleted");
-        }
+        _isFileExternallyDeleted = true;
     }
 
     public void StopAllWatchers()
@@ -73,6 +62,16 @@ public class DocumentManager
         foreach (var watcher in _fileWatchers)
             watcher.Stop();
         _fileWatchers.Clear();
+    }
+
+    public bool IsFileExternallyDeleted()
+    {
+        return _isFileExternallyDeleted;
+    }
+
+    public void SetFileExternallyDeleted(bool value)
+    {
+        _isFileExternallyDeleted = value;
     }
 
     public List<Document> GetAllDocuments()
@@ -83,6 +82,20 @@ public class DocumentManager
     public List<Document> GetDocumentsByName(string name)
     {
         return _documentRepository.GetDocumentsByName(name);
+    }
+
+    public List<Document> VerifyDocumentsIntegrity()
+    {
+        var documents = _documentRepository.GetAllDocuments();
+        var nonExistentDocuments = new List<Document>();
+        foreach (var document in documents)
+        {
+            if (!File.Exists(document.FilePath))
+            {
+                nonExistentDocuments.Add(document);
+            }
+        }
+        return nonExistentDocuments;
     }
 
     public bool AddDocument(string filePath)
@@ -122,7 +135,7 @@ public class DocumentManager
         {
             var oldFilePath = document.FilePath;
             var fileDirectory = Path.GetDirectoryName(oldFilePath) ?? string.Empty;
-            var newFilePath = Path.Combine(fileDirectory, newName) + ".txt";
+            var newFilePath = Path.Combine(fileDirectory, newName + ".txt");
 
             var currentDocumentPath = Path.Combine("Documents", document.Name);
             var newDocumentPath = Path.Combine("Documents", newName);
@@ -140,14 +153,9 @@ public class DocumentManager
             }
 
             File.Move(oldFilePath, newFilePath);
-
             Directory.Move(currentDocumentPath, newDocumentPath);
 
-            document.FilePath = newFilePath;
-            document.Name = newName;
-            document.LastModifiedDate = DateTime.Now;
-
-            _documentRepository.UpdateDocument(document);
+            _documentRepository.RenameDocument(document, newFilePath);
 
             _logger.LogInformation($"Document {document.Id} renamed successfully to {newName}.");
         }
@@ -155,8 +163,44 @@ public class DocumentManager
         {
             _logger.LogError($"RenameDocument: Failed to rename document {document.Id}. Error: {ex.Message}");
         }
+        finally
+        {
+            _isFileInternallyRenamed = false;
+        }
+    }
 
-        _isFileInternallyRenamed = false;
+    public void RecoverDocument(string oldFilePath, string newFilePath, bool isRenamed = false)
+    {
+        var document = _documentRepository.GetDocumentByPath(oldFilePath);
+        if (document == null)
+        {
+            _logger.LogError($"RecoverDocument: Document with path {oldFilePath} does not exist.");
+            return;
+        }
+
+        var newName = Path.GetFileNameWithoutExtension(newFilePath);
+
+        if (document.Name != newName)
+        {
+            try
+            {
+                Directory.Move(Path.Combine("Documents", document.Name), Path.Combine("Documents", newName));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"RecoverDocument: Failed to move directory. Error: {ex.Message}");
+                return;
+            }
+        }
+
+        document.FilePath = newFilePath;
+        document.Name = newName;
+        document.LastModifiedDate = DateTime.Now;
+
+        _documentRepository.UpdateDocument(document);
+        _logger.LogInformation(isRenamed
+            ? $"Document {document.Id} renamed."
+            : $"Document {document.Id} recovered successfully.");
     }
 
     public void DeleteDocument(Document document)
@@ -170,5 +214,16 @@ public class DocumentManager
         }
 
         _logger.LogInformation($"Document {document.Id} deleted");
+    }
+
+    public void DeleteDocument(string filePath)
+    {
+        var document = _documentRepository.GetDocumentByPath(filePath);
+        if (document == null)
+        {
+            _logger.LogError($"DeleteDocument: Document with path {filePath} does not exist.");
+            return;
+        }
+        DeleteDocument(document);
     }
 }

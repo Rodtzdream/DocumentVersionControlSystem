@@ -3,12 +3,12 @@
 public class FileChangeWatcher
 {
     private readonly FileSystemWatcher _watcher;
-    private readonly Action<string, string> _onRenamedOrMoved;
+    private readonly Action<string, string> _onRenamed;
     private readonly Action<string> _onDeleted;
 
-    public FileChangeWatcher(string pathToWatch, Action<string, string> onRenamedOrMoved, Action<string> onDeleted)
+    public FileChangeWatcher(string pathToWatch, Action<string, string> onRenamed, Action<string> onDeleted)
     {
-        _onRenamedOrMoved = onRenamedOrMoved;
+        _onRenamed = onRenamed;
         _onDeleted = onDeleted;
 
         _watcher = new FileSystemWatcher(Path.GetDirectoryName(pathToWatch)!)
@@ -24,7 +24,7 @@ public class FileChangeWatcher
 
     private void OnRenamed(object sender, RenamedEventArgs e)
     {
-        _onRenamedOrMoved(e.OldFullPath, e.FullPath);
+        _onRenamed(e.OldFullPath, e.FullPath);
     }
 
     private void OnDeleted(object sender, FileSystemEventArgs e)

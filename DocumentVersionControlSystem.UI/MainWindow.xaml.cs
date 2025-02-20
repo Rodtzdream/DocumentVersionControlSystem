@@ -1,4 +1,5 @@
 ﻿using DocumentVersionControlSystem.Database.Contexts;
+using DocumentVersionControlSystem.Database.Models;
 using DocumentVersionControlSystem.DiffManager;
 using DocumentVersionControlSystem.DocumentManagement;
 using DocumentVersionControlSystem.FileStorage;
@@ -6,12 +7,15 @@ using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.UI.Windows;
 using DocumentVersionControlSystem.VersionControl;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using static DocumentVersionControlSystem.UI.DocumentRecoveryWindow;
 
 namespace DocumentVersionControlSystem.UI;
 
@@ -47,6 +51,10 @@ public partial class MainWindow : Window
         _navigationButtonsStackPanel = (StackPanel)FindName("NavigationButtons");
 
         InitializeDynamicGrid();
+
+        var missingDocs = _documentManager.VerifyDocumentsIntegrity();
+        if (missingDocs.Count() > 0)
+            RecoverDocuments(missingDocs);
     }
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -73,6 +81,84 @@ public partial class MainWindow : Window
             Margin = new Thickness(0, _buttonStackPanel.ActualHeight - ActualHeight / 2, 0, 0),
             IsHitTestVisible = false
         };
+    }
+
+    private void MainWindow_Activated(object sender, EventArgs e)
+    {
+        if (MainFrame.Content is Page currentPage)
+        {
+            if (_documentManager.IsFileExternallyDeleted())
+            {
+                RecoverDocuments(_documentManager.VerifyDocumentsIntegrity());
+                _documentManager.SetFileExternallyDeleted(false);
+            }
+
+            switch (currentPage)
+            {
+                case HomePage:
+                    _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                    ClearVersionButtons();
+                    break;
+                case DocumentViewerPage documentViewerPage:
+                    if (!documentViewerPage.ReadDocument())
+                    {
+                        MainFrame.Navigate(_homePage);
+                        _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                        ClearVersionButtons();
+                        MessageBox.Show("Failed to load document. Returning to the home page.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                        AddVersionButtons();
+                    break;
+                case VersionDetailsPage versionDetailsPage:
+                    if (!versionDetailsPage.RefreshWindow())
+                    {
+                        MainFrame.Navigate(_homePage);
+                        _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                        ClearVersionButtons();
+                        MessageBox.Show("Failed to load version. Returning to the home page.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    break;
+            }
+        }
+    }
+
+    public void RecoverDocuments(List<Document> missingDocs)
+    {
+        var missingDocuments = new ObservableCollection<MissingDocumentViewModel>();
+
+        foreach (var doc in missingDocs)
+        {
+            missingDocuments.Add(new MissingDocumentViewModel
+            {
+                DocumentName = doc.Name,
+                OldPath = doc.FilePath,
+                NewPath = string.Empty
+            });
+        }
+
+        var recoverDocumentsWindow = new DocumentRecoveryWindow(missingDocuments);
+        var result = recoverDocumentsWindow.ShowDialog();
+
+        if (result == true)
+        {
+            foreach (var document in missingDocuments)
+            {
+                if (document.NewPath.StartsWith('<'))
+                {
+                    _documentManager.DeleteDocument(document.OldPath);
+                }
+                else if (!string.IsNullOrEmpty(document.NewPath))
+                {
+                    _documentManager.RecoverDocument(document.OldPath, document.NewPath, false);
+                }
+            }
+        }
+    }
+
+    private void MainWindow_Closed(object sender, EventArgs e)
+    {
+        _documentManager.StopAllWatchers();
     }
 
     private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
@@ -104,6 +190,7 @@ public partial class MainWindow : Window
     private void InitializeDynamicGrid()
     {
         SizeChanged += OnWindowSizeChanged;
+        Activated += MainWindow_Activated;
         _documentManager.InitializeFileWatchers();
     }
 
@@ -298,20 +385,20 @@ public partial class MainWindow : Window
 
     private void PreviousButton_Click(object sender, RoutedEventArgs e)
     {
-        if (MainFrame.CanGoBack)
-        {
-            MainFrame.GoBack();
+        if (!MainFrame.CanGoBack) return;
 
-            Dispatcher.Invoke(() =>
+        MainFrame.GoBack();
+
+        Dispatcher.InvokeAsync(() =>
+        {
+            var currentPage = MainFrame.Content as Page;
+            switch (currentPage)
             {
-                var currentPage = MainFrame.Content as Page;
-                if (currentPage is HomePage homePage)
-                {
+                case HomePage homePage:
                     homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                     ClearVersionButtons();
-                }
-                else if (currentPage is VersionDetailsPage versionDetailsPage)
-                {
+                    break;
+                case VersionDetailsPage versionDetailsPage:
                     if (!versionDetailsPage.RefreshWindow())
                     {
                         MainFrame.Navigate(_homePage);
@@ -320,33 +407,34 @@ public partial class MainWindow : Window
                         MessageBox.Show("Failed to load version. Returning to the home page.");
                     }
                     else
+                    {
                         AddVersionButtons(versionDetailsPage.GetVersionId());
-                }
-                else if (currentPage is DocumentViewerPage documentViewerPage)
-                {
+                    }
+                    break;
+                case DocumentViewerPage documentViewerPage:
                     documentViewerPage.ReadDocument();
                     AddVersionButtons();
-                }
-            }, DispatcherPriority.Background);
-        }
+                    break;
+            }
+        }, DispatcherPriority.Background);
     }
 
     private void NextButton_Click(object sender, RoutedEventArgs e)
     {
-        if (MainFrame.CanGoForward)
-        {
-            MainFrame.GoForward();
+        if (!MainFrame.CanGoForward) return;
 
-            Dispatcher.Invoke(() =>
+        MainFrame.GoForward();
+
+        Dispatcher.InvokeAsync(() =>
+        {
+            var currentPage = MainFrame.Content as Page;
+            switch (currentPage)
             {
-                var currentPage = MainFrame.Content as Page;
-                if (currentPage is HomePage homePage)
-                {
+                case HomePage homePage:
                     homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                     ClearVersionButtons();
-                }
-                else if (currentPage is VersionDetailsPage versionDetailsPage)
-                {
+                    break;
+                case VersionDetailsPage versionDetailsPage:
                     if (!versionDetailsPage.RefreshWindow())
                     {
                         MainFrame.Navigate(_homePage);
@@ -355,14 +443,15 @@ public partial class MainWindow : Window
                         MessageBox.Show("Failed to load version. Returning to the home page.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                     else
+                    {
                         AddVersionButtons(versionDetailsPage.GetVersionId());
-                }
-                else if (currentPage is DocumentViewerPage documentViewerPage)
-                {
+                    }
+                    break;
+                case DocumentViewerPage documentViewerPage:
                     documentViewerPage.ReadDocument();
                     AddVersionButtons();
-                }
-            }, DispatcherPriority.Background);
-        }
+                    break;
+            }
+        }, DispatcherPriority.Background);
     }
 }
