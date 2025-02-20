@@ -21,9 +21,14 @@
 
         <!-- Buttons in the right column -->
         <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Name="DocumentStackPanel" Margin="0,5,0,0" Background="Transparent" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
-                <Grid x:Name="ButtonGrid"/>
-            </StackPanel>
+            <Border x:Name="DropTargetBorder" Background="LightGray" BorderBrush="Transparent" BorderThickness="4">
+                <StackPanel x:Name="DocumentStackPanel" Margin="0,5,0,0" Background="Transparent" MouseLeftButtonDown="Grid_MouseLeftButtonDown"
+                        AllowDrop="True" DragOver="DocumentStackPanel_DragOver" Drop="Document_Drop" DragLeave="DocumentStackPanel_DragLeave">
+                    <Grid x:Name="ButtonGrid"/>
+                </StackPanel>
+            </Border>
         </ScrollViewer>
+
+        <TextBlock x:Name="DragDropText" Text="Drop file(s) here" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Visibility="Hidden"/>
     </Grid>
 </Page>

@@ -38,6 +38,64 @@ public partial class HomePage : Page
         AdjustGridLayout(_totalButtons);
     }
 
+    private void Document_Drop(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            foreach (string file in files)
+            {
+                if (Path.GetExtension(file).Equals(".txt", StringComparison.OrdinalIgnoreCase))
+                {
+                    DropTargetBorder.BorderBrush = Brushes.Transparent;
+                    DragDropText.Visibility = Visibility.Hidden;
+
+                    AddDocument(file);
+                }
+                else
+                {
+                    DropTargetBorder.BorderBrush = Brushes.Transparent;
+                    DragDropText.Visibility = Visibility.Hidden;
+
+                    MessageBox.Show("Only .txt files are allowed.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+    }
+
+    private void DocumentStackPanel_DragOver(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files.All(file => Path.GetExtension(file).Equals(".txt", StringComparison.OrdinalIgnoreCase)))
+            {
+                e.Effects = DragDropEffects.Copy;
+
+                ClearGridButtons();
+                DropTargetBorder.BorderBrush = Brushes.Gray;
+                DragDropText.Visibility = Visibility.Visible;
+
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+        }
+        else
+        {
+            e.Effects = DragDropEffects.None;
+        }
+    }
+
+    private void DocumentStackPanel_DragLeave(object sender, DragEventArgs e)
+    {
+        DropTargetBorder.BorderBrush = Brushes.Transparent;
+        DragDropText.Visibility = Visibility.Hidden;
+
+        AdjustGridLayout(_totalButtons);
+    }
+
     public void AdjustGridLayout(int totalButtons)
     {
         double windowWidth = ActualWidth - 200;
@@ -116,6 +174,13 @@ public partial class HomePage : Page
         };
     }
 
+    private void ClearGridButtons()
+    {
+        ButtonGrid.Children.Clear();
+        ButtonGrid.ColumnDefinitions.Clear();
+        ButtonGrid.RowDefinitions.Clear();
+    }
+
     public Button GetSelectedButton()
     {
         return _selectedDocumentButton;
@@ -172,25 +237,28 @@ public partial class HomePage : Page
         bool? result = openFileDialog.ShowDialog();
         if (result == true)
         {
-            string filePath = openFileDialog.FileName;
+            AddDocument(openFileDialog.FileName);
+        }
+    }
 
-            try
+    private void AddDocument(string filePath)
+    {
+        try
+        {
+            if (!_documentManager.AddDocument(filePath))
             {
-                if (!_documentManager.AddDocument(filePath))
-                {
-                    MessageBox.Show("Document with this name already exists...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                _totalButtons++;
-                AdjustGridLayout(_totalButtons);
-
-                MessageBox.Show("File added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Document {Path.GetFileName(filePath)} with this name already exists...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error reading file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+
+            _totalButtons++;
+            AdjustGridLayout(_totalButtons);
+
+            MessageBox.Show($"File {Path.GetFileName(filePath)} added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error reading file {Path.GetFileName(filePath)}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
