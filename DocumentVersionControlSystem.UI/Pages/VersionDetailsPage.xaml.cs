@@ -1,7 +1,7 @@
-﻿using DocumentVersionControlSystem.UI.Popups;
+﻿using DocumentVersionControlSystem.FileStorage;
+using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.VersionControl;
 using System;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -10,14 +10,16 @@ namespace DocumentVersionControlSystem.UI.Windows;
 public partial class VersionDetailsPage : Page
 {
     private readonly MainWindow _mainWindow;
+    private readonly IFileStorageManager _fileStorageManager;
     private readonly VersionControlManager _versionControlManager;
     private Database.Models.Version _version;
 
-    public VersionDetailsPage(MainWindow mainWindow, Database.Models.Version version, VersionControlManager versionControlManager)
+    public VersionDetailsPage(MainWindow mainWindow, IFileStorageManager fileStorageManager, Database.Models.Version version, VersionControlManager versionControlManager)
     {
-        _version = version;
-        _versionControlManager = versionControlManager;
         _mainWindow = mainWindow;
+        _fileStorageManager = fileStorageManager;
+        _versionControlManager = versionControlManager;
+        _version = version;
 
         InitializeComponent();
         LoadVersionDetails();
@@ -51,10 +53,10 @@ public partial class VersionDetailsPage : Page
 
     public bool ReadDocument()
     {
-        if (!File.Exists(_version.FilePath))
+        if (!_fileStorageManager.FileExists(_version.FilePath))
             return false;
 
-        DocumentText.Text = File.ReadAllText(_version.FilePath);
+        DocumentText.Text = _fileStorageManager.ReadFile(_version.FilePath);
         return true;
     }
 

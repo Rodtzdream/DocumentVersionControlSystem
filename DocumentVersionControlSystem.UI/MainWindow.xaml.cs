@@ -39,14 +39,13 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        _logger = new Logging.Logger();
-
         var databaseContext = new DatabaseContext();
-        _documentManager = new DocumentManager(_logger, databaseContext);
-        _diffManager = new DiffManager.DiffManager();
         _fileStorageManager = new FileStorageManager();
+        _logger = new Logging.Logger();
+        _diffManager = new DiffManager.DiffManager();
+        _documentManager = new DocumentManager(databaseContext, _fileStorageManager, _logger);
         _versionControlManager = new VersionControlManager(_logger, _fileStorageManager, _diffManager, databaseContext);
-        _homePage = new HomePage(this, _documentManager, _versionControlManager);
+        _homePage = new HomePage(this, _documentManager, _versionControlManager, _fileStorageManager);
 
         _navigationButtonsStackPanel = (StackPanel)FindName("NavigationButtons");
 
@@ -229,7 +228,7 @@ public partial class MainWindow : Window
 
     private void OpenVersionViewer(Database.Models.Version version)
     {
-        var versionDetailsWindow = new VersionDetailsPage(this, version, _versionControlManager);
+        var versionDetailsWindow = new VersionDetailsPage(this, _fileStorageManager, version, _versionControlManager);
         MainFrame.Navigate(versionDetailsWindow);
     }
 
@@ -328,7 +327,7 @@ public partial class MainWindow : Window
             {
                 var versionId = (int)parentButton.CommandParameter;
                 var version = _versionControlManager.GetVersionById(versionId);
-                var versionDetailsWindow = new VersionDetailsPage(this, version, _versionControlManager);
+                var versionDetailsWindow = new VersionDetailsPage(this, _fileStorageManager, version, _versionControlManager);
                 MainFrame.Navigate(versionDetailsWindow);
             }
         }
@@ -377,7 +376,7 @@ public partial class MainWindow : Window
             return;
 
         if (_homePage == null)
-            _homePage = new HomePage(this, _documentManager, _versionControlManager);
+            _homePage = new HomePage(this, _documentManager, _versionControlManager, _fileStorageManager);
 
         MainFrame.Navigate(_homePage);
         ClearVersionButtons();

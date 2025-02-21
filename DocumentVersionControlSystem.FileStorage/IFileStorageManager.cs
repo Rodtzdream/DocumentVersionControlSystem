@@ -2,7 +2,6 @@
 
 public interface IFileStorageManager
 {
-    void SaveFile(string filePath, string content);
     string ReadFile(string filePath);
     void DeleteFile(string filePath);
     bool FileExists(string filePath);

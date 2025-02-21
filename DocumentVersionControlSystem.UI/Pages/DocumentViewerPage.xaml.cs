@@ -1,4 +1,5 @@
-﻿using DocumentVersionControlSystem.UI.Popups;
+﻿using DocumentVersionControlSystem.FileStorage;
+using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.VersionControl;
 using System;
 using System.Diagnostics;
@@ -11,14 +12,16 @@ namespace DocumentVersionControlSystem.UI.Windows;
 public partial class DocumentViewerPage : Page
 {
     private readonly MainWindow _mainWindow;
+    private readonly IFileStorageManager _fileStorageManager;
     private readonly VersionControlManager _versionControlManager;
     private readonly Database.Models.Document _document;
 
-    public DocumentViewerPage(MainWindow mainWindow, VersionControlManager versionControl, Database.Models.Document document)
+    public DocumentViewerPage(MainWindow mainWindow, IFileStorageManager fileStorageManager, VersionControlManager versionControl, Database.Models.Document document)
     {
+        _mainWindow = mainWindow;
+        _fileStorageManager = fileStorageManager;
         _versionControlManager = versionControl;
         _document = document;
-        _mainWindow = mainWindow;
 
         InitializeComponent();
         ReadDocument();
@@ -54,7 +57,7 @@ public partial class DocumentViewerPage : Page
 
     public bool ReadDocument()
     {
-        if (!File.Exists(_document.FilePath))
+        if (!_fileStorageManager.FileExists(_document.FilePath))
             return false;
 
         DocumentText.Text = File.ReadAllText(_document.FilePath);

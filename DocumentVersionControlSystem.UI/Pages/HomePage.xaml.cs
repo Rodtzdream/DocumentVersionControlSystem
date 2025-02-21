@@ -1,4 +1,5 @@
 ﻿using DocumentVersionControlSystem.DocumentManagement;
+using DocumentVersionControlSystem.FileStorage;
 using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.VersionControl;
 using System;
@@ -14,20 +15,22 @@ namespace DocumentVersionControlSystem.UI.Windows;
 public partial class HomePage : Page
 {
     private Button _selectedDocumentButton;
+    private readonly MainWindow _mainWindow;
     private readonly DocumentManager _documentManager;
     private readonly VersionControlManager _versionControlManager;
-    private readonly MainWindow _mainWindow;
+    private readonly IFileStorageManager _fileStorageManager;
     private DocumentViewerPage _documentViewerWindow;
 
     private int _totalButtons;
 
-    public HomePage(MainWindow mainWindow, DocumentManager documentManagement, VersionControlManager versionControl)
+    public HomePage(MainWindow mainWindow, DocumentManager documentManagement, VersionControlManager versionControl, IFileStorageManager fileStorageManager)
     {
         InitializeComponent();
 
+        _mainWindow = mainWindow;
         _documentManager = documentManagement;
         _versionControlManager = versionControl;
-        _mainWindow = mainWindow;
+        _fileStorageManager = fileStorageManager;
 
         _totalButtons = _documentManager.GetAllDocuments().Count + 1;
         Loaded += Page_Loaded;
@@ -208,7 +211,7 @@ public partial class HomePage : Page
             var clickedButton = sender as Button;
             var document = _documentManager.GetDocumentsByName(clickedButton.Content.ToString()).First();
 
-            _documentViewerWindow = new DocumentViewerPage(_mainWindow, _versionControlManager, document);
+            _documentViewerWindow = new DocumentViewerPage(_mainWindow, _fileStorageManager, _versionControlManager, document);
             _mainWindow.MainFrame.Navigate(_documentViewerWindow);
             _mainWindow.AddVersionButtons();
         }
@@ -294,7 +297,7 @@ public partial class HomePage : Page
                 {
                     var document = _documentManager.GetDocumentsByName(parentButton.Content.ToString()).First();
 
-                    _documentViewerWindow = new DocumentViewerPage(_mainWindow, _versionControlManager, document);
+                    _documentViewerWindow = new DocumentViewerPage(_mainWindow, _fileStorageManager, _versionControlManager, document);
                     _mainWindow.MainFrame.Navigate(_documentViewerWindow);
                     _mainWindow.AddVersionButtons();
                 }

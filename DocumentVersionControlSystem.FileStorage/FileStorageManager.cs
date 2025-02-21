@@ -2,11 +2,6 @@
 
 public class FileStorageManager : IFileStorageManager
 {
-    public void SaveFile(string filePath, string content)
-    {
-        System.IO.File.WriteAllText(filePath, content);
-    }
-
     public string ReadFile(string filePath)
     {
         return System.IO.File.ReadAllText(filePath);

@@ -2,20 +2,23 @@
 
 using DocumentVersionControlSystem.Database.Contexts;
 using DocumentVersionControlSystem.Database.Models;
+using DocumentVersionControlSystem.FileStorage;
 
 public class DocumentManager
 {
     private readonly Database.Repositories.DocumentRepository _documentRepository;
+    private readonly IFileStorageManager _fileStorageManager;
     private readonly Logging.Logger _logger;
     private readonly List<FileChangeWatcher> _fileWatchers;
     private bool _isFileInternallyRenamed;
     private bool _isFileExternallyDeleted;
 
-    public DocumentManager(Logging.Logger logger, DatabaseContext databaseContext)
+    public DocumentManager(DatabaseContext databaseContext, IFileStorageManager fileStorageManager, Logging.Logger logger)
     {
-        _fileWatchers = new List<FileChangeWatcher>();
         _documentRepository = new Database.Repositories.DocumentRepository(databaseContext);
+        _fileStorageManager = fileStorageManager;
         _logger = logger;
+        _fileWatchers = new List<FileChangeWatcher>();
 
         _isFileInternallyRenamed = false;
         _isFileExternallyDeleted = false;
@@ -90,7 +93,7 @@ public class DocumentManager
         var nonExistentDocuments = new List<Document>();
         foreach (var document in documents)
         {
-            if (!File.Exists(document.FilePath))
+            if (!_fileStorageManager.FileExists(document.FilePath))
             {
                 nonExistentDocuments.Add(document);
             }
@@ -140,13 +143,13 @@ public class DocumentManager
             var currentDocumentPath = Path.Combine("Documents", document.Name);
             var newDocumentPath = Path.Combine("Documents", newName);
 
-            if (!File.Exists(oldFilePath))
+            if (!_fileStorageManager.FileExists(oldFilePath))
             {
                 _logger.LogError($"RenameDocument: File {oldFilePath} does not exist.");
                 return;
             }
 
-            if (File.Exists(newFilePath))
+            if (_fileStorageManager.FileExists(newFilePath))
             {
                 _logger.LogError($"RenameDocument: File {newFilePath} already exists.");
                 return;

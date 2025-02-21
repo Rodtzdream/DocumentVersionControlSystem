@@ -7,11 +7,13 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="images/document_icon.png" />
-    <None Remove="images/plus.png" />
-    <None Remove="images/house-icon.png" />
-    <None Remove="images/line-angle-left-icon.png" />
-    <None Remove="images/line-angle-right-icon.png" />
+    <None Remove="connections.config;images/document_icon.png;images/plus.png;images/house-icon.png;images/line-angle-left-icon.png;images/line-angle-right-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="connections.config">
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -22,10 +24,6 @@
     <ProjectReference Include="..\DocumentVersionControlSystem.VersionControl\DocumentVersionControlSystem.VersionControl.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="images/document_icon.png" />
-    <Resource Include="images/plus.png" />
-    <Resource Include="images/house-icon.png" />
-    <Resource Include="images/line-angle-left-icon.png" />
-    <Resource Include="images/line-angle-right-icon.png" />
+    <Resource Include="images/document_icon.png;images/plus.png;images/house-icon.png;images/line-angle-left-icon.png;images/line-angle-right-icon.png" />
   </ItemGroup>
 </Project>
