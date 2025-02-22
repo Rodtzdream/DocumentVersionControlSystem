@@ -1,8 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace DocumentVersionControlSystem.UI;
 
@@ -74,6 +77,57 @@ public partial class DocumentRecoveryWindow : Window
     {
         DialogResult = true;
         Close();
+    }
+
+    private void MissingDocumentsList_DragOver(object sender, DragEventArgs e)
+    {
+        Point position = e.GetPosition(MissingDocumentsList);
+
+        var item = GetListViewItemAt(position);
+
+        if (item != null)
+        {
+            MissingDocumentsList.SelectedItem = item.DataContext;
+        }
+    }
+
+    private ListViewItem? GetListViewItemAt(Point position)
+    {
+        HitTestResult hitTestResult = VisualTreeHelper.HitTest(MissingDocumentsList, position);
+        DependencyObject obj = hitTestResult.VisualHit;
+        while (obj != null && obj is not ListViewItem)
+        {
+            obj = VisualTreeHelper.GetParent(obj);
+        }
+        return obj as ListViewItem;
+    }
+
+    private void MissingDocumentsList_DragLeave(object sender, DragEventArgs e)
+    {
+        MissingDocumentsList.SelectedItem = null;
+    }
+
+    private void MissingDocumentsList_Drop(object sender, DragEventArgs e)
+    {
+        if (MissingDocumentsList.SelectedItem is MissingDocumentViewModel selectedDocument)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (files.Length == 1 && Path.GetExtension(files[0]).Equals(".txt", StringComparison.OrdinalIgnoreCase))
+                {
+                    selectedDocument.NewPath = files[0];
+                }
+                else
+                {
+                    MessageBox.Show("Invalid file format. Please drop a single .txt file.", "Invalid File Format", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Invalid file format. Please drop a single .txt file.", "Invalid File Format", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 
     public class MissingDocumentViewModel : INotifyPropertyChanged

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DocumentVersionControlSystem.UI"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-        Title="MainWindow" MinHeight="400" Height="400" MinWidth="600" Width="600">
+        Title="Document Recovery" MinHeight="400" Height="400" MinWidth="600" Width="600">
 
     <Grid>
         <!-- Title -->
@@ -16,12 +16,13 @@
 
         <!-- Recover Documents List -->
         <ListView Name="MissingDocumentsList" Margin="10,60,10,60" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" MinHeight="200" 
-                  SizeChanged="MissingDocumentsList_SizeChanged" MouseDoubleClick="MissingDocumentsList_MouseDoubleClick">
+                  SizeChanged="MissingDocumentsList_SizeChanged" MouseDoubleClick="MissingDocumentsList_MouseDoubleClick" AllowDrop="True" 
+                  DragOver="MissingDocumentsList_DragOver" DragLeave="MissingDocumentsList_DragLeave" Drop="MissingDocumentsList_Drop">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Document Name" Width="155" DisplayMemberBinding="{Binding DocumentName}"/>
-                    <GridViewColumn Header="Old Path" Width="200" DisplayMemberBinding="{Binding OldPath}"/>
-                    <GridViewColumn Header="New Path" Width="200" DisplayMemberBinding="{Binding NewPath}"/>
+                    <GridViewColumn Header="Document Name" Width="160" DisplayMemberBinding="{Binding DocumentName}"/>
+                    <GridViewColumn Header="Old Path" Width="210" DisplayMemberBinding="{Binding OldPath}"/>
+                    <GridViewColumn Header="New Path" Width="210" DisplayMemberBinding="{Binding NewPath}"/>
                 </GridView>
             </ListView.View>
         </ListView>
