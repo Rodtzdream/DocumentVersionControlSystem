@@ -99,12 +99,11 @@ public partial class DocumentViewerPage : Page
             if (versionCreated)
                 _mainWindow.AddVersionButtons();
 
-            var infoPopup = new InfoPopup(versionCreated ? InfoPopupType.VersionCreatedSuccessfully : InfoPopupType.NoChangesDetected);
-            infoPopup.ShowDialog();
+            _mainWindow.ShowInfoPopup(versionCreated ? InfoPopupType.VersionCreatedSuccessfully : InfoPopupType.NoChangesDetected);
         }
         else if (inputPopup.DialogResult == false)
         {
-            new InfoPopup(InfoPopupType.VersionCreationCanceled).ShowDialog();
+            _mainWindow.ShowInfoPopup(InfoPopupType.VersionCreationCanceled);
         }
     }
 }

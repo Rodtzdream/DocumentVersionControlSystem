@@ -60,7 +60,7 @@ public partial class HomePage : Page
                     DropTargetBorder.BorderBrush = Brushes.Transparent;
                     DragDropText.Visibility = Visibility.Hidden;
 
-                    new InfoPopup(InfoPopupType.InvalidFileFormat).Show();
+                    _mainWindow.ShowInfoPopup(InfoPopupType.InvalidFileFormat);
                 }
             }
         }
@@ -310,57 +310,61 @@ public partial class HomePage : Page
         var document = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).FirstOrDefault();
         if (document == null)
         {
-            new InfoPopup(InfoPopupType.DocumentNotFound).Show();
+            _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNotFound);
             return;
         }
 
         var popup = new InputPopup
         {
-            TitleText = { Text = "Rename document" }
+            TitleText = { Text = "Rename document" },
+            MessageText = { Text = document.Name }
         };
         popup.ShowDialog();
 
-        string newName = popup.MessageText.Text?.Trim();
-
-        if (string.IsNullOrEmpty(newName) || string.IsNullOrWhiteSpace(newName))
+        if (popup.DialogResult == true)
         {
-            new InfoPopup(InfoPopupType.DocumentNameEmpty).Show();
-            return;
-        }
+            string newName = popup.MessageText.Text?.Trim();
 
-        if (newName.Equals(document.Name, StringComparison.OrdinalIgnoreCase))
-        {
-            new InfoPopup(InfoPopupType.SameDocumentName).Show();
-            return;
-        }
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameEmpty);
+                return;
+            }
 
-        if (newName.Length > 50)
-        {
-            new InfoPopup(InfoPopupType.DocumentNameTooLong).Show();
-            return;
-        }
+            if (newName.Equals(document.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                _mainWindow.ShowInfoPopup(InfoPopupType.SameDocumentName);
+                return;
+            }
 
-        if (newName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
-        {
-            new InfoPopup(InfoPopupType.DocumentNameCannotEndWithTxt).Show();
-            return;
-        }
+            if (newName.Length > 50)
+            {
+                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameTooLong);
+                return;
+            }
 
-        if (_documentManager.GetDocumentsByName(newName).Any())
-        {
-            new InfoPopup(InfoPopupType.DocumentAlreadyExists).Show();
-            return;
-        }
+            if (newName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+            {
+                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameCannotEndWithTxt);
+                return;
+            }
 
-        if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-        {
-            new InfoPopup(InfoPopupType.DocumentNameContainsInvalidCharacters).Show();
-            return;
-        }
+            if (_documentManager.GetDocumentsByName(newName).Any())
+            {
+                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentAlreadyExists);
+                return;
+            }
 
-        _documentManager.RenameDocument(document, newName);
-        AdjustGridLayout(_totalButtons);
-        new InfoPopup(InfoPopupType.SuccessfulDocumentRename).Show();
+            if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            {
+                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameContainsInvalidCharacters);
+                return;
+            }
+
+            _documentManager.RenameDocument(document, newName);
+            AdjustGridLayout(_totalButtons);
+            _mainWindow.ShowInfoPopup(InfoPopupType.SuccessfulDocumentRename);
+        }
     }
 
     private void Remove_Click(object sender, RoutedEventArgs e)
@@ -369,6 +373,6 @@ public partial class HomePage : Page
         _documentManager.DeleteDocument(document);
         AdjustGridLayout(_totalButtons);
         _mainWindow.ClearVersionButtons();
-        new InfoPopup(InfoPopupType.SuccessfulDocumentRemove).Show();
+        _mainWindow.ShowInfoPopup(InfoPopupType.SuccessfulDocumentRemove);
     }
 }

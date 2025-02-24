@@ -105,7 +105,7 @@ public partial class MainWindow : Window
                         _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                         ClearVersionButtons();
 
-                        new InfoPopup(InfoPopupType.LoadDocumentFailed).ShowDialog();
+                        ShowInfoPopup(InfoPopupType.LoadDocumentFailed);
                     }
                     else
                         AddVersionButtons();
@@ -117,7 +117,7 @@ public partial class MainWindow : Window
                         _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                         ClearVersionButtons();
 
-                        new InfoPopup(InfoPopupType.LoadVersionFailed).ShowDialog();
+                        ShowInfoPopup(InfoPopupType.LoadVersionFailed);
                     }
                     break;
             }
@@ -407,7 +407,7 @@ public partial class MainWindow : Window
                         _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                         ClearVersionButtons();
 
-                        new InfoPopup(InfoPopupType.LoadVersionFailed).ShowDialog();
+                        ShowInfoPopup(InfoPopupType.LoadVersionFailed);
                     }
                     else
                     {
@@ -444,7 +444,7 @@ public partial class MainWindow : Window
                         _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                         ClearVersionButtons();
 
-                        new InfoPopup(InfoPopupType.LoadVersionFailed).ShowDialog();
+                        ShowInfoPopup(InfoPopupType.LoadVersionFailed);
                     }
                     else
                     {
@@ -457,5 +457,10 @@ public partial class MainWindow : Window
                     break;
             }
         }, DispatcherPriority.Background);
+    }
+
+    public void ShowInfoPopup(InfoPopupType popupType)
+    {
+        new InfoPopup(popupType).Show();
     }
 }
