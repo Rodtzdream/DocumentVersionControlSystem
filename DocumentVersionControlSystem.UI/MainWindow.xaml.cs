@@ -160,6 +160,7 @@ public partial class MainWindow : Window
     private void MainWindow_Closed(object sender, EventArgs e)
     {
         _documentManager.StopAllWatchers();
+        Application.Current.Shutdown();
     }
 
     private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
