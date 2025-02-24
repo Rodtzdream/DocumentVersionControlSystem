@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentVersionControlSystem.UI.Popups;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -12,11 +13,13 @@ namespace DocumentVersionControlSystem.UI;
 public partial class DocumentRecoveryWindow : Window
 {
     public ObservableCollection<MissingDocumentViewModel> _missingDocuments;
+    private readonly InfoPopup _infoPopup;
 
     public DocumentRecoveryWindow(ObservableCollection<MissingDocumentViewModel> missedDocuments)
     {
         InitializeComponent();
         _missingDocuments = missedDocuments;
+        _infoPopup = new InfoPopup(InfoPopupType.InvalidFileFormat);
         MissingDocumentsList.ItemsSource = _missingDocuments;
     }
 
@@ -120,14 +123,19 @@ public partial class DocumentRecoveryWindow : Window
                 }
                 else
                 {
-                    MessageBox.Show("Invalid file format. Please drop a single .txt file.", "Invalid File Format", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ShowInvalidFileFormatPopup();
                 }
             }
             else
             {
-                MessageBox.Show("Invalid file format. Please drop a single .txt file.", "Invalid File Format", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowInvalidFileFormatPopup();
             }
         }
+    }
+
+    private void ShowInvalidFileFormatPopup()
+    {
+        _infoPopup.Show();
     }
 
     public class MissingDocumentViewModel : INotifyPropertyChanged

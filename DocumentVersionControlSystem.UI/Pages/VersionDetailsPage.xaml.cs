@@ -106,7 +106,7 @@ public partial class VersionDetailsPage : Page
                 var newVersion = _versionControlManager.SwitchToVersionAndSaveAsLatest(_version.DocumentId, _version.Id, popup.Description);
                 if (newVersion.Id == _version.Id)
                 {
-                    MessageBox.Show("This version does not differ from your document!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    new InfoPopup(InfoPopupType.NoChangesDetected).ShowDialog();
                 }
                 else
                 {

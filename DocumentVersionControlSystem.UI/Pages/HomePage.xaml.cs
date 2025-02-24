@@ -60,7 +60,7 @@ public partial class HomePage : Page
                     DropTargetBorder.BorderBrush = Brushes.Transparent;
                     DragDropText.Visibility = Visibility.Hidden;
 
-                    MessageBox.Show("Only .txt files are allowed.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    new InfoPopup(InfoPopupType.InvalidFileFormat).Show();
                 }
             }
         }
@@ -250,18 +250,18 @@ public partial class HomePage : Page
         {
             if (!_documentManager.AddDocument(filePath))
             {
-                MessageBox.Show($"Document {Path.GetFileName(filePath)} with this name already exists...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                new InfoPopup("Error", $"A document named {Path.GetFileName(filePath)} already exists...").Show();
                 return;
             }
 
             _totalButtons++;
             AdjustGridLayout(_totalButtons);
 
-            MessageBox.Show($"File {Path.GetFileName(filePath)} added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            new InfoPopup("Success", $"File {Path.GetFileName(filePath)} added successfully!").Show();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error reading file {Path.GetFileName(filePath)}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            new InfoPopup("Error", $"Error reading file {Path.GetFileName(filePath)}: {ex.Message}").Show();
         }
     }
 
@@ -310,7 +310,7 @@ public partial class HomePage : Page
         var document = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).FirstOrDefault();
         if (document == null)
         {
-            MessageBox.Show("Document not found...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            new InfoPopup(InfoPopupType.DocumentNotFound).Show();
             return;
         }
 
@@ -324,43 +324,43 @@ public partial class HomePage : Page
 
         if (string.IsNullOrEmpty(newName) || string.IsNullOrWhiteSpace(newName))
         {
-            MessageBox.Show("Name cannot be empty...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            new InfoPopup(InfoPopupType.DocumentNameEmpty).Show();
             return;
         }
 
         if (newName.Equals(document.Name, StringComparison.OrdinalIgnoreCase))
         {
-            MessageBox.Show("Name cannot be the same as the current one...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            new InfoPopup(InfoPopupType.SameDocumentName).Show();
             return;
         }
 
-        if (newName.Length < 3 || newName.Length > 50)
+        if (newName.Length > 50)
         {
-            MessageBox.Show("Name must be between 3 and 50 characters...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            new InfoPopup(InfoPopupType.DocumentNameTooLong).Show();
             return;
         }
 
         if (newName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
         {
-            MessageBox.Show("Name cannot end with '.txt'...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            new InfoPopup(InfoPopupType.DocumentNameCannotEndWithTxt).Show();
             return;
         }
 
         if (_documentManager.GetDocumentsByName(newName).Any())
         {
-            MessageBox.Show("A document with this name already exists...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            new InfoPopup(InfoPopupType.DocumentAlreadyExists).Show();
             return;
         }
 
         if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
         {
-            MessageBox.Show("Name contains invalid characters...", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            new InfoPopup(InfoPopupType.DocumentNameContainsInvalidCharacters).Show();
             return;
         }
 
         _documentManager.RenameDocument(document, newName);
         AdjustGridLayout(_totalButtons);
-        MessageBox.Show("Rename successful", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+        new InfoPopup(InfoPopupType.SuccessfulDocumentRename).Show();
     }
 
     private void Remove_Click(object sender, RoutedEventArgs e)
@@ -369,6 +369,6 @@ public partial class HomePage : Page
         _documentManager.DeleteDocument(document);
         AdjustGridLayout(_totalButtons);
         _mainWindow.ClearVersionButtons();
-        MessageBox.Show("Document have been removed successfully", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+        new InfoPopup(InfoPopupType.SuccessfulDocumentRemove).Show();
     }
 }

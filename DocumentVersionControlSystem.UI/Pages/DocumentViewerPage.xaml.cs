@@ -76,7 +76,7 @@ public partial class DocumentViewerPage : Page
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Failed to open document in external editor. Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            new InfoPopup("Error", $"Failed to open document in external editor. Error: {ex.Message}").ShowDialog();
         }
     }
 
@@ -101,6 +101,10 @@ public partial class DocumentViewerPage : Page
 
             var infoPopup = new InfoPopup(versionCreated ? InfoPopupType.VersionCreatedSuccessfully : InfoPopupType.NoChangesDetected);
             infoPopup.ShowDialog();
+        }
+        else if (inputPopup.DialogResult == false)
+        {
+            new InfoPopup(InfoPopupType.VersionCreationCanceled).ShowDialog();
         }
     }
 }

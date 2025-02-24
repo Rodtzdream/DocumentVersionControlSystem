@@ -104,7 +104,8 @@ public partial class MainWindow : Window
                         MainFrame.Navigate(_homePage);
                         _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                         ClearVersionButtons();
-                        MessageBox.Show("Failed to load document. Returning to the home page.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                        new InfoPopup(InfoPopupType.LoadDocumentFailed).ShowDialog();
                     }
                     else
                         AddVersionButtons();
@@ -115,7 +116,8 @@ public partial class MainWindow : Window
                         MainFrame.Navigate(_homePage);
                         _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                         ClearVersionButtons();
-                        MessageBox.Show("Failed to load version. Returning to the home page.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                        new InfoPopup(InfoPopupType.LoadVersionFailed).ShowDialog();
                     }
                     break;
             }
@@ -403,7 +405,8 @@ public partial class MainWindow : Window
                         MainFrame.Navigate(_homePage);
                         _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                         ClearVersionButtons();
-                        MessageBox.Show("Failed to load version. Returning to the home page.");
+
+                        new InfoPopup(InfoPopupType.LoadVersionFailed).ShowDialog();
                     }
                     else
                     {
@@ -439,7 +442,8 @@ public partial class MainWindow : Window
                         MainFrame.Navigate(_homePage);
                         _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
                         ClearVersionButtons();
-                        MessageBox.Show("Failed to load version. Returning to the home page.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                        new InfoPopup(InfoPopupType.LoadVersionFailed).ShowDialog();
                     }
                     else
                     {
