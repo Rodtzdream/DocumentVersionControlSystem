@@ -10,11 +10,13 @@ public class DocumentManager
     private readonly IFileStorageManager _fileStorageManager;
     private readonly Logging.Logger _logger;
     private readonly List<FileChangeWatcher> _fileWatchers;
+    private readonly string _appFolderPath;
     private bool _isFileInternallyRenamed;
     private bool _isFileExternallyDeleted;
 
-    public DocumentManager(DatabaseContext databaseContext, IFileStorageManager fileStorageManager, Logging.Logger logger)
+    public DocumentManager(string appFolderPath, DatabaseContext databaseContext, IFileStorageManager fileStorageManager, Logging.Logger logger)
     {
+        _appFolderPath = appFolderPath;
         _documentRepository = new Database.Repositories.DocumentRepository(databaseContext);
         _fileStorageManager = fileStorageManager;
         _logger = logger;
@@ -119,7 +121,7 @@ public class DocumentManager
             LastModifiedDate = fileInfo.LastWriteTime
         };
 
-        var documentDirectory = Path.Combine("Documents", document.Name);
+        string documentDirectory = Path.Combine(_appFolderPath, "Documents", document.Name);
         if (!Directory.Exists(documentDirectory))
         {
             Directory.CreateDirectory(documentDirectory);
@@ -140,8 +142,8 @@ public class DocumentManager
             var fileDirectory = Path.GetDirectoryName(oldFilePath) ?? string.Empty;
             var newFilePath = Path.Combine(fileDirectory, newName + ".txt");
 
-            var currentDocumentPath = Path.Combine("Documents", document.Name);
-            var newDocumentPath = Path.Combine("Documents", newName);
+            var currentDocumentPath = Path.Combine(_appFolderPath, "Documents", document.Name);
+            var newDocumentPath = Path.Combine(_appFolderPath, "Documents", newName);
 
             if (!_fileStorageManager.FileExists(oldFilePath))
             {
@@ -187,7 +189,7 @@ public class DocumentManager
         {
             try
             {
-                Directory.Move(Path.Combine("Documents", document.Name), Path.Combine("Documents", newName));
+                Directory.Move(Path.Combine(_appFolderPath, "Documents", document.Name), Path.Combine(_appFolderPath, "Documents", newName));
             }
             catch (Exception ex)
             {
@@ -210,7 +212,7 @@ public class DocumentManager
     {
         _documentRepository.DeleteDocument(document);
 
-        var documentDirectory = Path.Combine("Documents", document.Name);
+        var documentDirectory = Path.Combine(_appFolderPath, "Documents", document.Name);
         if (Directory.Exists(documentDirectory))
         {
             Directory.Delete(documentDirectory, true);

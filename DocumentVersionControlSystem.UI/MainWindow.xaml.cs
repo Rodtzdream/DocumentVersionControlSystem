@@ -6,9 +6,11 @@ using DocumentVersionControlSystem.FileStorage;
 using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.UI.Windows;
 using DocumentVersionControlSystem.VersionControl;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -38,13 +40,16 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        var appFolderPath = InitializeDirectories();
 
         var databaseContext = new DatabaseContext();
+        ApplyMigration(databaseContext);
+
         _fileStorageManager = new FileStorageManager();
         _logger = new Logging.Logger();
         _diffManager = new DiffManager.DiffManager();
-        _documentManager = new DocumentManager(databaseContext, _fileStorageManager, _logger);
-        _versionControlManager = new VersionControlManager(_logger, _fileStorageManager, _diffManager, databaseContext);
+        _documentManager = new DocumentManager(appFolderPath, databaseContext, _fileStorageManager, _logger);
+        _versionControlManager = new VersionControlManager(appFolderPath, _logger, _fileStorageManager, _diffManager, databaseContext);
         _homePage = new HomePage(this, _documentManager, _versionControlManager, _fileStorageManager);
 
         _navigationButtonsStackPanel = (StackPanel)FindName("NavigationButtons");
@@ -52,8 +57,23 @@ public partial class MainWindow : Window
         InitializeDynamicGrid();
 
         var missingDocs = _documentManager.VerifyDocumentsIntegrity();
-        if (missingDocs.Count() > 0)
+        if (missingDocs.Count > 0)
             RecoverDocuments(missingDocs);
+    }
+
+    private static string InitializeDirectories()
+    {
+        var appFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DocumentVersionControlSystem");
+        if (!Directory.Exists(appFolderPath))
+        {
+            Directory.CreateDirectory(appFolderPath);
+        }
+        return appFolderPath;
+    }
+
+    private void ApplyMigration(DatabaseContext databaseContext)
+    {
+        databaseContext.Database.Migrate();
     }
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)

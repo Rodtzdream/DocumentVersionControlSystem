@@ -13,9 +13,11 @@ public class VersionControlManager
     private readonly IDiffManager _diffManager;
     private readonly IFileStorageManager _fileStorageManager;
     private readonly Logging.Logger _logger;
+    private readonly string _appFolderPath;
 
-    public VersionControlManager(Logging.Logger logger, IFileStorageManager fileStorageManager, IDiffManager diffManager, DatabaseContext databaseContext)
+    public VersionControlManager(string appFolderPath, Logging.Logger logger, IFileStorageManager fileStorageManager, IDiffManager diffManager, DatabaseContext databaseContext)
     {
+        _appFolderPath = appFolderPath;
         _logger = logger;
         _versionRepository = new VersionRepository(databaseContext);
         _documentRepository = new DocumentRepository(databaseContext);
@@ -42,7 +44,7 @@ public class VersionControlManager
             return false;
         }
 
-        var documentDirectory = Path.Combine("Documents", document.Name);
+        var documentDirectory = Path.Combine(_appFolderPath, "Documents", document.Name);
         string versionFilePath = Path.Combine(documentDirectory, $"{DateTime.Now:yyyyMMddHHmmss}.txt");
 
         Version version = new()
@@ -96,7 +98,7 @@ public class VersionControlManager
             return version;
         }
 
-        var documentDirectory = Path.Combine("Documents", document.Name);
+        var documentDirectory = Path.Combine(_appFolderPath, "Documents", document.Name);
         string versionFilePath = Path.Combine(documentDirectory, $"{DateTime.Now:yyyyMMddHHmmss}.txt");
 
         _fileStorageManager.CopyFile(version.FilePath, document.FilePath);

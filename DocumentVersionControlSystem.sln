@@ -3,21 +3,26 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.UI", ".\DocumentVersionControlSystem.UI\DocumentVersionControlSystem.UI.csproj", "{F71907F2-8CCC-47C6-9272-0E4E6963ECF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.UI", "DocumentVersionControlSystem.UI\DocumentVersionControlSystem.UI.csproj", "{F71907F2-8CCC-47C6-9272-0E4E6963ECF4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.Database", ".\DocumentVersionControlSystem.Database\DocumentVersionControlSystem.Database.csproj", "{71397AD4-C235-4B0F-9A22-B30AD9D1CB94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.Database", "DocumentVersionControlSystem.Database\DocumentVersionControlSystem.Database.csproj", "{71397AD4-C235-4B0F-9A22-B30AD9D1CB94}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.VersionControl", ".\DocumentVersionControlSystem.VersionControl\DocumentVersionControlSystem.VersionControl.csproj", "{EC77ACCC-CC8B-4C94-8A9E-7B2EC9EC48C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.VersionControl", "DocumentVersionControlSystem.VersionControl\DocumentVersionControlSystem.VersionControl.csproj", "{EC77ACCC-CC8B-4C94-8A9E-7B2EC9EC48C0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.DocumentManagement", ".\DocumentVersionControlSystem.DocumentManagement\DocumentVersionControlSystem.DocumentManagement.csproj", "{7622682B-62F9-4015-9401-33C76FCBD5D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.DocumentManagement", "DocumentVersionControlSystem.DocumentManagement\DocumentVersionControlSystem.DocumentManagement.csproj", "{7622682B-62F9-4015-9401-33C76FCBD5D9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.FileStorage", ".\DocumentVersionControlSystem.FileStorage\DocumentVersionControlSystem.FileStorage.csproj", "{18927193-9B37-4599-997C-EFF0A0B70100}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.FileStorage", "DocumentVersionControlSystem.FileStorage\DocumentVersionControlSystem.FileStorage.csproj", "{18927193-9B37-4599-997C-EFF0A0B70100}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.Logging", ".\DocumentVersionControlSystem.Logging\DocumentVersionControlSystem.Logging.csproj", "{B7736A26-818B-42BB-AEF0-297319625BC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.Logging", "DocumentVersionControlSystem.Logging\DocumentVersionControlSystem.Logging.csproj", "{B7736A26-818B-42BB-AEF0-297319625BC5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.DiffManager", ".\DocumentVersionControlSystem.DiffManager\DocumentVersionControlSystem.DiffManager.csproj", "{FD009855-CC04-4E64-A781-43DFA5F5BFA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.DiffManager", "DocumentVersionControlSystem.DiffManager\DocumentVersionControlSystem.DiffManager.csproj", "{FD009855-CC04-4E64-A781-43DFA5F5BFA8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.Tests", ".\DocumentVersionControlSystem.Tests\DocumentVersionControlSystem.Tests.csproj", "{6AB2E945-89AD-473D-80F0-61C5C384FA44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentVersionControlSystem.Tests", "DocumentVersionControlSystem.Tests\DocumentVersionControlSystem.Tests.csproj", "{6AB2E945-89AD-473D-80F0-61C5C384FA44}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{76A53739-B4AB-4AF3-ABB3-34A2B2EBD74D}"
+	ProjectSection(SolutionItems) = preProject
+		uninstall.bat = uninstall.bat
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,7 +1,6 @@
 ﻿namespace DocumentVersionControlSystem.Database.Contexts;
 using DocumentVersionControlSystem.Database.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Configuration;
 
 public class DatabaseContext : DbContext
 {
@@ -20,7 +19,12 @@ public class DatabaseContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString);
+            string appFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DocumentVersionControlSystem");
+            if (!Directory.Exists(appFolderPath))
+            {
+                Directory.CreateDirectory(appFolderPath);
+            }
+            optionsBuilder.UseSqlite($"Data Source={Path.Combine(appFolderPath, "database.db")};");
         }
     }
 
@@ -31,11 +35,11 @@ public class DatabaseContext : DbContext
 
         modelBuilder.Entity<Document>()
             .Property(d => d.CreationDate)
-            .HasDefaultValueSql("GETDATE()");
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         modelBuilder.Entity<Document>()
             .Property(d => d.LastModifiedDate)
-            .HasDefaultValueSql("GETDATE()");
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         modelBuilder.Entity<Document>()
             .Property(d => d.VersionCount)
@@ -46,7 +50,7 @@ public class DatabaseContext : DbContext
 
         modelBuilder.Entity<Version>()
             .Property(v => v.CreationDate)
-            .HasDefaultValueSql("GETDATE()");
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         base.OnModelCreating(modelBuilder);
     }

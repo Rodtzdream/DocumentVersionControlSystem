@@ -286,7 +286,7 @@ public class VersionRepositoryTests
         {
             var documentRepository = new DocumentRepository(context);
             var versionRepository = new VersionRepository(context);
-            var versionControlManager = new VersionControlManager(_mockLogger.Object, mockFileStorage.Object, mockDiffManager.Object, context);
+            var versionControlManager = new VersionControlManager("AppFolderPath", _mockLogger.Object, mockFileStorage.Object, mockDiffManager.Object, context);
 
             var document = new Document
             {
@@ -347,7 +347,7 @@ public class VersionRepositoryTests
         {
             var documentRepository = new DocumentRepository(context);
             var versionRepository = new VersionRepository(context);
-            var versionControlManager = new VersionControlManager(_mockLogger.Object, mockFileStorage.Object, mockDiffManager.Object, context);
+            var versionControlManager = new VersionControlManager("AppFolderPath", _mockLogger.Object, mockFileStorage.Object, mockDiffManager.Object, context);
 
             var document = new Document
             {
@@ -404,7 +404,7 @@ public class VersionRepositoryTests
         {
             var documentRepository = new DocumentRepository(context);
             var versionRepository = new VersionRepository(context);
-            var versionControlManager = new VersionControlManager(_mockLogger.Object, mockFileStorage.Object, mockDiffManager.Object, context);
+            var versionControlManager = new VersionControlManager("AppFolderPath", _mockLogger.Object, mockFileStorage.Object, mockDiffManager.Object, context);
 
             var document = new Document
             {
