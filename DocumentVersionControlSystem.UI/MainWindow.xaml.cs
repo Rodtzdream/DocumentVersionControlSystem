@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -67,7 +66,7 @@ public partial class MainWindow : Window
         {
             databaseContext.Database.Migrate();
         }
-        catch (Exception ex)
+            catch (Exception ex)
         {
             new InfoPopup("Error", $"Error updating the database: {ex.Message}").ShowDialog();
             throw;

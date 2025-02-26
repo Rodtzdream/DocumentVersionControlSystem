@@ -3,7 +3,11 @@ set "mainDir=%LocalAppData%\DocumentVersionControlSystem"
 
 if exist "%mainDir%" (
     rmdir /S /Q "%mainDir%"
-    echo All application data removed.
+    if not exist "%mainDir%" (
+        echo All application data removed.
+    ) else (
+        echo Failed to remove application data.
+    )
 ) else (
     echo No application data found.
 )

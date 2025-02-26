@@ -33,63 +33,63 @@ namespace DocumentVersionControlSystem.UI.Popups
             InitializeComponent();
             switch (popupType)
             {
-                case InfoPopupType.VersionCreationCanceled: //
+                case InfoPopupType.VersionCreationCanceled:
                     TitleText.Text = "Version creation canceled";
                     MessageText.Text = "You have canceled the process of creating a new version. No changes have been saved.";
                     break;
-                case InfoPopupType.VersionCreatedSuccessfully: //
+                case InfoPopupType.VersionCreatedSuccessfully:
                     TitleText.Text = "Version created successfully";
                     MessageText.Text = "The new version of the document has been created and saved successfully.";
                     break;
-                case InfoPopupType.NoChangesDetected: //
+                case InfoPopupType.NoChangesDetected:
                     TitleText.Text = "No changes detected";
                     MessageText.Text = "The selected file does not differ from the latest version. \nNo new version can be created.";
                     break;
-                case InfoPopupType.LoadVersionFailed: //
+                case InfoPopupType.LoadVersionFailed:
                     TitleText.Text = "Load version failed";
                     MessageText.Text = "Failed to load the version. Returning to the home page.";
                     break;
-                case InfoPopupType.LoadDocumentFailed: //
+                case InfoPopupType.LoadDocumentFailed:
                     TitleText.Text = "Load version failed";
                     MessageText.Text = "Failed to load the document. Returning to the home page.";
                     break;
-                case InfoPopupType.DocumentNotFound: //
+                case InfoPopupType.DocumentNotFound:
                     TitleText.Text = "Document not found";
                     MessageText.Text = "The document you are trying to access does not exist.";
                     break;
-                case InfoPopupType.DocumentAlreadyExists: //
+                case InfoPopupType.DocumentAlreadyExists:
                     TitleText.Text = "Document already exists";
                     MessageText.Text = "A document with the same name already exists in the system.";
                     break;
-                case InfoPopupType.SameDocumentName: //
+                case InfoPopupType.SameDocumentName:
                     TitleText.Text = "Same document name";
                     MessageText.Text = "Name cannot be the same as the current one.";
                     break;
-                case InfoPopupType.DocumentNameEmpty: //
+                case InfoPopupType.DocumentNameEmpty:
                     TitleText.Text = "Document name is empty";
                     MessageText.Text = "Please enter a name for the document.";
                     break;
-                case InfoPopupType.DocumentNameTooLong: //
+                case InfoPopupType.DocumentNameTooLong:
                     TitleText.Text = "Document name is too long";
                     MessageText.Text = "The document name exceeds the maximum length of 50 characters.";
                     break;
-                case InfoPopupType.DocumentNameCannotEndWithTxt: //
+                case InfoPopupType.DocumentNameCannotEndWithTxt:
                     TitleText.Text = "Document name cannot end with .txt";
                     MessageText.Text = "The document name cannot end with .txt. Please choose a different name.";
                     break;
-                case InfoPopupType.DocumentNameContainsInvalidCharacters: //
+                case InfoPopupType.DocumentNameContainsInvalidCharacters:
                     TitleText.Text = "Document name contains invalid characters";
                     MessageText.Text = "The document name contains invalid characters. Please use only letters, numbers, spaces, and the following special characters: - _ .";
                     break;
-                case InfoPopupType.SuccessfulDocumentRename: //
+                case InfoPopupType.SuccessfulDocumentRename:
                     TitleText.Text = "Document renamed successfully";
                     MessageText.Text = "The document has been renamed successfully.";
                     break;
-                case InfoPopupType.SuccessfulDocumentRemove: //
+                case InfoPopupType.SuccessfulDocumentRemove:
                     TitleText.Text = "Document removed successfully";
                     MessageText.Text = "The document has been removed successfully.";
                     break;
-                case InfoPopupType.InvalidFileFormat: //
+                case InfoPopupType.InvalidFileFormat:
                     TitleText.Text = "Invalid file format";
                     MessageText.Text = "Invalid file format. Only .txt files are allowed.";
                     break;
