@@ -1,5 +1,7 @@
 ﻿namespace DocumentVersionControlSystem.Database.Contexts;
+
 using DocumentVersionControlSystem.Database.Models;
+using DocumentVersionControlSystem.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 public class DatabaseContext : DbContext
@@ -19,12 +21,7 @@ public class DatabaseContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            string appFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DocumentVersionControlSystem");
-            if (!Directory.Exists(appFolderPath))
-            {
-                Directory.CreateDirectory(appFolderPath);
-            }
-            optionsBuilder.UseSqlite($"Data Source={Path.Combine(appFolderPath, "database.db")};");
+            optionsBuilder.UseSqlite($"Data Source={AppPaths.DatabaseFilePath};");
         }
     }
 

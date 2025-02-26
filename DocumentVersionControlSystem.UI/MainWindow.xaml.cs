@@ -3,6 +3,7 @@ using DocumentVersionControlSystem.Database.Models;
 using DocumentVersionControlSystem.DiffManager;
 using DocumentVersionControlSystem.DocumentManagement;
 using DocumentVersionControlSystem.FileStorage;
+using DocumentVersionControlSystem.Infrastructure;
 using DocumentVersionControlSystem.UI.Popups;
 using DocumentVersionControlSystem.UI.Windows;
 using DocumentVersionControlSystem.VersionControl;
@@ -40,7 +41,6 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        var appFolderPath = InitializeDirectories();
 
         var databaseContext = new DatabaseContext();
         ApplyMigration(databaseContext);
@@ -48,8 +48,8 @@ public partial class MainWindow : Window
         _fileStorageManager = new FileStorageManager();
         _logger = new Logging.Logger();
         _diffManager = new DiffManager.DiffManager();
-        _documentManager = new DocumentManager(appFolderPath, databaseContext, _fileStorageManager, _logger);
-        _versionControlManager = new VersionControlManager(appFolderPath, _logger, _fileStorageManager, _diffManager, databaseContext);
+        _documentManager = new DocumentManager(AppPaths.AppFolderPath, databaseContext, _fileStorageManager, _logger);
+        _versionControlManager = new VersionControlManager(AppPaths.AppFolderPath, _logger, _fileStorageManager, _diffManager, databaseContext);
         _homePage = new HomePage(this, _documentManager, _versionControlManager, _fileStorageManager);
 
         _navigationButtonsStackPanel = (StackPanel)FindName("NavigationButtons");
@@ -61,19 +61,17 @@ public partial class MainWindow : Window
             RecoverDocuments(missingDocs);
     }
 
-    private static string InitializeDirectories()
+    private static void ApplyMigration(DatabaseContext databaseContext)
     {
-        var appFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DocumentVersionControlSystem");
-        if (!Directory.Exists(appFolderPath))
+        try
         {
-            Directory.CreateDirectory(appFolderPath);
+            databaseContext.Database.Migrate();
         }
-        return appFolderPath;
-    }
-
-    private void ApplyMigration(DatabaseContext databaseContext)
-    {
-        databaseContext.Database.Migrate();
+        catch (Exception ex)
+        {
+            new InfoPopup("Error", $"Error updating the database: {ex.Message}").ShowDialog();
+            throw;
+        }
     }
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
