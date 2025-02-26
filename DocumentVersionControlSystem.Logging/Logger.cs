@@ -1,4 +1,6 @@
 ﻿namespace DocumentVersionControlSystem.Logging;
+
+using DocumentVersionControlSystem.Infrastructure;
 using Serilog;
 
 public class Logger : IDisposable
@@ -8,7 +10,7 @@ public class Logger : IDisposable
     static Logger()
     {
         _logger = new LoggerConfiguration()
-            .WriteTo.File("log.txt")
+            .WriteTo.File(AppPaths.AppFolderPath + "/log.txt")
             .CreateLogger();
     }
 

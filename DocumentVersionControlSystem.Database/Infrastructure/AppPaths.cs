@@ -20,7 +20,7 @@ public static class AppPaths
         }
         catch (Exception ex)
         {
-            File.WriteAllText(Path.Combine(AppFolderPath, "error.log"), $"Error creating directory: {ex.Message}");
+            File.WriteAllText(Path.Combine(AppFolderPath, "log.txt"), $"Error creating directory: {ex.Message}");
             throw;
         }
     }
