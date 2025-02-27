@@ -66,7 +66,7 @@ public partial class MainWindow : Window
         {
             databaseContext.Database.Migrate();
         }
-            catch (Exception ex)
+        catch (Exception ex)
         {
             new InfoPopup("Error", $"Error updating the database: {ex.Message}").ShowDialog();
             throw;
@@ -437,6 +437,29 @@ public partial class MainWindow : Window
                     break;
             }
         }, DispatcherPriority.Background);
+    }
+
+    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+        {
+            switch (e.SystemKey)
+            {
+                case Key.Left:
+                    PreviousButton_Click(sender, e);
+                    e.Handled = true;
+                    break;
+                case Key.Right:
+                    NextButton_Click(sender, e);
+                    e.Handled = true;
+                    break;
+            }
+        }
+        else if (e.Key == Key.Home)
+        {
+            HomeButton_Click(sender, e);
+            e.Handled = true;
+        }
     }
 
     private void NextButton_Click(object sender, RoutedEventArgs e)

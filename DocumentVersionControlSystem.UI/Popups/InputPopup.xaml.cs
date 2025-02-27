@@ -21,4 +21,17 @@ public partial class InputPopup : Window
         this.DialogResult = true;
         this.Close();
     }
+
+    private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case System.Windows.Input.Key.Enter:
+                ConfirmButton_Click(sender, e);
+                break;
+            case System.Windows.Input.Key.Escape:
+                CancelButton_Click(sender, e);
+                break;
+        }
+    }
 }

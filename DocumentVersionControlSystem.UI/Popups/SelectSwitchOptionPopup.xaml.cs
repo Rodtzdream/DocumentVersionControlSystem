@@ -41,4 +41,18 @@ public partial class SelectSwitchOptionPopup : Window
     {
         switchOption = SwitchOption.SaveAsTheLatest;
     }
+
+    private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case System.Windows.Input.Key.Enter:
+                OkButton_Click(sender, e);
+                break;
+            case System.Windows.Input.Key.Escape:
+                this.DialogResult = false;
+                this.Close();
+                break;
+        }
+    }
 }
