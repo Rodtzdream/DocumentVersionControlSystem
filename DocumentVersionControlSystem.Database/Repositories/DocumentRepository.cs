@@ -60,6 +60,12 @@ public class DocumentRepository
 
     public void RenameDocument(Models.Document document, string newFilePath)
     {
+        var existingDocument = _context.Documents.Local.FirstOrDefault(d => d.Id == document.Id);
+        if (existingDocument != null)
+        {
+            _context.Entry(existingDocument).State = EntityState.Detached;
+        }
+
         var newName = Path.GetFileNameWithoutExtension(newFilePath);
 
         document.FilePath = newFilePath;
@@ -67,7 +73,7 @@ public class DocumentRepository
         document.LastModifiedDate = DateTime.Now;
 
         _context.Entry(document).Property(d => d.Name).IsModified = true;
-        
+
         var versionsToRename = _context.Versions.Where(v => v.DocumentId == document.Id).ToList();
         foreach (var version in versionsToRename)
         {

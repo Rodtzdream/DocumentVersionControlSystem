@@ -189,7 +189,10 @@ public class DocumentManager
         {
             try
             {
-                Directory.Move(Path.Combine(_appFolderPath, "Documents", document.Name), Path.Combine(_appFolderPath, "Documents", newName));
+                if (!Directory.Exists(Path.Combine(_appFolderPath, "Documents", newName)))
+                {
+                    Directory.Move(Path.Combine(_appFolderPath, "Documents", document.Name), Path.Combine(_appFolderPath, "Documents", newName));
+                }
             }
             catch (Exception ex)
             {

@@ -257,7 +257,7 @@ public partial class HomePage : Page
             _totalButtons++;
             AdjustGridLayout(_totalButtons);
 
-            new InfoPopup("Success", $"File {Path.GetFileName(filePath)} added successfully!").Show();
+            new InfoPopup("Document added successfully", $"File {Path.GetFileName(filePath)} added successfully!").Show();
         }
         catch (Exception ex)
         {
@@ -331,15 +331,15 @@ public partial class HomePage : Page
                 return;
             }
 
-            if (newName.Equals(document.Name, StringComparison.OrdinalIgnoreCase))
-            {
-                _mainWindow.ShowInfoPopup(InfoPopupType.SameDocumentName);
-                return;
-            }
-
             if (newName.Length > 50)
             {
                 _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameTooLong);
+                return;
+            }
+
+            if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || newName.Contains('$'))
+            {
+                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameContainsInvalidCharacters);
                 return;
             }
 
@@ -349,15 +349,22 @@ public partial class HomePage : Page
                 return;
             }
 
-            if (_documentManager.GetDocumentsByName(newName).Any())
+            if (newName.Equals(document.Name, StringComparison.OrdinalIgnoreCase))
             {
-                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentAlreadyExists);
+                _mainWindow.ShowInfoPopup(InfoPopupType.SameDocumentName);
                 return;
             }
 
-            if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            if (_documentManager.GetDocumentsByName(newName).Any())
             {
-                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameContainsInvalidCharacters);
+                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentAlreadyExistsInTheSystem);
+                return;
+            }
+
+            string newFilePath = Path.Combine(Path.GetDirectoryName(document.FilePath), newName + ".txt");
+            if (_fileStorageManager.FileExists(newFilePath))
+            {
+                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentAlreadyExistsInTheRootPath);
                 return;
             }
 

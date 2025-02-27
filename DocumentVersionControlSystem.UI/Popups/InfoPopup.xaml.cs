@@ -10,7 +10,8 @@ namespace DocumentVersionControlSystem.UI.Popups
         LoadVersionFailed,
         LoadDocumentFailed,
         DocumentNotFound,
-        DocumentAlreadyExists,
+        DocumentAlreadyExistsInTheSystem,
+        DocumentAlreadyExistsInTheRootPath,
         SameDocumentName,
         DocumentNameEmpty,
         DocumentNameTooLong,
@@ -57,9 +58,13 @@ namespace DocumentVersionControlSystem.UI.Popups
                     TitleText.Text = "Document not found";
                     MessageText.Text = "The document you are trying to access does not exist.";
                     break;
-                case InfoPopupType.DocumentAlreadyExists:
+                case InfoPopupType.DocumentAlreadyExistsInTheSystem:
                     TitleText.Text = "Document already exists";
                     MessageText.Text = "A document with the same name already exists in the system.";
+                    break;
+                case InfoPopupType.DocumentAlreadyExistsInTheRootPath:
+                    TitleText.Text = "Document already exists in the root path";
+                    MessageText.Text = "A document with the same name already exists in the root path. Please choose a different name or move the original document.";
                     break;
                 case InfoPopupType.SameDocumentName:
                     TitleText.Text = "Same document name";
@@ -78,7 +83,7 @@ namespace DocumentVersionControlSystem.UI.Popups
                     MessageText.Text = "The document name cannot end with .txt. Please choose a different name.";
                     break;
                 case InfoPopupType.DocumentNameContainsInvalidCharacters:
-                    TitleText.Text = "Document name contains invalid characters";
+                    TitleText.Text = "Invalid characters";
                     MessageText.Text = "The document name contains invalid characters. Please use only letters, numbers, spaces, and the following special characters: - _ .";
                     break;
                 case InfoPopupType.SuccessfulDocumentRename:
