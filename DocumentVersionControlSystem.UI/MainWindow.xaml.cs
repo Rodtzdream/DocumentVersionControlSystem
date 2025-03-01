@@ -243,9 +243,12 @@ public partial class MainWindow : Window
     {
         if (sender is Button clickedButton && clickedButton.CommandParameter is int versionId)
         {
-            var version = _versionControlManager.GetVersionById(versionId);
-            OpenVersionViewer(version);
-            AddVersionButtons(versionId);
+            if (_currentVersionButton == null || clickedButton.CommandParameter != _currentVersionButton.CommandParameter)
+            {
+                var version = _versionControlManager.GetVersionById(versionId);
+                OpenVersionViewer(version);
+                AddVersionButtons(versionId);
+            }
         }
     }
 
@@ -358,10 +361,13 @@ public partial class MainWindow : Window
 
             if (parentButton != null)
             {
-                var versionId = (int)parentButton.CommandParameter;
-                var version = _versionControlManager.GetVersionById(versionId);
-                var versionDetailsWindow = new VersionDetailsPage(this, _fileStorageManager, version, _versionControlManager);
-                MainFrame.Navigate(versionDetailsWindow);
+                if (_currentVersionButton == null || parentButton.CommandParameter != _currentVersionButton.CommandParameter)
+                {
+                    var versionId = (int)parentButton.CommandParameter;
+                    var version = _versionControlManager.GetVersionById(versionId);
+                    var versionDetailsWindow = new VersionDetailsPage(this, _fileStorageManager, version, _versionControlManager);
+                    MainFrame.Navigate(versionDetailsWindow);
+                }
             }
         }
     }
