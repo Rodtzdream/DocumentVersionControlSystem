@@ -212,10 +212,10 @@ public partial class MainWindow : Window
         if (MainFrame.Content is DocumentViewerPage || MainFrame.Content is VersionDetailsPage)
         {
             var documentName = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).FirstOrDefault()?.Name;
-                int maxLength = MainFrame.Content is DocumentViewerPage ? (int)(ActualWidth / 40) : (int)(ActualWidth / 20);
-                MainTitle.Text = documentName.Length > maxLength
-                    ? $"{documentName.Substring(0, maxLength)}..."
-                    : $"{documentName}.txt";
+            int maxLength = MainFrame.Content is DocumentViewerPage ? (int)(ActualWidth / 40) : (int)(ActualWidth / 20);
+            MainTitle.Text = documentName.Length > maxLength
+                ? $"{documentName.Substring(0, maxLength)}..."
+                : $"{documentName}.txt";
         }
     }
 
@@ -402,9 +402,22 @@ public partial class MainWindow : Window
 
             if (parentButton != null)
             {
-                _versionControlManager.DeleteVersion((int)parentButton.CommandParameter);
-                AddVersionButtons();
-                _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+                if (_currentVersionButton != null && parentButton.CommandParameter == _currentVersionButton.CommandParameter)
+                {
+                    _versionControlManager.DeleteVersion((int)parentButton.CommandParameter);
+                    MainFrame.Navigate(_homePage);
+                    ClearVersionButtons();
+                    ShowInfoPopup(InfoPopupType.CurrentVersionDeleted);
+                }
+                else
+                {
+                    _versionControlManager.DeleteVersion((int)parentButton.CommandParameter);
+
+                    if (MainFrame.Content is VersionDetailsPage && _currentVersionButton != null)
+                        AddVersionButtons((int)_currentVersionButton.CommandParameter);
+                    else
+                        AddVersionButtons();
+                }
             }
         }
     }

@@ -9,6 +9,7 @@ namespace DocumentVersionControlSystem.UI.Popups
         NoChangesDetected,
         VersionSwitched,
         OnlyOneVersion,
+        CurrentVersionDeleted,
         LoadVersionFailed,
         LoadDocumentFailed,
         DocumentNotFound,
@@ -56,9 +57,13 @@ namespace DocumentVersionControlSystem.UI.Popups
                     TitleText.Text = "Only one version";
                     MessageText.Text = "The document has only one version. No changes can be made.";
                     break;
+                case InfoPopupType.CurrentVersionDeleted:
+                    TitleText.Text = "Current version deleted";
+                    MessageText.Text = "The current version has been deleted successfully. Returning to the home page.";
+                    break;
                 case InfoPopupType.LoadVersionFailed:
                     TitleText.Text = "Load version failed";
-                    MessageText.Text = "Failed to load the version. Returning to the home page.";
+                    MessageText.Text = "Failed to load the version. Returning to the home page. Probably this version was deleted.";
                     break;
                 case InfoPopupType.LoadDocumentFailed:
                     TitleText.Text = "Load version failed";
