@@ -60,6 +60,7 @@ public partial class DocumentViewerPage : Page
         if (!_fileStorageManager.FileExists(_document.FilePath))
             return false;
 
+        _document.VersionCount = _versionControlManager.GetVersionsByDocumentId(_document.Id).Count;
         DocumentText.Text = File.ReadAllText(_document.FilePath);
         return true;
     }

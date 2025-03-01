@@ -102,44 +102,42 @@ public partial class MainWindow : Window
 
     private void MainWindow_Activated(object sender, EventArgs e)
     {
-        if (MainFrame.Content is Page currentPage)
+        if (MainFrame.Content is not Page currentPage) return;
+
+        if (_documentManager.IsFileExternallyDeleted())
         {
-            if (_documentManager.IsFileExternallyDeleted())
-            {
-                RecoverDocuments(_documentManager.VerifyDocumentsIntegrity());
-                _documentManager.SetFileExternallyDeleted(false);
-            }
-
-            switch (currentPage)
-            {
-                case HomePage:
-                    _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
-                    ClearVersionButtons();
-                    break;
-                case DocumentViewerPage documentViewerPage:
-                    if (!documentViewerPage.ReadDocument())
-                    {
-                        MainFrame.Navigate(_homePage);
-                        _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
-                        ClearVersionButtons();
-
-                        ShowInfoPopup(InfoPopupType.LoadDocumentFailed);
-                    }
-                    else
-                        AddVersionButtons();
-                    break;
-                case VersionDetailsPage versionDetailsPage:
-                    if (!versionDetailsPage.RefreshWindow())
-                    {
-                        MainFrame.Navigate(_homePage);
-                        _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
-                        ClearVersionButtons();
-
-                        ShowInfoPopup(InfoPopupType.LoadVersionFailed);
-                    }
-                    break;
-            }
+            RecoverDocuments(_documentManager.VerifyDocumentsIntegrity());
+            _documentManager.SetFileExternallyDeleted(false);
         }
+
+        var allDocumentsCount = _documentManager.GetAllDocuments().Count + 1;
+        switch (currentPage)
+        {
+            case HomePage:
+                _homePage.AdjustGridLayout(allDocumentsCount);
+                ClearVersionButtons();
+                break;
+            case DocumentViewerPage documentViewerPage:
+                if (!documentViewerPage.ReadDocument())
+                {
+                    NavigateToHomePage(allDocumentsCount, InfoPopupType.LoadDocumentFailed);
+                }
+                break;
+            case VersionDetailsPage versionDetailsPage:
+                if (!versionDetailsPage.RefreshWindow())
+                {
+                    NavigateToHomePage(allDocumentsCount, InfoPopupType.LoadVersionFailed);
+                }
+                break;
+        }
+    }
+
+    private void NavigateToHomePage(int allDocumentsCount, InfoPopupType popupType)
+    {
+        MainFrame.Navigate(_homePage);
+        _homePage.AdjustGridLayout(allDocumentsCount);
+        ClearVersionButtons();
+        ShowInfoPopup(popupType);
     }
 
     public void RecoverDocuments(List<Document> missingDocs)

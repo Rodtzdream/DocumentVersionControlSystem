@@ -1,12 +1,10 @@
 ﻿using System.Windows;
 namespace DocumentVersionControlSystem.UI.Popups;
 
-
 public partial class SelectSwitchOptionPopup : Window
 {
-    InputPopup InputPopup;
     public SwitchOption switchOption { get; set; }
-    public string Description;
+    public string Description { get; private set; }
 
     public enum SwitchOption
     {
@@ -16,13 +14,13 @@ public partial class SelectSwitchOptionPopup : Window
 
     public SelectSwitchOptionPopup(string versionDescription)
     {
-        this.Description = versionDescription;
+        Description = versionDescription;
         InitializeComponent();
     }
 
     private void OkButton_Click(object sender, RoutedEventArgs e)
     {
-        var popup = new InputPopup(this.Description)
+        var popup = new InputPopup(Description)
         {
             TitleText = { Text = "Enter new version description:" }
         };
@@ -31,14 +29,14 @@ public partial class SelectSwitchOptionPopup : Window
         if (popup.DialogResult == true)
         {
             Description = popup.MessageText.Text;
-            this.DialogResult = true;
+            DialogResult = true;
         }
         else
         {
-            this.DialogResult = false;
+            DialogResult = false;
             new InfoPopup(InfoPopupType.VersionCreationCanceled).ShowDialog();
         }
-        this.Close();
+        Close();
     }
 
     private void DeleteNewer_Checked(object sender, RoutedEventArgs e)
@@ -59,8 +57,8 @@ public partial class SelectSwitchOptionPopup : Window
                 OkButton_Click(sender, e);
                 break;
             case System.Windows.Input.Key.Escape:
-                this.DialogResult = false;
-                this.Close();
+                DialogResult = false;
+                Close();
                 break;
         }
     }
