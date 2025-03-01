@@ -6,11 +6,13 @@ public class DocumentRepository
 {
     private readonly DatabaseContext _context;
 
+    // Constructor
     public DocumentRepository(DatabaseContext context)
     {
         _context = context;
     }
 
+    // Methods for getting data
     public Models.Document? GetDocumentById(int id)
     {
         return _context.Documents.AsNoTracking().FirstOrDefault(d => d.Id == id);
@@ -34,6 +36,7 @@ public class DocumentRepository
         }
     }
 
+    // Methods for adding, updating data
     public void AddDocument(Models.Document document)
     {
         _context.Documents.Add(document);
@@ -85,6 +88,7 @@ public class DocumentRepository
         _context.SaveChanges();
     }
 
+    // Method for deleting data
     public void DeleteDocument(Models.Document document)
     {
         var trackedDocument = _context.Documents.Local.FirstOrDefault(d => d.Id == document.Id);

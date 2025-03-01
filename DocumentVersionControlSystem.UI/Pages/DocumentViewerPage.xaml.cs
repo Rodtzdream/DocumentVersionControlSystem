@@ -16,6 +16,7 @@ public partial class DocumentViewerPage : Page
     private readonly VersionControlManager _versionControlManager;
     private readonly Database.Models.Document _document;
 
+    // Constructor
     public DocumentViewerPage(MainWindow mainWindow, IFileStorageManager fileStorageManager, VersionControlManager versionControl, Database.Models.Document document)
     {
         _mainWindow = mainWindow;
@@ -30,39 +31,16 @@ public partial class DocumentViewerPage : Page
         _mainWindow.SizeChanged += OnWindowSizeChanged;
     }
 
+    // Page loaded event
     private void DocumentViewerPage_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateButtonSizes(_mainWindow.ActualWidth, _mainWindow.ActualHeight);
     }
 
+    // Event handlers
     private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
     {
         UpdateButtonSizes(e.NewSize.Width, e.NewSize.Height);
-    }
-
-    private void UpdateButtonSizes(double width, double height)
-    {
-        double newSize = Math.Max(12, ActualWidth * 0.007);
-
-        OpenDocumentButton.Width = width * 0.06;
-        OpenDocumentButton.Height = height * 0.033;
-        OpenDocumentButton.Margin = new Thickness(width * 0.025 + 80, 0, 0, 0);
-        OpenDocumentButton.FontSize = newSize;
-
-        CreateNewVersionButton.Width = width * 0.07;
-        CreateNewVersionButton.Height = height * 0.033;
-        CreateNewVersionButton.Margin = new Thickness(0, 0, width * 0.006 + 5, 0);
-        CreateNewVersionButton.FontSize = newSize;
-    }
-
-    public bool ReadDocument()
-    {
-        if (!_fileStorageManager.FileExists(_document.FilePath))
-            return false;
-
-        _document.VersionCount = _versionControlManager.GetVersionsByDocumentId(_document.Id).Count;
-        DocumentText.Text = File.ReadAllText(_document.FilePath);
-        return true;
     }
 
     private void OpenInExternalEditor_Click(object sender, RoutedEventArgs e)
@@ -100,11 +78,38 @@ public partial class DocumentViewerPage : Page
             if (versionCreated)
                 _mainWindow.AddVersionButtons();
 
-            _mainWindow.ShowInfoPopup(versionCreated ? InfoPopupType.VersionCreatedSuccessfully : InfoPopupType.NoChangesDetected);
+            MainWindow.ShowInfoPopup(versionCreated ? InfoPopupType.VersionCreatedSuccessfully : InfoPopupType.NoChangesDetected);
         }
         else if (inputPopup.DialogResult == false)
         {
-            _mainWindow.ShowInfoPopup(InfoPopupType.VersionCreationCanceled);
+            MainWindow.ShowInfoPopup(InfoPopupType.VersionCreationCanceled);
         }
+    }
+
+    // Public methods
+    public bool ReadDocument()
+    {
+        if (!_fileStorageManager.FileExists(_document.FilePath))
+            return false;
+
+        _document.VersionCount = _versionControlManager.GetVersionsByDocumentId(_document.Id).Count;
+        DocumentText.Text = File.ReadAllText(_document.FilePath);
+        return true;
+    }
+
+    // Private support methods
+    private void UpdateButtonSizes(double width, double height)
+    {
+        double newSize = Math.Max(12, ActualWidth * 0.007);
+
+        OpenDocumentButton.Width = width * 0.06;
+        OpenDocumentButton.Height = height * 0.033;
+        OpenDocumentButton.Margin = new Thickness(width * 0.025 + 80, 0, 0, 0);
+        OpenDocumentButton.FontSize = newSize;
+
+        CreateNewVersionButton.Width = width * 0.07;
+        CreateNewVersionButton.Height = height * 0.033;
+        CreateNewVersionButton.Margin = new Thickness(0, 0, width * 0.006 + 5, 0);
+        CreateNewVersionButton.FontSize = newSize;
     }
 }

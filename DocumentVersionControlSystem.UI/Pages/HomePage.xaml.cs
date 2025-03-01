@@ -23,6 +23,7 @@ public partial class HomePage : Page
 
     private int _totalButtons;
 
+    // Constructor
     public HomePage(MainWindow mainWindow, DocumentManager documentManagement, VersionControlManager versionControl, IFileStorageManager fileStorageManager)
     {
         InitializeComponent();
@@ -36,11 +37,13 @@ public partial class HomePage : Page
         Loaded += Page_Loaded;
     }
 
+    // Event page loaded
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
         AdjustGridLayout(_totalButtons);
     }
 
+    // Event handlers
     private void Document_Drop(object sender, DragEventArgs e)
     {
         if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -60,7 +63,7 @@ public partial class HomePage : Page
                     DropTargetBorder.BorderBrush = Brushes.Transparent;
                     DragDropText.Visibility = Visibility.Hidden;
 
-                    _mainWindow.ShowInfoPopup(InfoPopupType.InvalidFileFormat);
+                    MainWindow.ShowInfoPopup(InfoPopupType.InvalidFileFormat);
                 }
             }
         }
@@ -99,6 +102,62 @@ public partial class HomePage : Page
         AdjustGridLayout(_totalButtons);
     }
 
+    private void OnButtonClicked(object sender, RoutedEventArgs e)
+    {
+        if (_selectedDocumentButton != null)
+        {
+            _selectedDocumentButton.ClearValue(Button.BorderBrushProperty);
+            _selectedDocumentButton.ClearValue(Button.BorderThicknessProperty);
+        }
+
+        _selectedDocumentButton = sender as Button;
+        _selectedDocumentButton.BorderBrush = Brushes.Gray;
+        _selectedDocumentButton.BorderThickness = new Thickness(3);
+
+        _mainWindow.AddVersionButtons();
+    }
+
+    private void OnButtonDoubleClicked(object sender, RoutedEventArgs e)
+    {
+        if (_selectedDocumentButton != null)
+        {
+            var clickedButton = sender as Button;
+            var document = _documentManager.GetDocumentsByName(clickedButton.Content.ToString()).First();
+
+            _documentViewerWindow = new DocumentViewerPage(_mainWindow, _fileStorageManager, _versionControlManager, document);
+            _mainWindow.MainFrame.Navigate(_documentViewerWindow);
+            _mainWindow.AddVersionButtons();
+        }
+    }
+
+    private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (_selectedDocumentButton != null)
+        {
+            _selectedDocumentButton.ClearValue(Button.BorderBrushProperty);
+            _selectedDocumentButton.ClearValue(Button.BorderThicknessProperty);
+            _selectedDocumentButton = null;
+            _mainWindow.ClearVersionButtons();
+        }
+    }
+
+    private void AddDocumentClicked(object sender, RoutedEventArgs e)
+    {
+        var openFileDialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+            Title = "Select a text file to add",
+            Multiselect = false
+        };
+
+        bool? result = openFileDialog.ShowDialog();
+        if (result == true)
+        {
+            AddDocument(openFileDialog.FileName);
+        }
+    }
+
+    // Supportive methods
     public void AdjustGridLayout(int totalButtons)
     {
         double windowWidth = ActualWidth - 200;
@@ -177,6 +236,26 @@ public partial class HomePage : Page
         };
     }
 
+    private void CreateContextMenuForButton(Button button)
+    {
+        var contextMenu = new ContextMenu();
+
+        var openItem = new MenuItem { Header = "Open" };
+        openItem.Click += Open_Click;
+
+        var renameItem = new MenuItem { Header = "Rename" };
+        renameItem.Click += Rename_Click;
+
+        var removeItem = new MenuItem { Header = "Remove" };
+        removeItem.Click += Remove_Click;
+
+        contextMenu.Items.Add(openItem);
+        contextMenu.Items.Add(renameItem);
+        contextMenu.Items.Add(removeItem);
+
+        button.ContextMenu = contextMenu;
+    }
+
     private void ClearGridButtons()
     {
         ButtonGrid.Children.Clear();
@@ -189,61 +268,7 @@ public partial class HomePage : Page
         return _selectedDocumentButton;
     }
 
-    private void OnButtonClicked(object sender, RoutedEventArgs e)
-    {
-        if (_selectedDocumentButton != null)
-        {
-            _selectedDocumentButton.ClearValue(Button.BorderBrushProperty);
-            _selectedDocumentButton.ClearValue(Button.BorderThicknessProperty);
-        }
-
-        _selectedDocumentButton = sender as Button;
-        _selectedDocumentButton.BorderBrush = Brushes.Gray;
-        _selectedDocumentButton.BorderThickness = new Thickness(3);
-
-        _mainWindow.AddVersionButtons();
-    }
-
-    private void OnButtonDoubleClicked(object sender, RoutedEventArgs e)
-    {
-        if (_selectedDocumentButton != null)
-        {
-            var clickedButton = sender as Button;
-            var document = _documentManager.GetDocumentsByName(clickedButton.Content.ToString()).First();
-
-            _documentViewerWindow = new DocumentViewerPage(_mainWindow, _fileStorageManager, _versionControlManager, document);
-            _mainWindow.MainFrame.Navigate(_documentViewerWindow);
-            _mainWindow.AddVersionButtons();
-        }
-    }
-
-    private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (_selectedDocumentButton != null)
-        {
-            _selectedDocumentButton.ClearValue(Button.BorderBrushProperty);
-            _selectedDocumentButton.ClearValue(Button.BorderThicknessProperty);
-            _selectedDocumentButton = null;
-            _mainWindow.ClearVersionButtons();
-        }
-    }
-
-    private void AddDocumentClicked(object sender, RoutedEventArgs e)
-    {
-        var openFileDialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
-            Title = "Select a text file to add",
-            Multiselect = false
-        };
-
-        bool? result = openFileDialog.ShowDialog();
-        if (result == true)
-        {
-            AddDocument(openFileDialog.FileName);
-        }
-    }
-
+    // Document management methods
     private void AddDocument(string filePath)
     {
         try
@@ -263,26 +288,6 @@ public partial class HomePage : Page
         {
             new InfoPopup("Error", $"Error reading file {Path.GetFileName(filePath)}: {ex.Message}").Show();
         }
-    }
-
-    private void CreateContextMenuForButton(Button button)
-    {
-        var contextMenu = new ContextMenu();
-
-        var openItem = new MenuItem { Header = "Open" };
-        openItem.Click += Open_Click;
-
-        var renameItem = new MenuItem { Header = "Rename" };
-        renameItem.Click += Rename_Click;
-
-        var removeItem = new MenuItem { Header = "Remove" };
-        removeItem.Click += Remove_Click;
-
-        contextMenu.Items.Add(openItem);
-        contextMenu.Items.Add(renameItem);
-        contextMenu.Items.Add(removeItem);
-
-        button.ContextMenu = contextMenu;
     }
 
     private void Open_Click(object sender, RoutedEventArgs e)
@@ -310,7 +315,7 @@ public partial class HomePage : Page
         var document = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).FirstOrDefault();
         if (document == null)
         {
-            _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNotFound);
+            MainWindow.ShowInfoPopup(InfoPopupType.DocumentNotFound);
             return;
         }
 
@@ -327,50 +332,50 @@ public partial class HomePage : Page
 
             if (string.IsNullOrWhiteSpace(newName))
             {
-                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameEmpty);
+                MainWindow.ShowInfoPopup(InfoPopupType.DocumentNameEmpty);
                 return;
             }
 
             if (newName.Length > 50)
             {
-                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameTooLong);
+                MainWindow.ShowInfoPopup(InfoPopupType.DocumentNameTooLong);
                 return;
             }
 
             if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || newName.Contains('$'))
             {
-                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameContainsInvalidCharacters);
+                MainWindow.ShowInfoPopup(InfoPopupType.DocumentNameContainsInvalidCharacters);
                 return;
             }
 
             if (newName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
             {
-                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentNameCannotEndWithTxt);
+                MainWindow.ShowInfoPopup(InfoPopupType.DocumentNameCannotEndWithTxt);
                 return;
             }
 
             if (newName.Equals(document.Name, StringComparison.OrdinalIgnoreCase))
             {
-                _mainWindow.ShowInfoPopup(InfoPopupType.SameDocumentName);
+                MainWindow.ShowInfoPopup(InfoPopupType.SameDocumentName);
                 return;
             }
 
             if (_documentManager.GetDocumentsByName(newName).Any())
             {
-                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentAlreadyExistsInTheSystem);
+                MainWindow.ShowInfoPopup(InfoPopupType.DocumentAlreadyExistsInTheSystem);
                 return;
             }
 
             string newFilePath = Path.Combine(Path.GetDirectoryName(document.FilePath), newName + ".txt");
             if (_fileStorageManager.FileExists(newFilePath))
             {
-                _mainWindow.ShowInfoPopup(InfoPopupType.DocumentAlreadyExistsInTheRootPath);
+                MainWindow.ShowInfoPopup(InfoPopupType.DocumentAlreadyExistsInTheRootPath);
                 return;
             }
 
             _documentManager.RenameDocument(document, newName);
             AdjustGridLayout(_totalButtons);
-            _mainWindow.ShowInfoPopup(InfoPopupType.SuccessfulDocumentRename);
+            MainWindow.ShowInfoPopup(InfoPopupType.SuccessfulDocumentRename);
         }
     }
 
@@ -380,6 +385,6 @@ public partial class HomePage : Page
         _documentManager.DeleteDocument(document);
         AdjustGridLayout(_totalButtons);
         _mainWindow.ClearVersionButtons();
-        _mainWindow.ShowInfoPopup(InfoPopupType.SuccessfulDocumentRemove);
+        MainWindow.ShowInfoPopup(InfoPopupType.SuccessfulDocumentRemove);
     }
 }

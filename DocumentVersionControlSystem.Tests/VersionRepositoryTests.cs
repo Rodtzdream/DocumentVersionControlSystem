@@ -53,6 +53,56 @@ public class VersionRepositoryTests
     }
 
     [Fact]
+    public void AddVersion_ShouldAddVersionToDocument_WhenDocumentHasVersions()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<DatabaseContext>()
+            .UseInMemoryDatabase(databaseName: "AddDocument_ShouldAddDocumentToDatabase2")
+            .Options;
+
+        using (var context = new DatabaseContext(options))
+        {
+            var documentRepository = new DocumentRepository(context);
+            var versionRepository = new VersionRepository(context);
+
+            var document = new Document
+            {
+                Name = "Test Document",
+                FilePath = "C:\\Documents\\TestDocument.txt"
+            };
+
+            documentRepository.AddDocument(document);
+
+            var version1 = new Database.Models.Version
+            {
+                DocumentId = document.Id,
+                VersionDescription = "Test Version 1",
+                FilePath = "C:\\Documents\\Test_Document.v1.txt",
+                CreationDate = DateTime.Now
+            };
+
+            var version2 = new Database.Models.Version
+            {
+                DocumentId = document.Id,
+                VersionDescription = "Test Version 2",
+                FilePath = "C:\\Documents\\Test_Document.v2.txt",
+                CreationDate = DateTime.Now
+            };
+
+
+            // Act
+            versionRepository.AddVersion(document, version1);
+            versionRepository.AddVersion(document, version2);
+
+            // Assert
+            Assert.Equal(2, context.Versions.Count());
+            Assert.Single(context.Documents);
+            Assert.Equal(document.Id, version1.DocumentId);
+            Assert.Equal(document.Id, version2.DocumentId);
+        }
+    }
+
+    [Fact]
     public void GetVersionById_ShouldReturnVersion()
     {
         // Arrange
@@ -92,45 +142,6 @@ public class VersionRepositoryTests
             Assert.Equal(version.FilePath, result.FilePath);
             Assert.Equal(version.VersionDescription, result.VersionDescription);
             Assert.Equal(version.CreationDate.ToUniversalTime(), result.CreationDate.ToUniversalTime());
-        }
-    }
-
-    [Fact]
-    public void DeleteVersion_ShouldDeleteVersion()
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "DeleteVersion_ShouldDeleteVersion")
-            .Options;
-
-        using (var context = new DatabaseContext(options))
-        {
-            DocumentRepository documentRepository = new DocumentRepository(context);
-            VersionRepository versionRepository = new VersionRepository(context);
-
-            var document = new Document
-            {
-                Name = "Test Document",
-                FilePath = "C:\\Documents\\TestDocument.txt"
-            };
-
-            documentRepository.AddDocument(document);
-
-            var version = new Database.Models.Version
-            {
-                DocumentId = document.Id,
-                VersionDescription = "Test Version",
-                FilePath = "C:\\Documents\\Test_Document.v1.txt",
-                CreationDate = DateTime.Now
-            };
-
-            versionRepository.AddVersion(document, version);
-
-            // Act
-            versionRepository.DeleteVersion(document, version);
-
-            // Assert
-            Assert.Empty(context.Versions);
         }
     }
 
@@ -183,17 +194,21 @@ public class VersionRepositoryTests
     }
 
     [Fact]
-    public void SaveChanges_ShouldSaveChanges()
+    public void ChangeVersionDescription_ShouldChangeDescription()
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "SaveChanges_ShouldSaveChanges")
+            .UseInMemoryDatabase(databaseName: "ChangeVersionDescription_ShouldChangeDescription")
             .Options;
+
+        var mockFileStorage = new Mock<IFileStorageManager>(); // МОК файл-сховища
+        var mockDiffManager = new Mock<IDiffManager>(); // МОК порівняння файлів
 
         using (var context = new DatabaseContext(options))
         {
             var documentRepository = new DocumentRepository(context);
             var versionRepository = new VersionRepository(context);
+            var versionControlManager = new VersionControlManager("AppFolderPath", _mockLogger.Object, mockFileStorage.Object, mockDiffManager.Object, context);
 
             var document = new Document
             {
@@ -206,68 +221,18 @@ public class VersionRepositoryTests
             var version = new Database.Models.Version
             {
                 DocumentId = document.Id,
-                VersionDescription = "Test Version",
+                VersionDescription = "Old Description",
                 FilePath = "C:\\Documents\\Test_Document.v1.txt",
                 CreationDate = DateTime.Now
             };
 
-            // Act
             versionRepository.AddVersion(document, version);
 
-            // Assert
-            Assert.Single(context.Versions);
-            Assert.Single(context.Documents);
-            Assert.Equal(document.Id, version.DocumentId);
-        }
-    }
-
-    [Fact]
-    public void AddVersion_ShouldAddVersionToDocument_WhenDocumentHasVersions()
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "AddDocument_ShouldAddDocumentToDatabase2")
-            .Options;
-
-        using (var context = new DatabaseContext(options))
-        {
-            var documentRepository = new DocumentRepository(context);
-            var versionRepository = new VersionRepository(context);
-
-            var document = new Document
-            {
-                Name = "Test Document",
-                FilePath = "C:\\Documents\\TestDocument.txt"
-            };
-
-            documentRepository.AddDocument(document);
-
-            var version1 = new Database.Models.Version
-            {
-                DocumentId = document.Id,
-                VersionDescription = "Test Version 1",
-                FilePath = "C:\\Documents\\Test_Document.v1.txt",
-                CreationDate = DateTime.Now
-            };
-
-            var version2 = new Database.Models.Version
-            {
-                DocumentId = document.Id,
-                VersionDescription = "Test Version 2",
-                FilePath = "C:\\Documents\\Test_Document.v2.txt",
-                CreationDate = DateTime.Now
-            };
-
-
             // Act
-            versionRepository.AddVersion(document, version1);
-            versionRepository.AddVersion(document, version2);
+            versionControlManager.ChangeVersionDescription(version.Id, "New Description");
 
             // Assert
-            Assert.Equal(2, context.Versions.Count());
-            Assert.Single(context.Documents);
-            Assert.Equal(document.Id, version1.DocumentId);
-            Assert.Equal(document.Id, version2.DocumentId);
+            Assert.Equal("New Description", context.Versions.First().VersionDescription);
         }
     }
 
@@ -390,21 +355,17 @@ public class VersionRepositoryTests
     }
 
     [Fact]
-    public void ChangeVersionDescription_ShouldChangeDescription()
+    public void SaveChanges_ShouldSaveChanges()
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "ChangeVersionDescription_ShouldChangeDescription")
+            .UseInMemoryDatabase(databaseName: "SaveChanges_ShouldSaveChanges")
             .Options;
-
-        var mockFileStorage = new Mock<IFileStorageManager>(); // МОК файл-сховища
-        var mockDiffManager = new Mock<IDiffManager>(); // МОК порівняння файлів
 
         using (var context = new DatabaseContext(options))
         {
             var documentRepository = new DocumentRepository(context);
             var versionRepository = new VersionRepository(context);
-            var versionControlManager = new VersionControlManager("AppFolderPath", _mockLogger.Object, mockFileStorage.Object, mockDiffManager.Object, context);
 
             var document = new Document
             {
@@ -417,7 +378,46 @@ public class VersionRepositoryTests
             var version = new Database.Models.Version
             {
                 DocumentId = document.Id,
-                VersionDescription = "Old Description",
+                VersionDescription = "Test Version",
+                FilePath = "C:\\Documents\\Test_Document.v1.txt",
+                CreationDate = DateTime.Now
+            };
+
+            // Act
+            versionRepository.AddVersion(document, version);
+
+            // Assert
+            Assert.Single(context.Versions);
+            Assert.Single(context.Documents);
+            Assert.Equal(document.Id, version.DocumentId);
+        }
+    }
+
+    [Fact]
+    public void DeleteVersion_ShouldDeleteVersion()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<DatabaseContext>()
+            .UseInMemoryDatabase(databaseName: "DeleteVersion_ShouldDeleteVersion")
+            .Options;
+
+        using (var context = new DatabaseContext(options))
+        {
+            DocumentRepository documentRepository = new DocumentRepository(context);
+            VersionRepository versionRepository = new VersionRepository(context);
+
+            var document = new Document
+            {
+                Name = "Test Document",
+                FilePath = "C:\\Documents\\TestDocument.txt"
+            };
+
+            documentRepository.AddDocument(document);
+
+            var version = new Database.Models.Version
+            {
+                DocumentId = document.Id,
+                VersionDescription = "Test Version",
                 FilePath = "C:\\Documents\\Test_Document.v1.txt",
                 CreationDate = DateTime.Now
             };
@@ -425,10 +425,10 @@ public class VersionRepositoryTests
             versionRepository.AddVersion(document, version);
 
             // Act
-            versionControlManager.ChangeVersionDescription(version.Id, "New Description");
+            versionRepository.DeleteVersion(document, version);
 
             // Assert
-            Assert.Equal("New Description", context.Versions.First().VersionDescription);
+            Assert.Empty(context.Versions);
         }
     }
 }

@@ -10,15 +10,15 @@ public partial class InputPopup : Window
         this.MessageText.Text = _messageText;
     }
 
-    private void CancelButton_Click(object sender, RoutedEventArgs e)
-    {
-        this.DialogResult = false;
-        this.Close();
-    }
-
     private void ConfirmButton_Click(object sender, RoutedEventArgs e)
     {
         this.DialogResult = true;
+        this.Close();
+    }
+
+    private void CancelButton_Click(object sender, RoutedEventArgs e)
+    {
+        this.DialogResult = false;
         this.Close();
     }
 

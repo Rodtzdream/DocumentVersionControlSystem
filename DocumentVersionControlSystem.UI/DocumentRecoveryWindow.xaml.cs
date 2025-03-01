@@ -15,6 +15,7 @@ public partial class DocumentRecoveryWindow : Window
     public ObservableCollection<MissingDocumentViewModel> _missingDocuments;
     private readonly InfoPopup _infoPopup;
 
+    // Constructor
     public DocumentRecoveryWindow(ObservableCollection<MissingDocumentViewModel> missedDocuments)
     {
         InitializeComponent();
@@ -23,6 +24,7 @@ public partial class DocumentRecoveryWindow : Window
         MissingDocumentsList.ItemsSource = _missingDocuments;
     }
 
+    // Event handlers
     private void MissingDocumentsList_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         if (MissingDocumentsList.View is GridView gridView)
@@ -43,23 +45,6 @@ public partial class DocumentRecoveryWindow : Window
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
     {
         OpenFileDialogAndSetNewPath();
-    }
-
-    private void OpenFileDialogAndSetNewPath()
-    {
-        if (MissingDocumentsList.SelectedItem is MissingDocumentViewModel selectedDocument)
-        {
-            var openFileDialog = new Microsoft.Win32.OpenFileDialog
-            {
-                Title = "Select New Document Path",
-                Filter = "Text files (*.txt)|*.txt"
-            };
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                selectedDocument.NewPath = openFileDialog.FileName;
-            }
-        }
     }
 
     private void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -94,17 +79,6 @@ public partial class DocumentRecoveryWindow : Window
         }
     }
 
-    private ListViewItem? GetListViewItemAt(Point position)
-    {
-        HitTestResult hitTestResult = VisualTreeHelper.HitTest(MissingDocumentsList, position);
-        DependencyObject obj = hitTestResult.VisualHit;
-        while (obj != null && obj is not ListViewItem)
-        {
-            obj = VisualTreeHelper.GetParent(obj);
-        }
-        return obj as ListViewItem;
-    }
-
     private void MissingDocumentsList_DragLeave(object sender, DragEventArgs e)
     {
         MissingDocumentsList.SelectedItem = null;
@@ -133,11 +107,41 @@ public partial class DocumentRecoveryWindow : Window
         }
     }
 
+    // Support methods
+    private void OpenFileDialogAndSetNewPath()
+    {
+        if (MissingDocumentsList.SelectedItem is MissingDocumentViewModel selectedDocument)
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Select New Document Path",
+                Filter = "Text files (*.txt)|*.txt"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                selectedDocument.NewPath = openFileDialog.FileName;
+            }
+        }
+    }
+
+    private ListViewItem? GetListViewItemAt(Point position)
+    {
+        HitTestResult hitTestResult = VisualTreeHelper.HitTest(MissingDocumentsList, position);
+        DependencyObject obj = hitTestResult.VisualHit;
+        while (obj != null && obj is not ListViewItem)
+        {
+            obj = VisualTreeHelper.GetParent(obj);
+        }
+        return obj as ListViewItem;
+    }
+
     private void ShowInvalidFileFormatPopup()
     {
         _infoPopup.Show();
     }
 
+    // Internal class
     public class MissingDocumentViewModel : INotifyPropertyChanged
     {
         private string? _newPath;

@@ -15,6 +15,7 @@ public class VersionControlManager
     private readonly Logging.Logger _logger;
     private readonly string _appFolderPath;
 
+    // Constructor
     public VersionControlManager(string appFolderPath, Logging.Logger logger, IFileStorageManager fileStorageManager, IDiffManager diffManager, DatabaseContext databaseContext)
     {
         _appFolderPath = appFolderPath;
@@ -25,6 +26,7 @@ public class VersionControlManager
         _diffManager = diffManager;
     }
 
+    // Methods for getting data
     public Version GetVersionById(int id)
     {
         return _versionRepository.GetVersionById(id);
@@ -35,6 +37,7 @@ public class VersionControlManager
         return _versionRepository.GetVersionsByDocumentId(documentId);
     }
 
+    // Methods for adding, updating data
     public bool CreateNewVersion(Document document, string versionDescription)
     {
         var latestVersion = _versionRepository.GetLatestVersionByDocumentId(document.Id);
@@ -129,6 +132,7 @@ public class VersionControlManager
         _logger.LogInformation($"Version {versionId} description changed to '{newDescription}'");
     }
 
+    // Method for deleting data
     public void DeleteVersion(int versionId)
     {
         var version = GetVersionById(versionId);

@@ -6,11 +6,13 @@ public class VersionRepository
 {
     private readonly DatabaseContext _context;
 
+    // Constructor
     public VersionRepository(DatabaseContext context)
     {
         _context = context;
     }
 
+    // Methods for getting data
     public Models.Version? GetVersionById(int id)
     {
         return _context.Versions.AsNoTracking().FirstOrDefault(v => v.Id == id);
@@ -34,6 +36,7 @@ public class VersionRepository
             .FirstOrDefault();
     }
 
+    // Methods for adding, updating data
     public void AddVersion(Models.Document document, Models.Version version)
     {
         document.VersionCount++;
@@ -57,6 +60,7 @@ public class VersionRepository
         }
     }
 
+    // Methods for deleting data
     public void DeleteVersion(Models.Document document, Models.Version version)
     {
         var existingVersion = _context.Versions.Find(version.Id);

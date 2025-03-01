@@ -38,6 +38,7 @@ public partial class MainWindow : Window
     private TextBlock _selectDocumentTextBlock, _noVersionsAvailableTextBlock;
     private StackPanel _buttonStackPanel, _navigationButtonsStackPanel;
 
+    // Constructor and initialization
     public MainWindow()
     {
         InitializeComponent();
@@ -74,6 +75,20 @@ public partial class MainWindow : Window
         }
     }
 
+    private void InitializeDynamicGrid()
+    {
+        SizeChanged += OnWindowSizeChanged;
+        Activated += MainWindow_Activated;
+        _documentManager.InitializeFileWatchers();
+    }
+
+    // Static methods
+    public static void ShowInfoPopup(InfoPopupType popupType)
+    {
+        new InfoPopup(popupType).Show();
+    }
+
+    // Event window handlers
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         MainFrame.Navigate(_homePage);
@@ -84,20 +99,6 @@ public partial class MainWindow : Window
         _noVersionsAvailableTextBlock = CreateTextBlock("No versions available");
 
         ClearVersionButtons();
-    }
-
-    private TextBlock CreateTextBlock(string text)
-    {
-        return new TextBlock
-        {
-            Text = text,
-            FontSize = 16,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-            Foreground = Brushes.Black,
-            Margin = new Thickness(0, _buttonStackPanel.ActualHeight - ActualHeight / 2, 0, 0),
-            IsHitTestVisible = false
-        };
     }
 
     private void MainWindow_Activated(object sender, EventArgs e)
@@ -129,47 +130,6 @@ public partial class MainWindow : Window
                     NavigateToHomePage(allDocumentsCount, InfoPopupType.LoadVersionFailed);
                 }
                 break;
-        }
-    }
-
-    private void NavigateToHomePage(int allDocumentsCount, InfoPopupType popupType)
-    {
-        MainFrame.Navigate(_homePage);
-        _homePage.AdjustGridLayout(allDocumentsCount);
-        ClearVersionButtons();
-        ShowInfoPopup(popupType);
-    }
-
-    public void RecoverDocuments(List<Document> missingDocs)
-    {
-        var missingDocuments = new ObservableCollection<MissingDocumentViewModel>();
-
-        foreach (var doc in missingDocs)
-        {
-            missingDocuments.Add(new MissingDocumentViewModel
-            {
-                DocumentName = doc.Name,
-                OldPath = doc.FilePath,
-                NewPath = string.Empty
-            });
-        }
-
-        var recoverDocumentsWindow = new DocumentRecoveryWindow(missingDocuments);
-        var result = recoverDocumentsWindow.ShowDialog();
-
-        if (result == true)
-        {
-            foreach (var document in missingDocuments)
-            {
-                if (document.NewPath.StartsWith('<'))
-                {
-                    _documentManager.DeleteDocument(document.OldPath);
-                }
-                else if (!string.IsNullOrEmpty(document.NewPath))
-                {
-                    _documentManager.RecoverDocument(document.OldPath, document.NewPath, false);
-                }
-            }
         }
     }
 
@@ -217,207 +177,36 @@ public partial class MainWindow : Window
         }
     }
 
-    private void InitializeDynamicGrid()
+    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        SizeChanged += OnWindowSizeChanged;
-        Activated += MainWindow_Activated;
-        _documentManager.InitializeFileWatchers();
-    }
-
-    private void OnButtonVersionClicked(object sender, RoutedEventArgs e)
-    {
-        if (sender is not Button clickedButton || clickedButton == _selectedVersionButton || clickedButton == _currentVersionButton)
-            return;
-
-        _selectedVersionButton?.ClearValue(Button.BorderBrushProperty);
-        _selectedVersionButton?.ClearValue(Button.BorderThicknessProperty);
-
-        _selectedVersionButton = clickedButton;
-        clickedButton.BorderBrush = Brushes.Gray;
-        clickedButton.BorderThickness = new Thickness(3);
-    }
-
-    private void OnButtonVersionDoubleClicked(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button clickedButton && clickedButton.CommandParameter is int versionId)
+        if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
         {
-            if (_currentVersionButton == null || clickedButton.CommandParameter != _currentVersionButton.CommandParameter)
+            switch (e.SystemKey)
             {
-                var version = _versionControlManager.GetVersionById(versionId);
-                OpenVersionViewer(version);
-                AddVersionButtons(versionId);
+                case Key.Left:
+                    PreviousButton_Click(sender, e);
+                    e.Handled = true;
+                    break;
+                case Key.Right:
+                    NextButton_Click(sender, e);
+                    e.Handled = true;
+                    break;
             }
         }
-    }
-
-    private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (_selectedVersionButton != null)
+        else if (e.Key == Key.Home)
         {
-            _selectedVersionButton.ClearValue(Button.BorderBrushProperty);
-            _selectedVersionButton.ClearValue(Button.BorderThicknessProperty);
-            _selectedVersionButton = null;
+            HomeButton_Click(sender, e);
+            e.Handled = true;
         }
     }
 
-    private void OpenVersionViewer(Database.Models.Version version)
+    // Navigation
+    private void NavigateToHomePage(int allDocumentsCount, InfoPopupType popupType)
     {
-        var versionDetailsWindow = new VersionDetailsPage(this, _fileStorageManager, version, _versionControlManager);
-        MainFrame.Navigate(versionDetailsWindow);
-    }
-
-    public void AddVersionButtons(int currentVersionId = -1)
-    {
-        if (_buttonStackPanel != null)
-        {
-            _buttonStackPanel.Children.Clear();
-
-            _selectedDocumentButton = _homePage.GetSelectedButton();
-
-            var documentId = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First().Id;
-            var versions = _versionControlManager.GetVersionsByDocumentId(documentId);
-
-            if (versions.Count == 0)
-            {
-                _buttonStackPanel.Children.Add(_noVersionsAvailableTextBlock);
-                return;
-            }
-
-            foreach (var version in versions)
-            {
-                var button = CreateVersionButton(version, currentVersionId);
-                _buttonStackPanel.Children.Add(button);
-            }
-        }
-    }
-
-    private Button CreateVersionButton(Database.Models.Version version, int currentVersionId)
-    {
-        var button = new Button
-        {
-            Content = version.CreationDate.ToString(),
-            Tag = version.VersionDescription,
-            Style = (Style)FindResource("RectangleButtonStyle"),
-            Margin = new Thickness(0, 8, 0, 0),
-            CommandParameter = version.Id,
-            ToolTip = $"{version.VersionDescription}.txt{Environment.NewLine}Created: {version.CreationDate}",
-            Width = _buttonStackPanel.ActualWidth * 0.95,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            MinWidth = 140,
-            MinHeight = 40
-        };
-
-        if (currentVersionId == version.Id)
-        {
-            _currentVersionButton = button;
-            _currentVersionButton.BorderBrush = Brushes.Black;
-            _currentVersionButton.BorderThickness = new Thickness(2.5);
-        }
-
-        button.Click += OnButtonVersionClicked;
-        button.MouseRightButtonDown += OnButtonVersionClicked;
-        button.MouseDoubleClick += OnButtonVersionDoubleClicked;
-
-        CreateContextMenuForVersionButton(button);
-        return button;
-    }
-
-    public void ClearVersionButtons()
-    {
-        if (_buttonStackPanel != null)
-        {
-            _buttonStackPanel.Children.Clear();
-            _buttonStackPanel.Children.Add(_selectDocumentTextBlock);
-        }
-    }
-
-    private void CreateContextMenuForVersionButton(Button button)
-    {
-        var contextMenu = new ContextMenu();
-
-        var openVersion = new MenuItem { Header = "Open" };
-        openVersion.Click += OpenVersion_Click;
-
-        var changeVersionDescription = new MenuItem { Header = "Change description" };
-        changeVersionDescription.Click += ChangeDescription_Click;
-
-        var deleteVersion = new MenuItem { Header = "Delete" };
-        deleteVersion.Click += DeleteVersion_Click;
-
-        contextMenu.Items.Add(openVersion);
-        contextMenu.Items.Add(changeVersionDescription);
-        contextMenu.Items.Add(deleteVersion);
-
-        button.ContextMenu = contextMenu;
-    }
-
-    private void OpenVersion_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
-        {
-            var parentButton = contextMenu.PlacementTarget as Button;
-
-            if (parentButton != null)
-            {
-                if (_currentVersionButton == null || parentButton.CommandParameter != _currentVersionButton.CommandParameter)
-                {
-                    var versionId = (int)parentButton.CommandParameter;
-                    var version = _versionControlManager.GetVersionById(versionId);
-                    var versionDetailsWindow = new VersionDetailsPage(this, _fileStorageManager, version, _versionControlManager);
-                    MainFrame.Navigate(versionDetailsWindow);
-                }
-            }
-        }
-    }
-
-    private void ChangeDescription_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
-        {
-            var parentButton = contextMenu.PlacementTarget as Button;
-
-            if (parentButton != null)
-            {
-                var popup = new InputPopup
-                {
-                    TitleText = { Text = "Change version description" },
-                    MessageText = { Text = parentButton.Tag.ToString() }
-                };
-                popup.ShowDialog();
-
-                var newName = popup.MessageText.Text;
-                _versionControlManager.ChangeVersionDescription((int)parentButton.CommandParameter, newName);
-                AddVersionButtons();
-            }
-        }
-    }
-
-    private void DeleteVersion_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
-        {
-            var parentButton = contextMenu.PlacementTarget as Button;
-
-            if (parentButton != null)
-            {
-                if (_currentVersionButton != null && parentButton.CommandParameter == _currentVersionButton.CommandParameter)
-                {
-                    _versionControlManager.DeleteVersion((int)parentButton.CommandParameter);
-                    MainFrame.Navigate(_homePage);
-                    ClearVersionButtons();
-                    ShowInfoPopup(InfoPopupType.CurrentVersionDeleted);
-                }
-                else
-                {
-                    _versionControlManager.DeleteVersion((int)parentButton.CommandParameter);
-
-                    if (MainFrame.Content is VersionDetailsPage && _currentVersionButton != null)
-                        AddVersionButtons((int)_currentVersionButton.CommandParameter);
-                    else
-                        AddVersionButtons();
-                }
-            }
-        }
+        MainFrame.Navigate(_homePage);
+        _homePage.AdjustGridLayout(allDocumentsCount);
+        ClearVersionButtons();
+        ShowInfoPopup(popupType);
     }
 
     private void HomeButton_Click(object sender, RoutedEventArgs e)
@@ -536,31 +325,249 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+    // Document handling
+    public void RecoverDocuments(List<Document> missingDocs)
     {
-        if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+        var missingDocuments = new ObservableCollection<MissingDocumentViewModel>();
+
+        foreach (var doc in missingDocs)
         {
-            switch (e.SystemKey)
+            missingDocuments.Add(new MissingDocumentViewModel
             {
-                case Key.Left:
-                    PreviousButton_Click(sender, e);
-                    e.Handled = true;
-                    break;
-                case Key.Right:
-                    NextButton_Click(sender, e);
-                    e.Handled = true;
-                    break;
-            }
+                DocumentName = doc.Name,
+                OldPath = doc.FilePath,
+                NewPath = string.Empty
+            });
         }
-        else if (e.Key == Key.Home)
+
+        var recoverDocumentsWindow = new DocumentRecoveryWindow(missingDocuments);
+        var result = recoverDocumentsWindow.ShowDialog();
+
+        if (result == true)
         {
-            HomeButton_Click(sender, e);
-            e.Handled = true;
+            foreach (var document in missingDocuments)
+            {
+                if (document.NewPath.StartsWith('<'))
+                {
+                    _documentManager.DeleteDocument(document.OldPath);
+                }
+                else if (!string.IsNullOrEmpty(document.NewPath))
+                {
+                    _documentManager.RecoverDocument(document.OldPath, document.NewPath, false);
+                }
+            }
         }
     }
 
-    public void ShowInfoPopup(InfoPopupType popupType)
+    public void AddVersionButtons(int currentVersionId = -1)
     {
-        new InfoPopup(popupType).Show();
+        if (_buttonStackPanel != null)
+        {
+            _buttonStackPanel.Children.Clear();
+
+            _selectedDocumentButton = _homePage.GetSelectedButton();
+
+            var documentId = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First().Id;
+            var versions = _versionControlManager.GetVersionsByDocumentId(documentId);
+
+            if (versions.Count == 0)
+            {
+                _buttonStackPanel.Children.Add(_noVersionsAvailableTextBlock);
+                return;
+            }
+
+            foreach (var version in versions)
+            {
+                var button = CreateVersionButton(version, currentVersionId);
+                _buttonStackPanel.Children.Add(button);
+            }
+        }
+    }
+
+    public void ClearVersionButtons()
+    {
+        if (_buttonStackPanel != null)
+        {
+            _buttonStackPanel.Children.Clear();
+            _buttonStackPanel.Children.Add(_selectDocumentTextBlock);
+        }
+    }
+
+    private void OpenVersionViewer(Database.Models.Version version)
+    {
+        var versionDetailsWindow = new VersionDetailsPage(this, _fileStorageManager, version, _versionControlManager);
+        MainFrame.Navigate(versionDetailsWindow);
+    }
+
+    // Button event handlers
+    private void OnButtonVersionClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button clickedButton || clickedButton == _selectedVersionButton || clickedButton == _currentVersionButton)
+            return;
+
+        _selectedVersionButton?.ClearValue(Button.BorderBrushProperty);
+        _selectedVersionButton?.ClearValue(Button.BorderThicknessProperty);
+
+        _selectedVersionButton = clickedButton;
+        clickedButton.BorderBrush = Brushes.Gray;
+        clickedButton.BorderThickness = new Thickness(3);
+    }
+
+    private void OnButtonVersionDoubleClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button clickedButton && clickedButton.CommandParameter is int versionId)
+        {
+            if (_currentVersionButton == null || clickedButton.CommandParameter != _currentVersionButton.CommandParameter)
+            {
+                var version = _versionControlManager.GetVersionById(versionId);
+                OpenVersionViewer(version);
+                AddVersionButtons(versionId);
+            }
+        }
+    }
+
+    private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (_selectedVersionButton != null)
+        {
+            _selectedVersionButton.ClearValue(Button.BorderBrushProperty);
+            _selectedVersionButton.ClearValue(Button.BorderThicknessProperty);
+            _selectedVersionButton = null;
+        }
+    }
+
+    private Button CreateVersionButton(Database.Models.Version version, int currentVersionId)
+    {
+        var button = new Button
+        {
+            Content = version.CreationDate.ToString(),
+            Tag = version.VersionDescription,
+            Style = (Style)FindResource("RectangleButtonStyle"),
+            Margin = new Thickness(0, 8, 0, 0),
+            CommandParameter = version.Id,
+            ToolTip = $"{version.VersionDescription}.txt{Environment.NewLine}Created: {version.CreationDate}",
+            Width = _buttonStackPanel.ActualWidth * 0.95,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            MinWidth = 140,
+            MinHeight = 40
+        };
+
+        if (currentVersionId == version.Id)
+        {
+            _currentVersionButton = button;
+            _currentVersionButton.BorderBrush = Brushes.Black;
+            _currentVersionButton.BorderThickness = new Thickness(2.5);
+        }
+
+        button.Click += OnButtonVersionClicked;
+        button.MouseRightButtonDown += OnButtonVersionClicked;
+        button.MouseDoubleClick += OnButtonVersionDoubleClicked;
+
+        CreateContextMenuForVersionButton(button);
+        return button;
+    }
+
+    private void CreateContextMenuForVersionButton(Button button)
+    {
+        var contextMenu = new ContextMenu();
+
+        var openVersion = new MenuItem { Header = "Open" };
+        openVersion.Click += OpenVersion_Click;
+
+        var changeVersionDescription = new MenuItem { Header = "Change description" };
+        changeVersionDescription.Click += ChangeDescription_Click;
+
+        var deleteVersion = new MenuItem { Header = "Delete" };
+        deleteVersion.Click += DeleteVersion_Click;
+
+        contextMenu.Items.Add(openVersion);
+        contextMenu.Items.Add(changeVersionDescription);
+        contextMenu.Items.Add(deleteVersion);
+
+        button.ContextMenu = contextMenu;
+    }
+
+    private void OpenVersion_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
+        {
+            var parentButton = contextMenu.PlacementTarget as Button;
+
+            if (parentButton != null)
+            {
+                if (_currentVersionButton == null || parentButton.CommandParameter != _currentVersionButton.CommandParameter)
+                {
+                    var versionId = (int)parentButton.CommandParameter;
+                    var version = _versionControlManager.GetVersionById(versionId);
+                    var versionDetailsWindow = new VersionDetailsPage(this, _fileStorageManager, version, _versionControlManager);
+                    MainFrame.Navigate(versionDetailsWindow);
+                }
+            }
+        }
+    }
+
+    private void ChangeDescription_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
+        {
+            var parentButton = contextMenu.PlacementTarget as Button;
+
+            if (parentButton != null)
+            {
+                var popup = new InputPopup
+                {
+                    TitleText = { Text = "Change version description" },
+                    MessageText = { Text = parentButton.Tag.ToString() }
+                };
+                popup.ShowDialog();
+
+                var newName = popup.MessageText.Text;
+                _versionControlManager.ChangeVersionDescription((int)parentButton.CommandParameter, newName);
+                AddVersionButtons();
+            }
+        }
+    }
+
+    private void DeleteVersion_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem && menuItem.Parent is ContextMenu contextMenu)
+        {
+            var parentButton = contextMenu.PlacementTarget as Button;
+
+            if (parentButton != null)
+            {
+                if (_currentVersionButton != null && parentButton.CommandParameter == _currentVersionButton.CommandParameter)
+                {
+                    _versionControlManager.DeleteVersion((int)parentButton.CommandParameter);
+                    MainFrame.Navigate(_homePage);
+                    ClearVersionButtons();
+                    ShowInfoPopup(InfoPopupType.CurrentVersionDeleted);
+                }
+                else
+                {
+                    _versionControlManager.DeleteVersion((int)parentButton.CommandParameter);
+
+                    if (MainFrame.Content is VersionDetailsPage && _currentVersionButton != null)
+                        AddVersionButtons((int)_currentVersionButton.CommandParameter);
+                    else
+                        AddVersionButtons();
+                }
+            }
+        }
+    }
+
+    // Supportive methods
+    private TextBlock CreateTextBlock(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            FontSize = 16,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Foreground = Brushes.Black,
+            Margin = new Thickness(0, _buttonStackPanel.ActualHeight - ActualHeight / 2, 0, 0),
+            IsHitTestVisible = false
+        };
     }
 }

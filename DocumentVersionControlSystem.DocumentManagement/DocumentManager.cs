@@ -14,6 +14,7 @@ public class DocumentManager
     private bool _isFileInternallyRenamed;
     private bool _isFileExternallyDeleted;
 
+    // Constructor
     public DocumentManager(string appFolderPath, DatabaseContext databaseContext, IFileStorageManager fileStorageManager, Logging.Logger logger)
     {
         _appFolderPath = appFolderPath;
@@ -26,6 +27,7 @@ public class DocumentManager
         _isFileExternallyDeleted = false;
     }
 
+    // Methods for initializing and stopping file watchers
     public void InitializeFileWatchers()
     {
         var documents = _documentRepository.GetAllDocuments();
@@ -41,6 +43,14 @@ public class DocumentManager
         }
     }
 
+    public void StopAllWatchers()
+    {
+        foreach (var watcher in _fileWatchers)
+            watcher.Stop();
+        _fileWatchers.Clear();
+    }
+
+    // Methods for handling file changes
     private void HandleFileRenamed(string oldPath, string newPath)
     {
         if (_isFileInternallyRenamed)
@@ -62,13 +72,7 @@ public class DocumentManager
         _isFileExternallyDeleted = true;
     }
 
-    public void StopAllWatchers()
-    {
-        foreach (var watcher in _fileWatchers)
-            watcher.Stop();
-        _fileWatchers.Clear();
-    }
-
+    // Methods for getting and setting file change flags
     public bool IsFileExternallyDeleted()
     {
         return _isFileExternallyDeleted;
@@ -79,6 +83,7 @@ public class DocumentManager
         _isFileExternallyDeleted = value;
     }
 
+    // Methods for getting data
     public List<Document> GetAllDocuments()
     {
         return _documentRepository.GetAllDocuments();
@@ -103,11 +108,12 @@ public class DocumentManager
         return nonExistentDocuments;
     }
 
+    // Methods for adding, renaming documents
     public bool AddDocument(string filePath)
     {
         if (GetDocumentsByName(Path.GetFileNameWithoutExtension(filePath)).Count != 0)
         {
-            _logger.LogError($"Document {filePath} already exists");
+            _logger.LogWarning($"Document {filePath} already exists");
             return false;
         }
 
@@ -147,13 +153,13 @@ public class DocumentManager
 
             if (!_fileStorageManager.FileExists(oldFilePath))
             {
-                _logger.LogError($"RenameDocument: File {oldFilePath} does not exist.");
+                _logger.LogWarning($"RenameDocument: File {oldFilePath} does not exist.");
                 return;
             }
 
             if (_fileStorageManager.FileExists(newFilePath))
             {
-                _logger.LogError($"RenameDocument: File {newFilePath} already exists.");
+                _logger.LogWarning($"RenameDocument: File {newFilePath} already exists.");
                 return;
             }
 
@@ -179,7 +185,7 @@ public class DocumentManager
         var document = _documentRepository.GetDocumentByPath(oldFilePath);
         if (document == null)
         {
-            _logger.LogError($"RecoverDocument: Document with path {oldFilePath} does not exist.");
+            _logger.LogWarning($"RecoverDocument: Document with path {oldFilePath} does not exist.");
             return;
         }
 
@@ -211,6 +217,7 @@ public class DocumentManager
             : $"Document {document.Id} recovered successfully.");
     }
 
+    // Methods for deleting documents
     public void DeleteDocument(Document document)
     {
         _documentRepository.DeleteDocument(document);
@@ -229,7 +236,7 @@ public class DocumentManager
         var document = _documentRepository.GetDocumentByPath(filePath);
         if (document == null)
         {
-            _logger.LogError($"DeleteDocument: Document with path {filePath} does not exist.");
+            _logger.LogWarning($"DeleteDocument: Document with path {filePath} does not exist.");
             return;
         }
         DeleteDocument(document);

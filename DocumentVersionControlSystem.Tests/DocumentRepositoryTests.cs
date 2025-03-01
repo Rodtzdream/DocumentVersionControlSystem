@@ -34,34 +34,6 @@ public class DocumentRepositoryTests
     }
 
     [Fact]
-    public void GetDocumentById_ShouldReturnDocument()
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "GetDocumentById_ShouldReturnDocument")
-            .Options;
-
-        using (var context = new DatabaseContext(options))
-        {
-            var documentRepository = new DocumentRepository(context);
-            var document = new Document
-            {
-                Name = "Test Document",
-                FilePath = "test.txt",
-                CreationDate = DateTime.Now
-            };
-
-            documentRepository.AddDocument(document);
-
-            // Act
-            var result = documentRepository.GetDocumentById(1);
-
-            // Assert
-            Assert.NotNull(result);
-        }
-    }
-
-    [Fact]
     public void GetAllDocuments_ShouldReturnAllDocuments()
     {
         // Arrange
@@ -102,11 +74,11 @@ public class DocumentRepositoryTests
     }
 
     [Fact]
-    public void UpdateDocument_ShouldUpdateDocumentInDatabase()
+    public void GetDocumentById_ShouldReturnDocument()
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "UpdateDocument_ShouldUpdateDocumentInDatabase")
+            .UseInMemoryDatabase(databaseName: "GetDocumentById_ShouldReturnDocument")
             .Options;
 
         using (var context = new DatabaseContext(options))
@@ -122,40 +94,30 @@ public class DocumentRepositoryTests
             documentRepository.AddDocument(document);
 
             // Act
-            document.Name = "Updated Test Document";
-            documentRepository.UpdateDocument(document);
+            var result = documentRepository.GetDocumentById(1);
 
             // Assert
-            var result = documentRepository.GetDocumentById(1);
-            Assert.Equal("Updated Test Document", result.Name);
+            Assert.NotNull(result);
         }
     }
 
     [Fact]
-    public void DeleteDocument_ShouldDeleteDocumentFromDatabase()
+    public void GetDocumentById_ShouldReturnNullIfDocumentDoesNotExist()
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "DeleteDocument_ShouldDeleteDocumentFromDatabase")
+            .UseInMemoryDatabase(databaseName: "GetDocumentById_ShouldReturnNullIfDocumentDoesNotExist")
             .Options;
 
         using (var context = new DatabaseContext(options))
         {
             var documentRepository = new DocumentRepository(context);
-            var document = new Document
-            {
-                Name = "Test Document",
-                FilePath = "test.txt",
-                CreationDate = DateTime.Now
-            };
-
-            documentRepository.AddDocument(document);
 
             // Act
-            documentRepository.DeleteDocument(document);
+            var result = documentRepository.GetDocumentById(1);
 
             // Assert
-            Assert.Empty(context.Documents);
+            Assert.Null(result);
         }
     }
 
@@ -226,29 +188,22 @@ public class DocumentRepositoryTests
     }
 
     [Fact]
-    public void SaveChanges_ShouldSaveChangesToDatabase()
+    public void GetDocumentByPath_ShouldReturnNullIfDocumentDoesNotExist()
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "SaveChanges_ShouldSaveChangesToDatabase")
+            .UseInMemoryDatabase(databaseName: "GetDocumentByPath_ShouldReturnNullIfDocumentDoesNotExist")
             .Options;
 
         using (var context = new DatabaseContext(options))
         {
             var documentRepository = new DocumentRepository(context);
-            var document = new Document
-            {
-                Name = "Test Document",
-                FilePath = "test.txt",
-                CreationDate = DateTime.Now
-            };
-
-            documentRepository.AddDocument(document);
 
             // Act
+            var result = documentRepository.GetDocumentByPath("test.txt");
 
             // Assert
-            Assert.Single(context.Documents);
+            Assert.Null(result);
         }
     }
 
@@ -299,54 +254,6 @@ public class DocumentRepositoryTests
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.VersionCount);
-        }
-    }
-
-    [Fact]
-    public void DeleteDocument_ShouldDeleteDocumentWithVersionsFromDatabase()
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "DeleteDocument_ShouldDeleteDocumentWithVersionsFromDatabase")
-            .Options;
-
-        using (var context = new DatabaseContext(options))
-        {
-            var documentRepository = new DocumentRepository(context);
-            var document = new Document
-            {
-                Name = "Test Document",
-                FilePath = "test.txt",
-                CreationDate = DateTime.Now
-            };
-
-            documentRepository.AddDocument(document);
-
-            var version1 = new Database.Models.Version
-            {
-                DocumentId = document.Id,
-                VersionDescription = "Initial version",
-                FilePath = "test1.txt",
-                CreationDate = DateTime.Now
-            };
-
-            var version2 = new Database.Models.Version
-            {
-                DocumentId = document.Id,
-                VersionDescription = "Updated version",
-                FilePath = "test2.txt",
-                CreationDate = DateTime.Now
-            };
-
-            document.VersionCount++;
-            document.VersionCount++;
-
-            // Act
-            documentRepository.DeleteDocument(document);
-
-            // Assert
-            Assert.Empty(context.Documents);
-            Assert.Empty(context.Versions);
         }
     }
 
@@ -459,42 +366,135 @@ public class DocumentRepositoryTests
     }
 
     [Fact]
-    public void GetDocumentByPath_ShouldReturnNullIfDocumentDoesNotExist()
+    public void UpdateDocument_ShouldUpdateDocumentInDatabase()
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "GetDocumentByPath_ShouldReturnNullIfDocumentDoesNotExist")
+            .UseInMemoryDatabase(databaseName: "UpdateDocument_ShouldUpdateDocumentInDatabase")
             .Options;
 
         using (var context = new DatabaseContext(options))
         {
             var documentRepository = new DocumentRepository(context);
+            var document = new Document
+            {
+                Name = "Test Document",
+                FilePath = "test.txt",
+                CreationDate = DateTime.Now
+            };
+
+            documentRepository.AddDocument(document);
 
             // Act
-            var result = documentRepository.GetDocumentByPath("test.txt");
+            document.Name = "Updated Test Document";
+            documentRepository.UpdateDocument(document);
 
             // Assert
-            Assert.Null(result);
+            var result = documentRepository.GetDocumentById(1);
+            Assert.Equal("Updated Test Document", result.Name);
         }
     }
 
     [Fact]
-    public void GetDocumentById_ShouldReturnNullIfDocumentDoesNotExist()
+    public void SaveChanges_ShouldSaveChangesToDatabase()
     {
         // Arrange
         var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(databaseName: "GetDocumentById_ShouldReturnNullIfDocumentDoesNotExist")
+            .UseInMemoryDatabase(databaseName: "SaveChanges_ShouldSaveChangesToDatabase")
             .Options;
 
         using (var context = new DatabaseContext(options))
         {
             var documentRepository = new DocumentRepository(context);
+            var document = new Document
+            {
+                Name = "Test Document",
+                FilePath = "test.txt",
+                CreationDate = DateTime.Now
+            };
+
+            documentRepository.AddDocument(document);
 
             // Act
-            var result = documentRepository.GetDocumentById(1);
 
             // Assert
-            Assert.Null(result);
+            Assert.Single(context.Documents);
+        }
+    }
+
+    [Fact]
+    public void DeleteDocument_ShouldDeleteDocumentFromDatabase()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<DatabaseContext>()
+            .UseInMemoryDatabase(databaseName: "DeleteDocument_ShouldDeleteDocumentFromDatabase")
+            .Options;
+
+        using (var context = new DatabaseContext(options))
+        {
+            var documentRepository = new DocumentRepository(context);
+            var document = new Document
+            {
+                Name = "Test Document",
+                FilePath = "test.txt",
+                CreationDate = DateTime.Now
+            };
+
+            documentRepository.AddDocument(document);
+
+            // Act
+            documentRepository.DeleteDocument(document);
+
+            // Assert
+            Assert.Empty(context.Documents);
+        }
+    }
+
+    [Fact]
+    public void DeleteDocument_ShouldDeleteDocumentWithVersionsFromDatabase()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<DatabaseContext>()
+            .UseInMemoryDatabase(databaseName: "DeleteDocument_ShouldDeleteDocumentWithVersionsFromDatabase")
+            .Options;
+
+        using (var context = new DatabaseContext(options))
+        {
+            var documentRepository = new DocumentRepository(context);
+            var document = new Document
+            {
+                Name = "Test Document",
+                FilePath = "test.txt",
+                CreationDate = DateTime.Now
+            };
+
+            documentRepository.AddDocument(document);
+
+            var version1 = new Database.Models.Version
+            {
+                DocumentId = document.Id,
+                VersionDescription = "Initial version",
+                FilePath = "test1.txt",
+                CreationDate = DateTime.Now
+            };
+
+            var version2 = new Database.Models.Version
+            {
+                DocumentId = document.Id,
+                VersionDescription = "Updated version",
+                FilePath = "test2.txt",
+                CreationDate = DateTime.Now
+            };
+
+            document.VersionCount++;
+            document.VersionCount++;
+
+            // Act
+            documentRepository.DeleteDocument(document);
+
+            // Assert
+            Assert.Empty(context.Documents);
+            Assert.Empty(context.Versions);
         }
     }
 }
