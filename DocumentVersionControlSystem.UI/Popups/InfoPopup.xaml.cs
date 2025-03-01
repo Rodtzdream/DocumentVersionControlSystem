@@ -7,6 +7,8 @@ namespace DocumentVersionControlSystem.UI.Popups
         VersionCreationCanceled,
         VersionCreatedSuccessfully,
         NoChangesDetected,
+        VersionSwitched,
+        OnlyOneVersion,
         LoadVersionFailed,
         LoadDocumentFailed,
         DocumentNotFound,
@@ -45,6 +47,14 @@ namespace DocumentVersionControlSystem.UI.Popups
                 case InfoPopupType.NoChangesDetected:
                     TitleText.Text = "No changes detected";
                     MessageText.Text = "The selected file does not differ from the latest version. \nNo new version can be created.";
+                    break;
+                case InfoPopupType.VersionSwitched:
+                    TitleText.Text = "Version switched";
+                    MessageText.Text = "The version has been switched successfully.";
+                    break;
+                case InfoPopupType.OnlyOneVersion:
+                    TitleText.Text = "Only one version";
+                    MessageText.Text = "The document has only one version. No changes can be made.";
                     break;
                 case InfoPopupType.LoadVersionFailed:
                     TitleText.Text = "Load version failed";

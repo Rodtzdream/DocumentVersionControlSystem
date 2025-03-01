@@ -22,14 +22,23 @@ public partial class SelectSwitchOptionPopup : Window
 
     private void OkButton_Click(object sender, RoutedEventArgs e)
     {
-        this.DialogResult = true;
-        this.Close();
-        InputPopup = new InputPopup(this.Description);
-        InputPopup.TitleText.Text = "Enter version description:";
-        InputPopup.ShowDialog();
+        var popup = new InputPopup(this.Description)
+        {
+            TitleText = { Text = "Enter new version description:" }
+        };
+        popup.ShowDialog();
 
-        if (InputPopup.DialogResult == true)
-            Description = InputPopup.MessageText.Text;
+        if (popup.DialogResult == true)
+        {
+            Description = popup.MessageText.Text;
+            this.DialogResult = true;
+        }
+        else
+        {
+            this.DialogResult = false;
+            new InfoPopup(InfoPopupType.VersionCreationCanceled).ShowDialog();
+        }
+        this.Close();
     }
 
     private void DeleteNewer_Checked(object sender, RoutedEventArgs e)

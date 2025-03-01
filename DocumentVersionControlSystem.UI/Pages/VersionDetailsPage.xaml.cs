@@ -99,21 +99,30 @@ public partial class VersionDetailsPage : Page
         {
             if (popup.switchOption == SelectSwitchOptionPopup.SwitchOption.DeleteNewer)
             {
-                _versionControlManager.SwitchToVersionAndDeleteNewer(_version.DocumentId, _version.Id, popup.Description);
+                if (_versionControlManager.SwitchToVersionAndDeleteNewer(_version.DocumentId, _version.Id, popup.Description))
+                {
+                    _mainWindow.ShowInfoPopup(InfoPopupType.VersionSwitched);
+                    RefreshWindow();
+                }
+                else
+                {
+                    _mainWindow.ShowInfoPopup(InfoPopupType.OnlyOneVersion);
+                }
             }
             else if (popup.switchOption == SelectSwitchOptionPopup.SwitchOption.SaveAsTheLatest)
             {
                 var newVersion = _versionControlManager.SwitchToVersionAndSaveAsLatest(_version.DocumentId, _version.Id, popup.Description);
-                if (newVersion.Id == _version.Id)
+                if (newVersion.Id != _version.Id)
                 {
-                    _mainWindow.ShowInfoPopup(InfoPopupType.NoChangesDetected);
+                    _version = newVersion;
+                    _mainWindow.ShowInfoPopup(InfoPopupType.VersionSwitched);
+                    RefreshWindow();
                 }
                 else
                 {
-                    _version = newVersion;
+                    _mainWindow.ShowInfoPopup(InfoPopupType.NoChangesDetected);
                 }
             }
-            RefreshWindow();
         }
     }
 }

@@ -62,29 +62,33 @@ public class VersionControlManager
         return true;
     }
 
-    public void SwitchToVersionAndDeleteNewer(int documentId, int versionId, string description)
+    public bool SwitchToVersionAndDeleteNewer(int documentId, int versionId, string description)
     {
         var version = GetVersionById(versionId);
         var document = _documentRepository.GetDocumentById(documentId) ?? throw new InvalidOperationException($"Document with ID {documentId} not found.");
 
+        if (document.VersionCount == 1)
+        {
+            return false;
+        }
+
         _fileStorageManager.CopyFile(version.FilePath, document.FilePath);
 
-        if (document.VersionCount > 1)
-        {
-            var versionsToDelete = _versionRepository.GetVersionsByDocumentId(document.Id)
-                .Where(v => v.CreationDate > version.CreationDate)
-                .ToList();
+        var versionsToDelete = _versionRepository.GetVersionsByDocumentId(document.Id)
+            .Where(v => v.CreationDate > version.CreationDate)
+            .ToList();
 
-            foreach (var v in versionsToDelete)
-            {
-                _versionRepository.DeleteVersion(document, v);
-                _fileStorageManager.DeleteFile(v.FilePath);
-            }
+        foreach (var v in versionsToDelete)
+        {
+            _versionRepository.DeleteVersion(document, v);
+            _fileStorageManager.DeleteFile(v.FilePath);
         }
 
         _documentRepository.UpdateDocumentLastModifiedDate(document, DateTime.Now);
         _versionRepository.UpdateVersionDescription(version, description);
         _logger.LogInformation($"Switched to version {version.Id} for document {document.Id}");
+
+        return true;
     }
 
     public Version SwitchToVersionAndSaveAsLatest(int documentId, int versionId, string description)
