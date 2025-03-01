@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Media;
+using System.Runtime.Versioning;
+using System.Windows;
 
 namespace DocumentVersionControlSystem.UI.Popups
 {
@@ -27,11 +29,7 @@ namespace DocumentVersionControlSystem.UI.Popups
 
     public partial class InfoPopup : Window
     {
-        public InfoPopup()
-        {
-            InitializeComponent();
-        }
-
+        [SupportedOSPlatform("windows")]
         public InfoPopup(InfoPopupType popupType)
         {
             InitializeComponent();
@@ -114,13 +112,17 @@ namespace DocumentVersionControlSystem.UI.Popups
                     MessageText.Text = "Invalid file format. Only .txt files are allowed.";
                     break;
             }
+            SystemSounds.Exclamation.Play();
         }
 
+        [SupportedOSPlatform("windows")]
         public InfoPopup(string title, string message)
         {
             InitializeComponent();
             TitleText.Text = title;
             MessageText.Text = message;
+
+            SystemSounds.Exclamation.Play();
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
