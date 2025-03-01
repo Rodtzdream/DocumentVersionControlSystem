@@ -183,7 +183,8 @@ public partial class MainWindow : Window
 
     private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        _homePage.AdjustGridLayout(_documentManager.GetAllDocuments().Count + 1);
+        var allDocumentsCount = _documentManager.GetAllDocuments().Count + 1;
+        _homePage.AdjustGridLayout(allDocumentsCount);
 
         _selectedDocumentButton = _homePage.GetSelectedButton();
         if (_selectedDocumentButton != null)
@@ -193,17 +194,28 @@ public partial class MainWindow : Window
             AddVersionButtons();
         }
 
-        double newSize = Math.Max(16, ActualWidth * 0.01);
-        DocumentVersionsTextBlock.FontSize = newSize;
-        DocVersionControlTextBlock.FontSize = newSize;
+        double newSize = Math.Max(16, ActualWidth * 0.009);
+        MainTitle.FontSize = newSize;
+        SidePanelTitle.FontSize = newSize;
 
         if (_navigationButtonsStackPanel != null)
         {
+            double buttonWidth = _navigationButtonsStackPanel.ActualWidth * 0.021;
+            double buttonHeight = _navigationButtonsStackPanel.ActualHeight * 0.7;
             foreach (Button button in _navigationButtonsStackPanel.Children)
             {
-                button.Width = _navigationButtonsStackPanel.ActualWidth * 0.021;
-                button.Height = _navigationButtonsStackPanel.ActualHeight * 0.7;
+                button.Width = buttonWidth;
+                button.Height = buttonHeight;
             }
+        }
+
+        if (MainFrame.Content is DocumentViewerPage || MainFrame.Content is VersionDetailsPage)
+        {
+            var documentName = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).FirstOrDefault()?.Name;
+                int maxLength = MainFrame.Content is DocumentViewerPage ? (int)(ActualWidth / 40) : (int)(ActualWidth / 20);
+                MainTitle.Text = documentName.Length > maxLength
+                    ? $"{documentName.Substring(0, maxLength)}..."
+                    : $"{documentName}.txt";
         }
     }
 
@@ -482,6 +494,28 @@ public partial class MainWindow : Window
         if (e.Content is Page page)
         {
             Title = page.Title;
+
+            var currentPage = MainFrame.Content as Page;
+            switch (currentPage)
+            {
+                case HomePage:
+                    MainTitle.Text = "Document Version Control System";
+                    break;
+                case DocumentViewerPage:
+                    var documentName = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).FirstOrDefault()?.Name;
+                    int maxLength = (int)(ActualWidth / 40);
+                    MainTitle.Text = documentName.Length > maxLength
+                        ? $"{documentName.Substring(0, maxLength)}..."
+                        : $"{documentName}.txt";
+                    break;
+                case VersionDetailsPage:
+                    documentName = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).FirstOrDefault()?.Name;
+                    maxLength = (int)(ActualWidth / 20);
+                    MainTitle.Text = documentName.Length > maxLength
+                        ? $"{documentName.Substring(0, maxLength)}..."
+                        : $"{documentName}.txt";
+                    break;
+            }
         }
     }
 

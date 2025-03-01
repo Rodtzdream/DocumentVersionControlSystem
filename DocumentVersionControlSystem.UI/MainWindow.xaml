@@ -21,8 +21,8 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <TextBlock Name="DocumentVersionsTextBlock" Text="Document Versions" Grid.Column="0" Grid.Row="0" FontSize="16" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            <TextBlock Name="DocVersionControlTextBlock" Text="DocVersionControl" Grid.Column="1" Grid.Row="0" FontSize="16" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBlock Name="SidePanelTitle" Text="Document Versions" Grid.Column="0" Grid.Row="0" FontSize="16" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBlock Name="MainTitle" Text="Document Version Control System" Grid.Column="1" Grid.Row="0" FontSize="16" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
             <!-- Navigation Buttons -->
             <StackPanel Name="NavigationButtons" Grid.Column="1" Orientation="Horizontal" Margin="5,0,0,0">
