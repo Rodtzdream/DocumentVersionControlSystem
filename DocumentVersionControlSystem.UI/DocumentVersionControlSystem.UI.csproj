@@ -7,6 +7,9 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="images\document_icon.png;images\house-icon.png;images\line-angle-right-icon.png;images\plus.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -19,7 +22,7 @@
     <ProjectReference Include="..\DocumentVersionControlSystem.VersionControl\DocumentVersionControlSystem.VersionControl.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="images/document_icon.png;images/plus.png;images/house-icon.png;images/line-angle-left-icon.png;images/line-angle-right-icon.png" />
+    <Resource Include="images\document_icon.png;images\house-icon.png;images\icon.png;images\line-angle-left-icon.png;images\line-angle-right-icon.png;images\plus.png" />
   </ItemGroup>
   <ItemGroup>
     <None Update="database.db">

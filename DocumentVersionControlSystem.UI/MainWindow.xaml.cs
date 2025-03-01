@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Navigation;
 using System.Windows.Threading;
 using static DocumentVersionControlSystem.UI.DocumentRecoveryWindow;
 
@@ -439,29 +440,6 @@ public partial class MainWindow : Window
         }, DispatcherPriority.Background);
     }
 
-    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
-    {
-        if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
-        {
-            switch (e.SystemKey)
-            {
-                case Key.Left:
-                    PreviousButton_Click(sender, e);
-                    e.Handled = true;
-                    break;
-                case Key.Right:
-                    NextButton_Click(sender, e);
-                    e.Handled = true;
-                    break;
-            }
-        }
-        else if (e.Key == Key.Home)
-        {
-            HomeButton_Click(sender, e);
-            e.Handled = true;
-        }
-    }
-
     private void NextButton_Click(object sender, RoutedEventArgs e)
     {
         if (!MainFrame.CanGoForward) return;
@@ -497,6 +475,37 @@ public partial class MainWindow : Window
                     break;
             }
         }, DispatcherPriority.Background);
+    }
+
+    private void Frame_Navigated(object sender, NavigationEventArgs e)
+    {
+        if (e.Content is Page page)
+        {
+            Title = page.Title;
+        }
+    }
+
+    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+        {
+            switch (e.SystemKey)
+            {
+                case Key.Left:
+                    PreviousButton_Click(sender, e);
+                    e.Handled = true;
+                    break;
+                case Key.Right:
+                    NextButton_Click(sender, e);
+                    e.Handled = true;
+                    break;
+            }
+        }
+        else if (e.Key == Key.Home)
+        {
+            HomeButton_Click(sender, e);
+            e.Handled = true;
+        }
     }
 
     public void ShowInfoPopup(InfoPopupType popupType)

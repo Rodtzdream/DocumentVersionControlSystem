@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DocumentVersionControlSystem.UI.Windows"
         mc:Ignorable="d"
       d:DesignHeight="515" d:DesignWidth="850"
-        Title="DocumentViewer">
+        Title="Document viewer">
 
     <Grid>
         <Grid.ColumnDefinitions>

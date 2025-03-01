@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:DocumentVersionControlSystem.UI"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
         Title="MainWindow" MinHeight="515" Height="515" MinWidth="850" Width="850" Background="#D9D9D9"
-        ResizeMode="CanResize" Loaded="MainWindow_Loaded" Closed="MainWindow_Closed" PreviewKeyDown="Window_PreviewKeyDown">
+        ResizeMode="CanResize" Loaded="MainWindow_Loaded" Closed="MainWindow_Closed" PreviewKeyDown="Window_PreviewKeyDown"
+        Icon="images/icon.png">
 
     <Border BorderBrush="Black" BorderThickness="1">
         <Grid>
@@ -41,7 +42,7 @@
                 <StackPanel x:Name="ButtonStackPanel" Background="Transparent" MouseLeftButtonDown="Grid_MouseLeftButtonDown"/>
             </ScrollViewer>
 
-            <Frame x:Name="MainFrame" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" NavigationUIVisibility="Hidden" />
+            <Frame x:Name="MainFrame" Navigated="Frame_Navigated" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Grid.ColumnSpan="2" NavigationUIVisibility="Hidden" />
         </Grid>
     </Border>
 </Window>
