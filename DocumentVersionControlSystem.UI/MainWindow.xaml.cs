@@ -58,8 +58,7 @@ public partial class MainWindow : Window
         InitializeDynamicGrid();
 
         var missingDocs = _documentManager.VerifyDocumentsIntegrity();
-        if (missingDocs.Count > 0)
-            RecoverDocuments(missingDocs);
+        RecoverDocuments(missingDocs);
     }
 
     private static void ApplyMigration(DatabaseContext databaseContext)
@@ -107,15 +106,21 @@ public partial class MainWindow : Window
 
         if (_documentManager.IsFileExternallyDeleted())
         {
-            RecoverDocuments(_documentManager.VerifyDocumentsIntegrity());
+            var missingDocs = _documentManager.VerifyDocumentsIntegrity();
+            RecoverDocuments(missingDocs);
             _documentManager.SetFileExternallyDeleted(false);
+
+            if (WindowState == WindowState.Minimized)
+            {
+                WindowState = WindowState.Normal;
+            }
         }
 
-        var allDocumentsCount = _documentManager.GetAllDocuments().Count + 1;
+        var allDocumentsCount = _documentManager.GetAllDocuments().Count;
         switch (currentPage)
         {
             case HomePage:
-                _homePage.AdjustGridLayout(allDocumentsCount);
+                _homePage.AdjustGridLayout(allDocumentsCount + 1);
                 ClearVersionButtons();
                 break;
             case DocumentViewerPage documentViewerPage:
@@ -141,8 +146,8 @@ public partial class MainWindow : Window
 
     private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        var allDocumentsCount = _documentManager.GetAllDocuments().Count + 1;
-        _homePage.AdjustGridLayout(allDocumentsCount);
+        var allDocumentsCount = _documentManager.GetAllDocuments().Count;
+        _homePage.AdjustGridLayout(allDocumentsCount + 1);
 
         _selectedDocumentButton = _homePage.GetSelectedButton();
         if (_selectedDocumentButton != null)
@@ -204,7 +209,7 @@ public partial class MainWindow : Window
     private void NavigateToHomePage(int allDocumentsCount, InfoPopupType popupType)
     {
         MainFrame.Navigate(_homePage);
-        _homePage.AdjustGridLayout(allDocumentsCount);
+        _homePage.AdjustGridLayout(allDocumentsCount + 1);
         ClearVersionButtons();
         ShowInfoPopup(popupType);
     }
@@ -328,6 +333,9 @@ public partial class MainWindow : Window
     // Document handling
     public void RecoverDocuments(List<Document> missingDocs)
     {
+        if (missingDocs.Count == 0)
+            return;
+
         var missingDocuments = new ObservableCollection<MissingDocumentViewModel>();
 
         foreach (var doc in missingDocs)
@@ -541,7 +549,7 @@ public partial class MainWindow : Window
                     _versionControlManager.DeleteVersion((int)parentButton.CommandParameter);
                     MainFrame.Navigate(_homePage);
                     ClearVersionButtons();
-                    ShowInfoPopup(InfoPopupType.CurrentVersionDeleted);
+                    ShowInfoPopup(InfoPopupType.OpenVersionDeleted);
                 }
                 else
                 {

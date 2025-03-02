@@ -46,7 +46,7 @@ public class DocumentManager
     public void StopAllWatchers()
     {
         foreach (var watcher in _fileWatchers)
-            watcher.Stop();
+            watcher.Dispose();
         _fileWatchers.Clear();
     }
 
@@ -195,9 +195,12 @@ public class DocumentManager
         {
             try
             {
-                if (!Directory.Exists(Path.Combine(_appFolderPath, "Documents", newName)))
+                var oldDocumentPath = Path.Combine(_appFolderPath, "Documents", document.Name);
+                var newDocumentPath = Path.Combine(_appFolderPath, "Documents", newName);
+
+                if (!Directory.Exists(newDocumentPath))
                 {
-                    Directory.Move(Path.Combine(_appFolderPath, "Documents", document.Name), Path.Combine(_appFolderPath, "Documents", newName));
+                    Directory.Move(oldDocumentPath, newDocumentPath);
                 }
             }
             catch (Exception ex)
@@ -206,6 +209,13 @@ public class DocumentManager
                 return;
             }
         }
+
+        var watcher = _fileWatchers.FirstOrDefault(w => w.FileName == document.Name);
+        if (watcher != null)
+        {
+            watcher.Dispose();
+        }
+        _fileWatchers.Add(new FileChangeWatcher(newFilePath, HandleFileRenamed, HandleFileDeleted));
 
         document.FilePath = newFilePath;
         document.Name = newName;

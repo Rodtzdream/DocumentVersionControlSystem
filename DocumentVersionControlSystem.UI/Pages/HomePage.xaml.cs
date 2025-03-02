@@ -279,8 +279,7 @@ public partial class HomePage : Page
                 return;
             }
 
-            _totalButtons++;
-            AdjustGridLayout(_totalButtons);
+            AdjustGridLayout(++_totalButtons);
 
             new InfoPopup("Document added successfully", $"File {Path.GetFileName(filePath)} added successfully!").Show();
         }
@@ -383,7 +382,7 @@ public partial class HomePage : Page
     {
         var document = _documentManager.GetDocumentsByName(_selectedDocumentButton.Content.ToString()).First();
         _documentManager.DeleteDocument(document);
-        AdjustGridLayout(_totalButtons);
+        AdjustGridLayout(--_totalButtons);
         _mainWindow.ClearVersionButtons();
         MainWindow.ShowInfoPopup(InfoPopupType.SuccessfulDocumentRemove);
     }
