@@ -1,6 +1,6 @@
 # Document Version Control System (0.9.0-beta)
 
-A desktop application for managing document versions, built with .NET 8 and WPF. Features include versioning, external editing, adaptive UI scaling, and security mechanisms to prevent external tampering. The application is powered by SQLite, EF Core, DiffPlex, and Serilog. Please note that the search and differencing features are not implemented for this version.
+A desktop application for managing document versions, built with .NET 8 and WPF. Features include versioning, external editing, adaptive UI scaling, and security mechanisms to prevent external tampering. The application is powered by SQLite, EF Core, DiffPlex, and Serilog.
 
 ## Features
 
