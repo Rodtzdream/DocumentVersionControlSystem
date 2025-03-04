@@ -1,7 +1,7 @@
 ﻿<Window x:Class="DocumentVersionControlSystem.UI.Popups.InputPopup"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Information" Height="160" Width="400" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" KeyDown="Window_KeyDown" Icon="../images/icon.png">
+        Title="Information" Height="160" Width="400" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" KeyDown="Window_KeyDown" Icon="../Resources/App.ico">
     <Grid>
         <!-- Заголовок -->
         <TextBlock x:Name="TitleText" Text="" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0"/>

@@ -7,7 +7,7 @@
         mc:Ignorable="d" WindowStartupLocation="CenterScreen"
         Title="MainWindow" MinHeight="515" Height="515" MinWidth="850" Width="850" Background="#D9D9D9"
         ResizeMode="CanResize" Loaded="MainWindow_Loaded" Closed="MainWindow_Closed" PreviewKeyDown="Window_PreviewKeyDown"
-        Icon="images/icon.png">
+        Icon="Resources/App.ico">
 
     <Border BorderBrush="Black" BorderThickness="1">
         <Grid>

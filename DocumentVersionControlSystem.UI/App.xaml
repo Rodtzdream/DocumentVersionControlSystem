@@ -29,7 +29,7 @@
                                     <RowDefinition Height="2*" />
                                     <RowDefinition Height="1*" />
                                 </Grid.RowDefinitions>
-                                <Image Source="images/document_icon.png" 
+                                <Image Source="Resources/document-icon.png" 
                                        HorizontalAlignment="Center" 
                                        Grid.Row="0" Margin="0,5,0,0" Width="38" Height="38" />
                                 <TextBlock Text="{TemplateBinding Tag}"
@@ -98,7 +98,7 @@
                                     <RowDefinition Height="2*" />
                                     <RowDefinition Height="1*" />
                                 </Grid.RowDefinitions>
-                                <Image Source="images/plus.png" 
+                                <Image Source="Resources/plus.png" 
                                HorizontalAlignment="Center" 
                                Grid.Row="0" Margin="0,5,0,0" Width="20" Height="20" />
                                 <TextBlock Text="Add document"
@@ -176,7 +176,7 @@
                                 BorderThickness="{TemplateBinding BorderThickness}" 
                                 CornerRadius="5">
                             <Grid>
-                                <Image Source="images/house-icon.png" 
+                                <Image Source="Resources/house-icon.png" 
                                        HorizontalAlignment="Center" 
                                        VerticalAlignment="Center" 
                                        Stretch="Uniform" Margin="3,3,3,3"/>
@@ -201,7 +201,7 @@
                         BorderThickness="{TemplateBinding BorderThickness}" 
                         CornerRadius="5">
                             <Grid>
-                                <Image Source="images/line-angle-left-icon.png" 
+                                <Image Source="Resources/line-angle-left-icon.png" 
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
                                Stretch="Uniform" Margin="5,5,5,5"/>
@@ -226,7 +226,7 @@
                         BorderThickness="{TemplateBinding BorderThickness}" 
                         CornerRadius="5">
                             <Grid>
-                                <Image Source="images/line-angle-right-icon.png" 
+                                <Image Source="Resources/line-angle-right-icon.png" 
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
                                Stretch="Uniform" Margin="5,5,5,5"/>
